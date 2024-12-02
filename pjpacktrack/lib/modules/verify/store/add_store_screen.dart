@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pjpacktrack/store/store_provider.dart';
+import 'package:pjpacktrack/future/store_provider.dart';
 
 class AddStoreScreen extends ConsumerStatefulWidget {
   final String uid;

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:pjpacktrack/store/add_store_screen.dart';
-import 'package:pjpacktrack/store/firebase_auth_provider.dart';
-import 'package:pjpacktrack/store/store_provider.dart';
-import 'package:pjpacktrack/store/store_selected_provider.dart';
-import 'package:pjpacktrack/ui/QRScannerAndVideo.dart';
+import 'package:pjpacktrack/modules/verify/store/add_store_screen.dart';
+import 'package:pjpacktrack/future/firebase_auth_provider.dart';
+import 'package:pjpacktrack/future/store_provider.dart';
+import 'package:pjpacktrack/future/store_selected_provider.dart';
+import 'package:pjpacktrack/modules/ui/QRScannerAndVideo.dart';
 // Import ProcessScreen
 
 class StoreListScreen extends ConsumerWidget {

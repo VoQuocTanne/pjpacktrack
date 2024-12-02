@@ -1,10 +1,10 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pjpacktrack/auth/auth_provider.dart';
-import 'package:pjpacktrack/auth/signup.dart';
-import 'package:pjpacktrack/store/list_store_screen.dart';
-import 'package:pjpacktrack/ui/QRScannerAndVideo.dart';
+import 'package:pjpacktrack/future/auth_provider.dart';
+import 'package:pjpacktrack/modules/verify/auth/signup.dart';
+import 'package:pjpacktrack/modules/verify/store/list_store_screen.dart';
+import 'package:pjpacktrack/modules/ui/QRScannerAndVideo.dart';
 
 class LoginScreen extends ConsumerWidget {
   final TextEditingController emailController = TextEditingController();

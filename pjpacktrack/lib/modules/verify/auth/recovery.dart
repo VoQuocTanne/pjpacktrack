@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:pjpacktrack/auth/login.dart';
+import 'package:pjpacktrack/modules/verify/auth/login.dart';
 
 class RecoveryEmailAddress extends StatefulWidget {
   const RecoveryEmailAddress({super.key});

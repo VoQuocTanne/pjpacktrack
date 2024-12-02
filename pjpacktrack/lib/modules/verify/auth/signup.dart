@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pjpacktrack/auth/auth_provider.dart';
-import 'package:pjpacktrack/auth/login.dart';
+import 'package:pjpacktrack/future/auth_provider.dart';
+import 'package:pjpacktrack/modules/verify/auth/login.dart';
 
 class SignUpScreen extends ConsumerWidget {
   final TextEditingController emailController = TextEditingController();

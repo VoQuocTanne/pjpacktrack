@@ -2,7 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pjpacktrack/ui/QRScannerAndVideo.dart';
+import 'package:pjpacktrack/modules/ui/QRScannerAndVideo.dart';
 
 class Verify extends StatefulWidget {
   const Verify({super.key});

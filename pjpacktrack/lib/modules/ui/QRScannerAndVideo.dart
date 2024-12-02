@@ -1,8 +1,8 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:pjpacktrack/ui/RecordingScreen.dart';
-import 'package:pjpacktrack/ui/odervideo.dart';
-import 'package:pjpacktrack/ui/profile.dart';
+import 'package:pjpacktrack/modules/ui/RecordingScreen.dart';
+import 'package:pjpacktrack/modules/ui/odervideo.dart';
+import 'package:pjpacktrack/modules/ui/profile.dart';
 
 class QRScannerAndVideo extends StatefulWidget {
   final List<CameraDescription> cameras;
