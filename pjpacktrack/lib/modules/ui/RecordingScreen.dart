@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:path/path.dart' as p;
 import 'package:aws_storage_service/aws_storage_service.dart';
+import 'package:pjpacktrack/modules/ui/aws_config.dart';
 
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -21,7 +22,10 @@ class _RecordingScreenState extends State<RecordingScreen> {
   final List<String> _videoPaths = [];
 
   final AwsCredentialsConfig credentialsConfig = AwsCredentialsConfig(
-    
+    accessKey: AwsConfig.accessKey, // Sử dụng giá trị từ AwsConfig
+    secretKey: AwsConfig.secretKey,
+    bucketName: AwsConfig.bucketName,
+    region: AwsConfig.region,
   );
 
   @override

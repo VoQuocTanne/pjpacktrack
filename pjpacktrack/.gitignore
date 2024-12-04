@@ -9,7 +9,7 @@
 .history
 .svn/
 migrate_working_dir/
-
+/lib/modules/ui/aws_config.dart
 # IntelliJ related
 *.iml
 *.ipr
