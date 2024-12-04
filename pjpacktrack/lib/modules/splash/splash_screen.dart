@@ -106,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 } else if (role == 'owner') {
                   // return OwnerDashboard();
                 } else if (role == 'user') {
-                  return BottomTabScreen(cameras: cameras,);
+                  return BottomTabScreen();
                 } else {
                   return Scaffold(
                     body: Center(

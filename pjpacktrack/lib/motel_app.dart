@@ -12,7 +12,6 @@ import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/logic/controllers/theme_provider.dart';
 import 'package:pjpacktrack/model/user_repo/firebase_user_repo.dart';
 import 'package:pjpacktrack/model/user_repo/user_repo.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pjpacktrack/modules/bottom_tab/bottom_tab_screen.dart';
 import 'package:pjpacktrack/modules/login/login_screen.dart';
 import 'package:pjpacktrack/modules/splash/introduction_screen.dart';
