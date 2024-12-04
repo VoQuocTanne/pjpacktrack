@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>976775636394-nsaqi0vtop1pmbjhmku64qdob5qdm1qt.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.976775636394-nsaqi0vtop1pmbjhmku64qdob5qdm1qt</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>976775636394-getri3u34u5qog4i3p1kcnqo0rg2u8uh.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAWMaDk5K9sl8Ki-S0qE32luMBzyJfN0uA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>976775636394</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.pjpacktrack</string>
+	<key>PROJECT_ID</key>
+	<string>jgpacktrack</string>
+	<key>STORAGE_BUCKET</key>
+	<string>jgpacktrack.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:976775636394:ios:6726acd036ad7cf4e6f7d3</string>
+	<key>DATABASE_URL</key>
+	<string>https://jgpacktrack-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

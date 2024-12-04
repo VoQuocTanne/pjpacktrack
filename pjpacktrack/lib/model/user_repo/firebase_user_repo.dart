@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_login_facebook/flutter_login_facebook.dart';
+// import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,13 +15,13 @@ class FirebaseUserRepository implements UserRepository {
   FirebaseUserRepository({
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
-    FacebookLogin? facebookAuth,
+    // FacebookLogin? facebookAuth,
   })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn(),
-        _facebookAuth = facebookAuth ?? FacebookLogin();
+        _googleSignIn = googleSignIn ?? GoogleSignIn();
+        // _facebookAuth = facebookAuth ?? FacebookLogin();
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
-  final FacebookLogin _facebookAuth;
+  // final FacebookLogin _facebookAuth;
   final usersCollection = FirebaseFirestore.instance.collection('users');
   final CollectionReference userCollection =
       FirebaseFirestore.instance.collection('users');
@@ -100,42 +100,42 @@ class FirebaseUserRepository implements UserRepository {
   }
 
   @override
-  Future<MyUser> signInFacebook() async {
-    try {
-      final FacebookLoginResult loginResult = await _facebookAuth.logIn();
-      if (loginResult.status == FacebookLoginStatus.success) {
-        final FacebookAccessToken accessToken = loginResult.accessToken!;
-        final credential = FacebookAuthProvider.credential(accessToken.token);
-        final UserCredential userCredential =
-            await _firebaseAuth.signInWithCredential(credential);
-        final myUser = MyUser(
-            userId: userCredential
-                .user!.uid, // Hoặc để trống nếu không cần tại thời điểm này
-            email: userCredential.user?.email ?? '',
-            fullname: userCredential.user!.displayName ?? 'User',
-            picture: userCredential.user!.photoURL ?? null, // Nếu không có ảnh
-            phonenumber: userCredential.user?.phoneNumber ??
-                '', // Nếu chưa có số điện thoại
-            birthday: DateTime.now(), // Nếu không có ngày sinh cụ thể
-            role: 'user', // Gán quyền mặc định
-            status: 'active');
+  // Future<MyUser> signInFacebook() async {
+  //   try {
+  //     final FacebookLoginResult loginResult = await _facebookAuth.logIn();
+  //     if (loginResult.status == FacebookLoginStatus.success) {
+  //       final FacebookAccessToken accessToken = loginResult.accessToken!;
+  //       final credential = FacebookAuthProvider.credential(accessToken.token);
+  //       final UserCredential userCredential =
+  //           await _firebaseAuth.signInWithCredential(credential);
+  //       final myUser = MyUser(
+  //           userId: userCredential
+  //               .user!.uid, // Hoặc để trống nếu không cần tại thời điểm này
+  //           email: userCredential.user?.email ?? '',
+  //           fullname: userCredential.user!.displayName ?? 'User',
+  //           picture: userCredential.user!.photoURL ?? null, // Nếu không có ảnh
+  //           phonenumber: userCredential.user?.phoneNumber ??
+  //               '', // Nếu chưa có số điện thoại
+  //           birthday: DateTime.now(), // Nếu không có ngày sinh cụ thể
+  //           role: 'user', // Gán quyền mặc định
+  //           status: 'active');
 
-        return myUser;
-      } else {
-        throw Exception("Sign-In was canceled by user");
-      }
-    } catch (e) {
-      log(e.toString());
-      rethrow;
-    }
-  }
+  //       return myUser;
+  //     } else {
+  //       throw Exception("Sign-In was canceled by user");
+  //     }
+  //   } catch (e) {
+  //     log(e.toString());
+  //     rethrow;
+  //   }
+  // }
 
   @override
   Future<void> logOut() async {
     try {
       await _googleSignIn.signOut();
       await _firebaseAuth.signOut();
-      await _facebookAuth.logOut();
+      // await _facebookAuth.logOut();
     } catch (e) {
       log(e.toString());
       rethrow;

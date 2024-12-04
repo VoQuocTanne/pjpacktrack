@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "976775636394",
+    "firebase_url": "https://jgpacktrack-default-rtdb.firebaseio.com",
     "project_id": "jgpacktrack",
     "storage_bucket": "jgpacktrack.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.pjpacktrack"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "976775636394-getri3u34u5qog4i3p1kcnqo0rg2u8uh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pjpacktrack",
+            "certificate_hash": "152e1c8b66f2c9d456e2f75d3dec15d1962767c8"
+          }
+        },
+        {
+          "client_id": "976775636394-dmsufh669u1nb8ds6d3k3lfmfsd6gk43.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAk0EzcMrVyH4Km_xIyPYZbT8KQJBFGlEE"
@@ -20,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "976775636394-dmsufh669u1nb8ds6d3k3lfmfsd6gk43.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "976775636394-nsaqi0vtop1pmbjhmku64qdob5qdm1qt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pjpacktrack"
+              }
+            }
+          ]
         }
       }
     }
