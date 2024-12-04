@@ -62,10 +62,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      const Padding(
-                        padding: EdgeInsets.only(top: 32),
-                        child: FacebookGoogleButtonView(),
-                      ),
+                      // const Padding(
+                      //   padding: EdgeInsets.only(top: 32),
+                      //   child: FacebookGoogleButtonView(),
+                      // ),
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(

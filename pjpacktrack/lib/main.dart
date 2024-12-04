@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:get/instance_manager.dart';
 import 'package:pjpacktrack/firebase_options.dart';
 import 'package:pjpacktrack/language/app_localizations.dart';
@@ -13,6 +12,7 @@ import 'package:pjpacktrack/logic/controllers/theme_provider.dart';
 import 'package:pjpacktrack/model/user_repo/firebase_user_repo.dart';
 import 'package:pjpacktrack/motel_app.dart';
 import 'package:pjpacktrack/widgets/app_constant.dart';
+
 late List<CameraDescription> cameras;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

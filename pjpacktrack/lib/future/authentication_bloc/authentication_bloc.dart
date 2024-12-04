@@ -46,22 +46,22 @@ class AuthenticationBloc
       }
     });
 
-    // Xử lý sự kiện đăng nhập với Facebook
-    on<SignInWithFacebookRequested>((event, emit) async {
-      emit(SignInProcess());
-      try {
-        MyUser user = await userRepository.signInFacebook();
-        final userDoc =
-            FirebaseFirestore.instance.collection('users').doc(user.userId);
-        final userSnapshot = await userDoc.get();
-        if (!userSnapshot.exists) {
-          await userRepository.setUserData(user);
-        }
-        emit(SignInSuccess());
-      } catch (e) {
-        emit(SignInFailure(e.toString()));
-      }
-    });
+    // // Xử lý sự kiện đăng nhập với Facebook
+    // on<SignInWithFacebookRequested>((event, emit) async {
+    //   emit(SignInProcess());
+    //   try {
+    //     MyUser user = await userRepository.signInFacebook();
+    //     final userDoc =
+    //         FirebaseFirestore.instance.collection('users').doc(user.userId);
+    //     final userSnapshot = await userDoc.get();
+    //     if (!userSnapshot.exists) {
+    //       await userRepository.setUserData(user);
+    //     }
+    //     emit(SignInSuccess());
+    //   } catch (e) {
+    //     emit(SignInFailure(e.toString()));
+    //   }
+    // });
 
     // Xử lý sự kiện đăng nhập với email và password
     on<SignInRequired>((event, emit) async {
