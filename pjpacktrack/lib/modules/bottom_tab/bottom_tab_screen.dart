@@ -21,7 +21,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
   late AnimationController _animationController;
   bool _isFirstTime = true;
   Widget _indexView = Container();
-  BottomBarType bottomBarType = BottomBarType.explore;
+  BottomBarType bottomBarType = BottomBarType.order;
 
   @override
   void initState() {
@@ -67,11 +67,11 @@ class _BottomTabScreenState extends State<BottomTabScreen>
     if (tabType != bottomBarType) {
       bottomBarType = tabType;
       _animationController.reverse().then((f) {
-        if (tabType == BottomBarType.explore) {
+        if (tabType == BottomBarType.order) {
           setState(() {
             _indexView = OrderHistoryScreen();
           });
-        } else if (tabType == BottomBarType.trips) {
+        } else if (tabType == BottomBarType.camqr) {
           setState(() {
             _indexView = RecordingScreen(cameras: widget.cameras);
           });
@@ -96,18 +96,18 @@ class _BottomTabScreenState extends State<BottomTabScreen>
             children: <Widget>[
               TabButtonUI(
                 icon: Icons.search,
-                isSelected: tabType == BottomBarType.explore,
+                isSelected: tabType == BottomBarType.order,
                 text: Loc.alized.explore,
                 onTap: () {
-                  tabClick(BottomBarType.explore);
+                  tabClick(BottomBarType.order);
                 },
               ),
               TabButtonUI(
-                icon: FontAwesomeIcons.heart,
-                isSelected: tabType == BottomBarType.trips,
+                icon: FontAwesomeIcons.qrcode,
+                isSelected: tabType == BottomBarType.camqr,
                 text: Loc.alized.trips,
                 onTap: () {
-                  tabClick(BottomBarType.trips);
+                  tabClick(BottomBarType.camqr);
                 },
               ),
               TabButtonUI(
@@ -129,4 +129,4 @@ class _BottomTabScreenState extends State<BottomTabScreen>
   }
 }
 
-enum BottomBarType { explore, trips, profile }
+enum BottomBarType { order, camqr, profile }

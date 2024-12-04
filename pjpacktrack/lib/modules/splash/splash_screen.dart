@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,12 +8,14 @@ import 'package:pjpacktrack/constants/text_styles.dart';
 import 'package:pjpacktrack/future/authentication_bloc/authentication_bloc.dart';
 import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/logic/controllers/theme_provider.dart';
+import 'package:pjpacktrack/main.dart';
 import 'package:pjpacktrack/modules/bottom_tab/bottom_tab_screen.dart';
 import 'package:pjpacktrack/routes/route_names.dart';
 import 'package:pjpacktrack/widgets/common_button.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  final List<CameraDescription> cameras;
+  const SplashScreen({Key? key, required this.cameras}) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -106,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 } else if (role == 'owner') {
                   // return OwnerDashboard();
                 } else if (role == 'user') {
-                  return BottomTabScreen();
+                  return BottomTabScreen(cameras: cameras);
                 } else {
                   return Scaffold(
                     body: Center(
@@ -116,11 +119,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 }
               }
 
-              return Scaffold(
-                body: Center(
-                  child: Text('Không tìm thấy dữ liệu người dùng.'),
-                ),
-              );
+              return BottomTabScreen(cameras: cameras);
             },
           );
         } else {

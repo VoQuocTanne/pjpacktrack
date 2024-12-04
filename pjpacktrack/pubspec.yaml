@@ -85,7 +85,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-      - packages/flutter_hotel_booking_ver2/language/lang/language_text.json
+      - packages/pjpacktrack/language/lang/language_text.json
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

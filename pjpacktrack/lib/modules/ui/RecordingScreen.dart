@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -22,10 +21,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
   final List<String> _videoPaths = [];
 
   final AwsCredentialsConfig credentialsConfig = AwsCredentialsConfig(
-    accessKey: '',
-    secretKey: '',
-    bucketName: 'mybucket-packtrack',
-    region: 'ap-southeast-1',
+    
   );
 
   @override
@@ -136,31 +132,32 @@ class _RecordingScreenState extends State<RecordingScreen> {
       ),
       body: Stack(
         children: [
-          CameraPreview(_cameraController!),
-          Positioned(
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: MobileScanner(onDetect: (BarcodeCapture capture) async {
-              if (_isScanning && !_isRecording) {
-                final barcode = capture.barcodes.first;
-                final String? code = barcode.rawValue;
-
-                if (code != null) {
-                  setState(() {
-                    _isScanning = false;
-                  });
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Mã QR/Barcode: $code')),
-                  );
-
-                  await _startRecording();
-                }
-              }
-            }),
+          // CameraPreview chiếm toàn bộ màn hình
+          Positioned.fill(
+            child: CameraPreview(_cameraController!),
           ),
+          // MobileScanner nằm trên cùng và chỉ hoạt động khi quét
+          if (_isScanning)
+            Positioned.fill(
+              child: MobileScanner(onDetect: (BarcodeCapture capture) async {
+                if (_isScanning && !_isRecording) {
+                  final barcode = capture.barcodes.first;
+                  final String? code = barcode.rawValue;
+
+                  if (code != null) {
+                    setState(() {
+                      _isScanning = false;
+                    });
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Mã QR/Barcode: $code')),
+                    );
+
+                    await _startRecording();
+                  }
+                }
+              }),
+            ),
         ],
       ),
       bottomNavigationBar: Container(

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +11,7 @@ import 'package:pjpacktrack/constants/themes.dart';
 import 'package:pjpacktrack/future/authentication_bloc/authentication_bloc.dart';
 import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/logic/controllers/theme_provider.dart';
+import 'package:pjpacktrack/main.dart';
 import 'package:pjpacktrack/model/user_repo/firebase_user_repo.dart';
 import 'package:pjpacktrack/model/user_repo/user_repo.dart';
 import 'package:pjpacktrack/modules/bottom_tab/bottom_tab_screen.dart';
@@ -112,10 +114,10 @@ class _MotelAppState extends State<MotelApp> {
 
   Map<String, WidgetBuilder> _buildRoutes() {
     return {
-      RoutesName.splash: (BuildContext context) => const SplashScreen(),
+      RoutesName.splash: (BuildContext context) => SplashScreen(cameras: cameras),
       RoutesName.introductionScreen: (BuildContext context) =>
           IntroductionScreen(FirebaseUserRepository()),
-      RoutesName.home: (BuildContext context) => const BottomTabScreen(),
+      RoutesName.home: (BuildContext context) => BottomTabScreen(cameras: cameras),
       RoutesName.login: (BuildContext context) => const LoginScreen(),
     };
   }
