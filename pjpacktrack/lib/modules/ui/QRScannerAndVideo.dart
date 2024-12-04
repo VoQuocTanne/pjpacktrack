@@ -2,7 +2,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:pjpacktrack/modules/ui/RecordingScreen.dart';
 import 'package:pjpacktrack/modules/ui/odervideo.dart';
-import 'package:pjpacktrack/modules/ui/profile.dart';
 
 class QRScannerAndVideo extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -21,7 +20,6 @@ class _QRScannerAndVideoState extends State<QRScannerAndVideo> {
   void initState() {
     super.initState();
     _screens = [
-      ProfileScreen(), // Hồ sơ
       RecordingScreen(cameras: widget.cameras), // Ghi hình
       OrderHistoryScreen(), // Đơn hàng
     ];

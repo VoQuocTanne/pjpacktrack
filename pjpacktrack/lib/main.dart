@@ -1,28 +1,35 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pjpacktrack/modules/verify/auth/login.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/instance_manager.dart';
+import 'package:pjpacktrack/firebase_options.dart';
+import 'package:pjpacktrack/language/app_localizations.dart';
+import 'package:pjpacktrack/logic/controllers/theme_provider.dart';
+import 'package:pjpacktrack/model/user_repo/firebase_user_repo.dart';
+import 'package:pjpacktrack/motel_app.dart';
+import 'package:pjpacktrack/widgets/app_constant.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(const ProviderScope(child: MyApp()));
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Quét QR & Quay Video',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: LoginScreen(),
-    );
+  if (!kIsWeb) {
+    Stripe.publishableKey = publishableKey;
   }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await Get.putAsync<Loc>(() => Loc().init(), permanent: true);
+
+  await Get.putAsync<ThemeController>(() => ThemeController.init(),
+      permanent: true);
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]).then((_) => runApp(ProviderScope(
+      child: MotelApp(FirebaseUserRepository())))); // Thêm ProviderScope ở đây
 }
