@@ -10,6 +10,7 @@
 .svn/
 migrate_working_dir/
 /lib/modules/ui/aws_config.dart
+/assets/dialog_flow_auth.json
 # IntelliJ related
 *.iml
 *.ipr

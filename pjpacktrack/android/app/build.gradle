@@ -45,3 +45,12 @@ android {
 flutter {
     source = "../.."
 }
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:32.2.3')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation 'com.facebook.android:facebook-login:16.0.0' // Thêm Facebook Login SDK
+}
+
+// Bắt buộc cho Firebase
+apply plugin: 'com.google.gms.google-services'
