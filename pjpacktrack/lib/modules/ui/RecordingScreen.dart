@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:path/path.dart' as p;
 import 'package:aws_storage_service/aws_storage_service.dart';
 import 'package:pjpacktrack/modules/ui/aws_config.dart';
+import 'package:pjpacktrack/modules/ui/delivery_option.dart';
 
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -17,12 +20,16 @@ class RecordingScreen extends StatefulWidget {
 
 class _RecordingScreenState extends State<RecordingScreen> {
   CameraController? _cameraController;
+  MobileScannerController? _scannerController;
   bool _isRecording = false;
   bool _isScanning = true;
+  bool _isFlashOn = false;
+  String? _lastScannedCode;
+  String? _selectedDeliveryOption;
   final List<String> _videoPaths = [];
 
   final AwsCredentialsConfig credentialsConfig = AwsCredentialsConfig(
-    accessKey: AwsConfig.accessKey, // Sử dụng giá trị từ AwsConfig
+    accessKey: AwsConfig.accessKey,
     secretKey: AwsConfig.secretKey,
     bucketName: AwsConfig.bucketName,
     region: AwsConfig.region,
@@ -31,30 +38,56 @@ class _RecordingScreenState extends State<RecordingScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeCamera();
+    _initializeScannerController();
+  }
+
+  void _initializeScannerController() {
+    _scannerController = MobileScannerController(
+      detectionSpeed: DetectionSpeed.normal,
+      facing: CameraFacing.back,
+      formats: [BarcodeFormat.qrCode],
+    );
   }
 
   Future<void> _initializeCamera() async {
-    _cameraController = CameraController(
-      widget.cameras[0],
-      ResolutionPreset.high,
-      enableAudio: true,
-    );
-    await _cameraController!.initialize();
-    setState(() {});
+    try {
+      _cameraController = CameraController(
+        widget.cameras[0],
+        ResolutionPreset.high,
+        enableAudio: true,
+      );
+      await _cameraController!.initialize();
+      if (mounted) setState(() {});
+    } catch (e) {
+      print('Camera initialization error: $e');
+    }
+  }
+
+  void _toggleFlash() async {
+    if (_isScanning) {
+      await _scannerController?.toggleTorch();
+      setState(() => _isFlashOn = !_isFlashOn);
+    } else if (_cameraController != null) {
+      try {
+        final newFlashMode = _isFlashOn ? FlashMode.off : FlashMode.torch;
+        await _cameraController!.setFlashMode(newFlashMode);
+        setState(() => _isFlashOn = !_isFlashOn);
+      } catch (e) {
+        print('Flash toggle error: $e');
+      }
+    }
   }
 
   Future<void> _startRecording() async {
+    await _scannerController?.stop();
+    await _initializeCamera();
+
     if (_cameraController != null && !_isRecording) {
       try {
         await _cameraController!.startVideoRecording();
-        setState(() {
-          _isRecording = true;
-        });
+        setState(() => _isRecording = true);
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi bắt đầu quay video: $e')),
-        );
+        print('Recording start error: $e');
       }
     }
   }
@@ -67,52 +100,21 @@ class _RecordingScreenState extends State<RecordingScreen> {
           _isRecording = false;
           _videoPaths.add(videoFile.path);
         });
-        await _uploadVideoToAWS(videoFile.path);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Video đã lưu tại: ${videoFile.path}')),
-        );
 
-        //await _uploadVideoToAWS(videoFile.path);
+        await _uploadVideoToAWS(videoFile.path);
+
+        _cameraController?.dispose();
+        _cameraController = null;
 
         setState(() {
-          _isScanning = true; // Bật lại trạng thái quét sau khi lưu video
+          _isScanning = true;
+          _lastScannedCode = null;
         });
+
+        _initializeScannerController();
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi dừng quay video: $e')),
-        );
+        print('Recording stop error: $e');
       }
-    }
-  }
-
-  Future<void> _uploadVideoToAWS(String filePath) async {
-    try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đang tải video lên AWS...')),
-      );
-
-      UploadTaskConfig uploadConfig = UploadTaskConfig(
-        credentailsConfig: credentialsConfig,
-        url: 'videos/${p.basename(filePath)}',
-        uploadType: UploadType.file,
-        file: File(filePath),
-      );
-
-      UploadFile uploadFile = UploadFile(config: uploadConfig);
-      uploadFile.uploadProgress.listen((event) {
-        print('Tiến trình tải: ${event[0]} / ${event[1]}');
-      });
-
-      await uploadFile.upload().then((value) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Tải lên thành công: $value')),
-        );
-        uploadFile.dispose();
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi tải lên AWS: $e')),
-      );
     }
   }
 
@@ -124,33 +126,32 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_cameraController == null || !_cameraController!.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Quét QR & Quay Video'),
         backgroundColor: Colors.teal,
-        elevation: 4,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(_isFlashOn ? Icons.flash_on : Icons.flash_off),
+            onPressed: _toggleFlash,
+          ),
+        ],
       ),
       body: Stack(
         children: [
-          // CameraPreview chiếm toàn bộ màn hình
-          Positioned.fill(
-            child: CameraPreview(_cameraController!),
-          ),
-          // MobileScanner nằm trên cùng và chỉ hoạt động khi quét
-          if (_isScanning)
-            Positioned.fill(
-              child: MobileScanner(onDetect: (BarcodeCapture capture) async {
-                if (_isScanning && !_isRecording) {
+          if (_isScanning && !_isRecording && _selectedDeliveryOption != null)
+            MobileScanner(
+              controller: _scannerController,
+              onDetect: (BarcodeCapture capture) async {
+                if (_lastScannedCode == null) {
                   final barcode = capture.barcodes.first;
                   final String? code = barcode.rawValue;
 
                   if (code != null) {
                     setState(() {
                       _isScanning = false;
+                      _lastScannedCode = code;
                     });
 
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -160,36 +161,108 @@ class _RecordingScreenState extends State<RecordingScreen> {
                     await _startRecording();
                   }
                 }
-              }),
+              },
+            ),
+          if (!_isScanning && _isRecording && _cameraController != null)
+            CameraPreview(_cameraController!),
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.2,
+            left: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.3),
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(8),
+                  bottomRight: Radius.circular(8),
+                ),
+              ),
+              child: DeliveryOptionsWidget(
+                onOptionSelected: (String option) {
+                  setState(() => _selectedDeliveryOption = option);
+                  _saveDeliveryOption(option);
+                },
+              ),
+            ),
+          ),
+          if (_selectedDeliveryOption == null)
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'Vui lòng chọn loại giao hàng trước khi quét mã',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             ),
         ],
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              color: Colors.grey.withOpacity(0.5),
-              offset: const Offset(0, -1),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton.icon(
-          onPressed: _isRecording ? _stopRecording : null,
-          icon: Icon(_isRecording ? Icons.stop : Icons.videocam),
-          label: const Text('Dừng Quay Video'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-      ),
+      // Previous bottomNavigationBar...
     );
+  }
+
+  Future<void> _saveDeliveryOption(String option) async {
+    try {
+      await FirebaseFirestore.instance.collection('delivery_options').add({
+        'option': option,
+        'userId': FirebaseAuth.instance.currentUser?.uid,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error saving delivery option: $e');
+    }
+  }
+
+  Future<void> _uploadVideoToAWS(String filePath) async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đang tải video lên AWS...')),
+      );
+
+      final videoFileName =
+          '${DateTime.now().millisecondsSinceEpoch}_${p.basename(filePath)}';
+      final videoKey = 'videos/$videoFileName';
+
+      UploadTaskConfig uploadConfig = UploadTaskConfig(
+        credentailsConfig: credentialsConfig,
+        url: videoKey,
+        uploadType: UploadType.file,
+        file: File(filePath),
+      );
+
+      UploadFile uploadFile = UploadFile(config: uploadConfig);
+      uploadFile.uploadProgress.listen((event) {
+        print('Tiến trình tải: ${event[0]} / ${event[1]}');
+      });
+
+      await uploadFile.upload().then((value) async {
+        final videoUrl =
+            'https://${credentialsConfig.bucketName}.s3.${credentialsConfig.region}.amazonaws.com/$videoKey';
+
+        await FirebaseFirestore.instance.collection('videos').add({
+          'url': videoUrl,
+          'fileName': videoFileName,
+          'uploadDate': FieldValue.serverTimestamp(),
+          'userId': FirebaseAuth.instance.currentUser?.uid,
+          'qrCode': _lastScannedCode,
+          'deliveryOption': _selectedDeliveryOption,
+          'status': 'completed'
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Video đã được tải lên và lưu thành công')),
+        );
+        uploadFile.dispose();
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi trong quá trình xử lý: $e')),
+      );
+    }
   }
 }
