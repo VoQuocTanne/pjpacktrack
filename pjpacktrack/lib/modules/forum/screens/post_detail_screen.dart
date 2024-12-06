@@ -30,7 +30,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         .add(comment.toFirestore());
 
     // Cập nhật số lượng comment
-    //abc
     await FirebaseFirestore.instance
         .collection('posts')
         .doc(widget.post.id)
