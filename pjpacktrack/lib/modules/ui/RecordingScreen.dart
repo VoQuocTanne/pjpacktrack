@@ -201,7 +201,32 @@ class _RecordingScreenState extends State<RecordingScreen> {
             ),
         ],
       ),
-      // Previous bottomNavigationBar...
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 10,
+              color: Colors.grey.withOpacity(0.5),
+              offset: const Offset(0, -1),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton.icon(
+          onPressed: _isRecording ? _stopRecording : null,
+          icon: Icon(_isRecording ? Icons.stop : Icons.videocam),
+          label: const Text('Dừng Quay Video'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -243,19 +268,24 @@ class _RecordingScreenState extends State<RecordingScreen> {
         final videoUrl =
             'https://${credentialsConfig.bucketName}.s3.${credentialsConfig.region}.amazonaws.com/$videoKey';
 
-        await FirebaseFirestore.instance.collection('videos').add({
+        final videoDocRef = await FirebaseFirestore.instance.collection('videos').add({
           'url': videoUrl,
           'fileName': videoFileName,
           'uploadDate': FieldValue.serverTimestamp(),
           'userId': FirebaseAuth.instance.currentUser?.uid,
           'qrCode': _lastScannedCode,
           'deliveryOption': _selectedDeliveryOption,
-          'status': 'completed'
+          'status': 'completed',
         });
 
+        // Use the document ID as the videoId
+        final newVideoId = videoDocRef.id;
+
+        // Update the document with the videoId
+        await videoDocRef.update({'videoId': newVideoId});
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Video đã được tải lên và lưu thành công')),
+          const SnackBar(content: Text('Video đã được tải lên và lưu thành công')),
         );
         uploadFile.dispose();
       });

@@ -69,12 +69,12 @@ class _MotelAppState extends State<MotelApp> {
                         key: ValueKey(
                             'languageCode ${locController.locale.languageCode}'),
                         data: MediaQuery.of(context).copyWith(
-                          textScaleFactor:
+                          textScaler: TextScaler.linear(
                               MediaQuery.of(context).size.width > 360
                                   ? 1.0
                                   : MediaQuery.of(context).size.width >= 340
                                       ? 0.9
-                                      : 0.8,
+                                      : 0.8),
                         ),
                         child: child ?? const SizedBox(),
                       ),
@@ -114,10 +114,12 @@ class _MotelAppState extends State<MotelApp> {
 
   Map<String, WidgetBuilder> _buildRoutes() {
     return {
-      RoutesName.splash: (BuildContext context) => SplashScreen(cameras: cameras),
+      RoutesName.splash: (BuildContext context) =>
+          SplashScreen(cameras: cameras),
       RoutesName.introductionScreen: (BuildContext context) =>
           IntroductionScreen(FirebaseUserRepository()),
-      RoutesName.home: (BuildContext context) => BottomTabScreen(cameras: cameras),
+      RoutesName.home: (BuildContext context) =>
+          BottomTabScreen(cameras: cameras),
       RoutesName.login: (BuildContext context) => const LoginScreen(),
     };
   }

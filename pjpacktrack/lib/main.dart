@@ -32,6 +32,6 @@ void main() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown
-  ]).then((_) => runApp(ProviderScope(
-      child: MotelApp(FirebaseUserRepository())))); // Thêm ProviderScope ở đây
+  ]).then(
+      (_) => runApp(ProviderScope(child: MotelApp(FirebaseUserRepository()))));
 }
