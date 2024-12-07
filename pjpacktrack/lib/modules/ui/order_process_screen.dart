@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pjpacktrack/modules/ui/play_video.dart';
@@ -9,12 +10,13 @@ class OrderProcessScreen extends StatelessWidget {
   final Map<String, dynamic> orderData;
   final Map<String, dynamic> videoData;
   final String orderDate;
-
+  final String userId;
   const OrderProcessScreen({
     super.key,
     required this.orderData,
     required this.videoData,
     required this.orderDate,
+    required this.userId,
   });
 
   @override
@@ -71,6 +73,7 @@ class OrderProcessScreen extends StatelessWidget {
           color: color,
           isActive: _getStatusForStep(title),
           orderData: {...orderData, 'currentStep': title},
+          userId: userId,
         ),
         const Divider(height: 32),
         _buildVideoList(title),
@@ -79,13 +82,16 @@ class OrderProcessScreen extends StatelessWidget {
   }
 
   Widget _buildVideoList(String deliveryOption) {
-    final collection = orderData['isQRCode'] ? 'qr_codes' : 'barcodes';
 
+    final collection = orderData['isQRCode'] ? 'qr_codes' : 'barcodes';
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return const Center(child: Text('Chưa đăng nhập'));
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection(collection)
           .doc(orderData['id'])
           .collection('videos')
+          .where('userId', isEqualTo: currentUser.uid)
           .where('deliveryOption', isEqualTo: deliveryOption)
           .snapshots(),
       builder: (context, snapshot) {
@@ -93,7 +99,9 @@ class OrderProcessScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+        final videos = snapshot.data?.docs ?? [];
+
+        if (videos.isEmpty) {
           return Center(
             child: Text(
               'Không có video cho $deliveryOption',
@@ -105,9 +113,9 @@ class OrderProcessScreen extends StatelessWidget {
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: snapshot.data!.docs.length,
+          itemCount: videos.length,
           itemBuilder: (context, index) {
-            final video = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+            final video = videos[index].data() as Map<String, dynamic>;
             final uploadDate = (video['uploadDate'] as Timestamp?)?.toDate();
             final formattedDate = uploadDate != null
                 ? '${uploadDate.day}/${uploadDate.month}/${uploadDate.year}'
@@ -127,8 +135,9 @@ class OrderProcessScreen extends StatelessWidget {
                 onDismissed: (direction) => _deleteVideo(
                   orderData['id'],
                   orderData['isQRCode'],
-                  snapshot.data!.docs[index].id,
+                  videos[index].id,
                   video['url'],
+                  currentUser.uid,  // Pass userId for verification
                 ),
                 child: ListTile(
                   leading: Icon(Icons.play_circle_fill, color: Colors.black12),
@@ -141,6 +150,7 @@ class OrderProcessScreen extends StatelessWidget {
                         orderId: orderData['id'],
                         isQRCode: orderData['isQRCode'],
                         deliveryOption: deliveryOption,
+                        userId: currentUser.uid, // Pass userId to video player
                       ),
                     ),
                   ),
@@ -152,6 +162,7 @@ class OrderProcessScreen extends StatelessWidget {
       },
     );
   }
+
   bool _getStatusForStep(String step) {
     switch (step) {
       case 'Đóng gói':
@@ -184,17 +195,21 @@ class OrderProcessScreen extends StatelessWidget {
     ) ?? false;
   }
 
-  Future<void> _deleteVideo(String docId, bool isQRCode, String videoId, String videoUrl) async {
+  Future<void> _deleteVideo(String docId, bool isQRCode, String videoId, String videoUrl, String userId) async {
     try {
       final collection = isQRCode ? 'qr_codes' : 'barcodes';
-      await FirebaseFirestore.instance
+      final docRef = FirebaseFirestore.instance
           .collection(collection)
-          .doc(docId)
-          .collection('videos')
-          .doc(videoId)
-          .delete();
+          .doc(docId);
 
-      // TODO: Delete video from AWS S3
+      // Verify userId before deleting
+      final doc = await docRef.get();
+      if (doc.exists && doc.data()?['userId'] == userId) {
+        await docRef
+            .collection('videos')
+            .doc(videoId)
+            .delete();
+      }
     } catch (e) {
       print('Error deleting video: $e');
     }

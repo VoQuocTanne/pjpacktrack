@@ -6,12 +6,13 @@ class AwsVideoPlayer extends StatefulWidget {
   final String orderId;
   final bool isQRCode;
   final String deliveryOption;
-
+  final String userId;
   const AwsVideoPlayer({
     super.key,
     required this.orderId,
     required this.isQRCode,
     required this.deliveryOption,
+    required this.userId,
   });
 
   @override
@@ -23,7 +24,6 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
   bool _isInitialized = false;
   bool _hasError = false;
   String? _videoUrl;
-
   @override
   void initState() {
     super.initState();

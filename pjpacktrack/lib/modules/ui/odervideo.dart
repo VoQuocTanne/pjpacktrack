@@ -1,12 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'order_process_screen.dart';
 
 class OrderHistoryScreen extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return const Center(child: Text('Chưa đăng nhập'));
     return Scaffold(
         appBar: AppBar(
           title: const Text(
@@ -19,11 +23,13 @@ class OrderHistoryScreen extends StatelessWidget {
         body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('qr_codes')
+                .where('userId', isEqualTo: currentUser.uid)
                 .snapshots(),
             builder: (context, qrSnapshot) {
               return StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('barcodes')
+                      .where('userId', isEqualTo: currentUser.uid)
                       .snapshots(),
                   builder: (context, barcodeSnapshot) {
                     final allDocs = [...?qrSnapshot.data?.docs, ...?barcodeSnapshot.data?.docs];
@@ -36,7 +42,7 @@ class OrderHistoryScreen extends StatelessWidget {
                           final data = doc.data() as Map<String, dynamic>;
                           final isQRCode = data['isQRCode'] ?? false;
 
-                          return _buildOrderCard(doc.id, data, isQRCode, context);
+                          return _buildOrderCard(doc.id, data, isQRCode, context, currentUser.uid);
                         }
                     );
                   }
@@ -46,7 +52,7 @@ class OrderHistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderCard(String docId, Map<String, dynamic> data, bool isQRCode, BuildContext context) {
+  Widget _buildOrderCard(String docId, Map<String, dynamic> data, bool isQRCode, BuildContext context, String userId) {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
@@ -54,7 +60,7 @@ class OrderHistoryScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
-        onTap: () => _navigateToOrderProcess(context, docId, data, isQRCode),
+        onTap: () => _navigateToOrderProcess(context, data, docId, isQRCode, userId),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -122,7 +128,8 @@ class OrderHistoryScreen extends StatelessWidget {
   }
 
 
-  void _navigateToOrderProcess(BuildContext context, String docId, Map<String, dynamic> data, bool isQRCode) {
+  void _navigateToOrderProcess(BuildContext context, Map<String, dynamic> data, String docId, bool isQRCode, String userId) {
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -134,6 +141,7 @@ class OrderHistoryScreen extends StatelessWidget {
           },
           videoData: {},
           orderDate: DateTime.now().toString(),
+          userId: userId,
         ),
       ),
     );

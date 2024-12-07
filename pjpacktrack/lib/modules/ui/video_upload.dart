@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:aws_storage_service/aws_storage_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
@@ -60,30 +61,30 @@ class VideoUploader {
     return 'https://${credentialsConfig.bucketName}.s3.${credentialsConfig.region}.amazonaws.com/$videoKey';
   }
 
-  Future<void> _handleFirestoreUpload(
-      String videoUrl, String videoFileName) async {
+  Future<void> _handleFirestoreUpload(String videoUrl, String videoFileName) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    // Check both collections with userId filter
     final qrSnapshot = await FirebaseFirestore.instance
         .collection('qr_codes')
-        .doc(lastScannedCode)
+        .where('userId', isEqualTo: currentUser.uid)
+        .where('code', isEqualTo: lastScannedCode)
         .get();
 
     final barcodeSnapshot = await FirebaseFirestore.instance
         .collection('barcodes')
-        .doc(lastScannedCode)
+        .where('userId', isEqualTo: currentUser.uid)
+        .where('code', isEqualTo: lastScannedCode)
         .get();
 
-    final videoDocRef = qrSnapshot.exists
-        ? qrSnapshot.reference
-        : barcodeSnapshot.exists
-            ? barcodeSnapshot.reference
-            : null;
+    final doc = qrSnapshot.docs.firstOrNull ?? barcodeSnapshot.docs.firstOrNull;
+    final docRef = doc?.reference;
 
-    if (videoDocRef != null) {
-      final data =
-          qrSnapshot.exists ? qrSnapshot.data()! : barcodeSnapshot.data()!;
-      await _handleExistingDocument(videoDocRef, videoUrl, videoFileName, data);
+    if (docRef != null) {
+      await _handleExistingDocument(docRef, videoUrl, videoFileName, doc!.data());
     } else {
-      await _createNewDocument(videoUrl, videoFileName);
+      await _createNewDocument(videoUrl, videoFileName, currentUser.uid);
     }
   }
 
@@ -110,12 +111,13 @@ class VideoUploader {
         'Video đã được cập nhật cho trạng thái $selectedDeliveryOption');
   }
 
-  Future<void> _createNewDocument(String videoUrl, String videoFileName) async {
+  Future<void> _createNewDocument(String videoUrl, String videoFileName, String userId) async {
     final collection = isQRCode ? 'qr_codes' : 'barcodes';
-    final newDocRef =
-        FirebaseFirestore.instance.collection(collection).doc(lastScannedCode);
+    final newDocRef = FirebaseFirestore.instance.collection(collection).doc();
 
     await newDocRef.set({
+      'code': lastScannedCode,
+      'userId': userId,
       'closedStatus': selectedDeliveryOption == 'Đóng gói',
       'shippingStatus': selectedDeliveryOption == 'Giao hàng',
       'returnStatus': selectedDeliveryOption == 'Trả hàng',

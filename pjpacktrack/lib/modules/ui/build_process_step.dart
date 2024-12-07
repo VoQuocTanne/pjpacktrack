@@ -9,6 +9,7 @@ class ProcessStepWidget extends StatelessWidget {
   final Color color;
   final bool isActive;
   final Map<String, dynamic> orderData;
+  final String userId;
 
   const ProcessStepWidget({
     super.key,
@@ -17,6 +18,7 @@ class ProcessStepWidget extends StatelessWidget {
     required this.color,
     required this.isActive,
     required this.orderData,
+    required this.userId,
   });
 
   @override
@@ -126,6 +128,7 @@ class ProcessStepWidget extends StatelessWidget {
             orderId: orderData['id'],
             isQRCode: orderData['isQRCode'],
             deliveryOption: title,
+            userId: userId,
           ),
         ),
       ),
