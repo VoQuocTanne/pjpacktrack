@@ -46,7 +46,7 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
                   return InkWell(
                     onTap: helpSearchList[index].subTxt != ""
                         ? () {
-                            NavigationServices(context).gotoHowDoScreen();
+                            NavigationServices(context).gotoViewWeb(helpSearchList[index].url);
                           }
                         : null,
                     child: Column(
@@ -118,7 +118,7 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
             Navigator.pop(context);
           },
           iconData: Icons.arrow_back,
-          titleText: Loc.alized.how_can_help_you,
+          titleText: "Chính sách hoàn trả",
         ),
         Padding(
             padding: const EdgeInsets.only(left: 24, right: 24, top: 16),
