@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
-
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,10 +14,11 @@ class FirebaseUserRepository implements UserRepository {
   FirebaseUserRepository({
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
-    //FacebookLogin? facebookAuth,
+
+    // FacebookLogin? facebookAuth,
   })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
         _googleSignIn = googleSignIn ?? GoogleSignIn();
-  //     _facebookAuth = facebookAuth ?? FacebookLogin();
+        // _facebookAuth = facebookAuth ?? FacebookLogin();
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
   // final FacebookLogin _facebookAuth;
@@ -99,7 +99,8 @@ class FirebaseUserRepository implements UserRepository {
     }
   }
 
-  // @override
+
+  @override
   // Future<MyUser> signInFacebook() async {
   //   try {
   //     final FacebookLoginResult loginResult = await _facebookAuth.logIn();
