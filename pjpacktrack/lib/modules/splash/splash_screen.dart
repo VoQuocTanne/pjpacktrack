@@ -175,11 +175,11 @@ class _SplashScreenState extends State<SplashScreen> {
                       height: 16,
                     ),
                     Text(
-                      "Hotel",
+                      "Pack Track",
                       textAlign: TextAlign.left,
                       style: TextStyles(context)
                           .getBoldStyle()
-                          .copyWith(fontSize: 24, color: Colors.white),
+                          .copyWith(fontSize: 24, color: Colors.black),
                     ),
                     const SizedBox(
                       height: 8,
@@ -188,11 +188,11 @@ class _SplashScreenState extends State<SplashScreen> {
                       opacity: isLoadText ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 420),
                       child: Text(
-                        Loc.alized.best_hotel_deals,
+                        "Chúng tôi luôn mang đến điều tốt nhất cho bạn",
                         textAlign: TextAlign.left,
                         style: TextStyles(context)
                             .getRegularStyle()
-                            .copyWith(color: Colors.white),
+                            .copyWith(color: Colors.black),
                       ),
                     ),
                     const Expanded(
@@ -206,6 +206,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         padding: const EdgeInsets.only(
                             left: 48, right: 48, bottom: 8, top: 8),
                         buttonText: Loc.alized.get_started,
+                        textColor: Color(0xFF284B8C), // Màu chữ
+                        backgroundColor: Colors.white, // Màu nền
                         onTap: () {
                           NavigationServices(context).gotoIntroductionScreen();
                         },

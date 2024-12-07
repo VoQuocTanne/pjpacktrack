@@ -84,7 +84,7 @@ class AppTheme {
   static Color getColor(ColorType colordata) {
     switch (colordata) {
       case ColorType.verdigris:
-        return isLightMode ? const Color(0xFF4FBE9F) : const Color(0xFF4FBE9F);
+        return isLightMode ? const Color(0xFF284B8C) : const Color(0xFF284B8C);
       case ColorType.malibu:
         return isLightMode ? const Color(0xFF5DCAEC) : const Color(0xFF5DCAEC);
       case ColorType.darkSkyBlue:
