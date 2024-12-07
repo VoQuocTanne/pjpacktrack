@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pjpacktrack/model/user_repo/my_user.dart';
 
 class UserService {
@@ -15,7 +16,7 @@ class UserService {
           return MyUser(
             userId: userId,
             email: data['email'],
-            fullname: data['fullname']?? 'Unknown User',
+            fullname: data['fullname'] ?? 'Unknown User',
             picture: data['picture'],
             phonenumber: data['phonenumber'],
             birthday: (data['birthday'] as Timestamp).toDate(),
@@ -30,12 +31,12 @@ class UserService {
       return null;
     }
   }
+
   Future<void> updateUser(MyUser user) async {
     try {
       // Tham chiếu đến document của user dựa trên userId
-      DocumentReference userDocRef = _firestore.collection('users').doc(user.userId);
-
-  
+      DocumentReference userDocRef =
+          _firestore.collection('users').doc(user.userId);
 
       // Tạo một map chứa dữ liệu cần cập nhật
       Map<String, dynamic> userData = {
@@ -54,6 +55,7 @@ class UserService {
       rethrow;
     }
   }
+
   Future<String?> uploadPicture(String? file, String userId) async {
     try {
       await _firestore.collection('users').doc(userId).update({
@@ -67,4 +69,26 @@ class UserService {
       rethrow; // Ném lại ngoại lệ để xử lý bên ngoài nếu cần
     }
   }
+
+  // Future<String> _getCurrentUserName() async {
+  //   User? user = FirebaseAuth.instance.currentUser;
+
+  //   if (user != null) {
+  //     // Assuming you store the username in Firestore or some other place
+  //     DocumentSnapshot userDoc = await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(user.uid)
+  //         .get();
+
+  //     if (userDoc.exists) {
+  //       // Get the 'name' field from the user document (make sure to replace 'name' with the actual field name)
+  //       return userDoc['name'] ??
+  //           'Tên người dùng'; // Return a fallback name if not found
+  //     } else {
+  //       return 'Tên người dùng'; // Fallback if user document doesn't exist
+  //     }
+  //   } else {
+  //     throw Exception('User is not logged in');
+  //   }
+  // }
 }

@@ -81,8 +81,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   void _createPost() async {
-    if (_titleController.text.trim().isEmpty ||
-        _contentController.text.trim().isEmpty) {
+    if (_contentController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Vui lòng nhập tiêu đề và nội dung')),
       );
@@ -97,20 +96,23 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       }
 
       final post = PostModel(
-        id: '',
-        title: _titleController.text.trim(),
         content: _contentController.text.trim(),
-        authorId: 'current_user_id', // Thay bằng ID người dùng thực tế
-        authorName: 'Nhà Bán Hàng',
+        authorId: 'current_user_id', // Replace with actual user ID
+        authorName: 'Nhà Bán Hàng', // Replace with actual user name
         imageUrls: imageUrls, // Lưu trữ danh sách URL ảnh
         createdAt: DateTime.now(),
         viewCount: 0,
         commentCount: 0,
       );
 
-      await FirebaseFirestore.instance
+      // Add post to Firestore and retrieve the generated ID
+      DocumentReference postRef = await FirebaseFirestore.instance
           .collection('posts')
           .add(post.toFirestore());
+
+      // Update the PostModel with the Firestore document ID
+      post.id = postRef.id;
+
       Navigator.pop(context);
     } catch (e) {
       print('Error creating post: $e');
@@ -138,17 +140,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextFormField(
-              controller: _titleController,
-              decoration: InputDecoration(
-                hintText: 'Tiêu đề bài viết',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              maxLines: 1,
-            ),
-            SizedBox(height: 16),
             TextFormField(
               controller: _contentController,
               decoration: InputDecoration(

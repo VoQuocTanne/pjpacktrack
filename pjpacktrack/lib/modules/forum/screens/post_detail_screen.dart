@@ -19,18 +19,18 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     if (_commentController.text.trim().isEmpty) return;
 
     final comment = CommentModel(
-      postId: widget.post.id,
-      authorId: 'current_user_id', // Thay bằng ID người dùng thực tế
-      authorName: 'Nhà Bán Hàng', // Thay bằng tên người dùng thực tế
+      postId:
+          widget.post.id!, // The id will now be non-null after saving the post
+      authorId: 'current_user_id', // Replace with actual user ID
+      authorName: 'Nhà Bán Hàng', // Replace with actual user name
       content: _commentController.text.trim(),
-      createdAt: DateTime.now(), // Đảm bảo có thời gian tạo
+      createdAt: DateTime.now(),
     );
 
     await FirebaseFirestore.instance
         .collection('comments')
         .add(comment.toFirestore());
 
-    // Cập nhật số lượng comment
     await FirebaseFirestore.instance
         .collection('posts')
         .doc(widget.post.id)
@@ -51,20 +51,19 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       ),
       body: Column(
         children: [
-          // Nội dung bài viết
+          // Combined post content and comments
           Expanded(
-            flex: 1,
             child: SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.post.title,
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
+                    // Text(
+                    //   widget.post.title,
+                    //   style:
+                    //       TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    // ),
                     SizedBox(height: 8),
                     Row(
                       children: [
@@ -75,77 +74,100 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     ),
                     SizedBox(height: 16),
                     Text(widget.post.content),
+                    SizedBox(height: 16),
+
+                    // Display Post Images
+                    if (widget.post.imageUrls.isNotEmpty)
+                      Column(
+                        children: widget.post.imageUrls.map((imageUrl) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Image.network(
+                              imageUrl,
+                              width: double.infinity,
+                              fit: BoxFit
+                                  .contain, // Ensure image is displayed as is
+                            ),
+                          );
+                        }).toList(),
+                      ),
+
+                    Divider(height: 32, color: Colors.grey),
+
+                    // Display Comments
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('comments')
+                          .where('postId', isEqualTo: widget.post.id)
+                          .orderBy('createdAt', descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Đã xảy ra lỗi khi tải bình luận.',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.red),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Chi tiết lỗi:',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  snapshot.error.toString(),
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return Center(child: Text('Chưa có bình luận nào.'));
+                        }
+
+                        var comments = snapshot.data!.docs
+                            .map((doc) => CommentModel.fromFirestore(doc))
+                            .toList();
+
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: comments.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: Text(comments[index].authorName),
+                              subtitle: Text(comments[index].content),
+                              trailing: Text(
+                                '${comments[index].createdAt.day}/${comments[index].createdAt.month}/${comments[index].createdAt.year} ${comments[index].createdAt.hour}:${comments[index].createdAt.minute}',
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 12),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
             ),
           ),
 
-          // Danh sách bình luận
-          Expanded(
-            flex: 2,
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('comments')
-                  .where('postId', isEqualTo: widget.post.id)
-                  .orderBy('createdAt', descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Đã xảy ra lỗi khi tải bình luận.',
-                          style: TextStyle(fontSize: 16, color: Colors.red),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Chi tiết lỗi:',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          snapshot.error.toString(),
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(child: Text('Chưa có bình luận nào.'));
-                }
-
-                var comments = snapshot.data!.docs
-                    .map((doc) => CommentModel.fromFirestore(doc))
-                    .toList();
-
-                return ListView.builder(
-                  itemCount: comments.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(comments[index].authorName),
-                      subtitle: Text(comments[index].content),
-                      trailing: Text(
-                        '${comments[index].createdAt.day}/${comments[index].createdAt.month}/${comments[index].createdAt.year} ${comments[index].createdAt.hour}:${comments[index].createdAt.minute}',
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-
-          // Ô nhập bình luận
+          // Comment Input Box
           Padding(
             padding: EdgeInsets.all(8),
             child: Row(

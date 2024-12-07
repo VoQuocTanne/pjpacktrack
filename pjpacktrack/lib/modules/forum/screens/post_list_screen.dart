@@ -56,63 +56,65 @@ class PostListScreen extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      child: ListTile(
-        contentPadding: EdgeInsets.all(12),
-        subtitle: Column(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PostDetailScreen(post: post),
+            ),
+          );
+        },
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row 1: Display Author Name
-            Text(post.authorName,
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 8),
-
-            // Row 2: Display Date (formatted)
-            Text(
-              '${post.createdAt.day}/${post.createdAt.month}/${post.createdAt.year} ${post.createdAt.hour}:${post.createdAt.minute}',
-              style: TextStyle(color: Colors.grey),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Display the author's name
+                  Text(post.authorName,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  SizedBox(height: 4),
+                  // Display the post's creation date
+                  Text(
+                    '${post.createdAt.day}/${post.createdAt.month}/${post.createdAt.year} ${post.createdAt.hour}:${post.createdAt.minute}',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                  SizedBox(height: 8),
+                  // Display the post content summary
+                  Text(post.content,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 14)),
+                  SizedBox(height: 8),
+                  // Display the comment count
+                  Row(
+                    children: [
+                      Icon(Icons.comment, size: 16, color: Colors.grey),
+                      SizedBox(width: 4),
+                      Text('${post.commentCount}',
+                          style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 8),
-
-            // Row 3: Display Content and Comment Count
-            Text(post.content, maxLines: 2, overflow: TextOverflow.ellipsis),
-            Row(
-              children: [
-                Icon(Icons.comment, size: 16, color: Colors.grey),
-                SizedBox(width: 4),
-                Text('${post.commentCount}',
-                    style: TextStyle(color: Colors.grey)),
-              ],
-            ),
-            SizedBox(height: 8),
-
-            // Row 4: Display Images (if any)
             if (post.imageUrls.isNotEmpty)
-              SizedBox(
-                height: 150,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: post.imageUrls.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: Image.network(
-                        post.imageUrls[index],
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  },
+              ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                child: Image.network(
+                  post.imageUrls[0],
+                  width: double.infinity,
+                  height: 180,
+                  fit: BoxFit.cover,
                 ),
               ),
           ],
         ),
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PostDetailScreen(post: post)));
-        },
       ),
     );
   }
