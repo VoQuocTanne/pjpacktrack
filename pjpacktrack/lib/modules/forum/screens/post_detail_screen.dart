@@ -23,6 +23,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       authorId: 'current_user_id', // Thay bằng ID người dùng thực tế
       authorName: 'Nhà Bán Hàng', // Thay bằng tên người dùng thực tế
       content: _commentController.text.trim(),
+      createdAt: DateTime.now(), // Đảm bảo có thời gian tạo
     );
 
     await FirebaseFirestore.instance
@@ -52,6 +53,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         children: [
           // Nội dung bài viết
           Expanded(
+            flex: 1,
             child: SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.all(16),
@@ -81,6 +83,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
           // Danh sách bình luận
           Expanded(
+            flex: 2,
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('comments')
@@ -88,8 +91,37 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   .orderBy('createdAt', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Đã xảy ra lỗi khi tải bình luận.',
+                          style: TextStyle(fontSize: 16, color: Colors.red),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Chi tiết lỗi:',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          snapshot.error.toString(),
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(child: Text('Chưa có bình luận nào.'));
                 }
 
                 var comments = snapshot.data!.docs
@@ -102,6 +134,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     return ListTile(
                       title: Text(comments[index].authorName),
                       subtitle: Text(comments[index].content),
+                      trailing: Text(
+                        '${comments[index].createdAt.day}/${comments[index].createdAt.month}/${comments[index].createdAt.year} ${comments[index].createdAt.hour}:${comments[index].createdAt.minute}',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
                     );
                   },
                 );
