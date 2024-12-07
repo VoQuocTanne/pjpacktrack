@@ -3,8 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class AwsVideoPlayer extends StatefulWidget {
-  final String videoId; // ID tài liệu chứa video
-  const AwsVideoPlayer({super.key, required this.videoId});
+  final String orderId;
+  final bool isQRCode;
+  final String deliveryOption;
+
+  const AwsVideoPlayer({
+    super.key,
+    required this.orderId,
+    required this.isQRCode,
+    required this.deliveryOption,
+  });
 
   @override
   _AwsVideoPlayerState createState() => _AwsVideoPlayerState();
@@ -14,50 +22,45 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
   late VideoPlayerController _controller;
   bool _isInitialized = false;
   bool _hasError = false;
-  String? _videoUrl; // Đường dẫn video từ Firestore
+  String? _videoUrl;
 
   @override
   void initState() {
     super.initState();
-    _fetchVideoUrl(); // Lấy URL video từ Firestore
+    _fetchVideoUrl();
   }
 
   Future<void> _fetchVideoUrl() async {
-    setState(() {
-      _isInitialized = false;
-      _hasError = false;
-    });
-
     try {
-      final doc = await FirebaseFirestore.instance
+      final collection = widget.isQRCode ? 'qr_codes' : 'barcodes';
+
+      final videoQuery = await FirebaseFirestore.instance
+          .collection(collection)
+          .doc(widget.orderId)
           .collection('videos')
-          .doc(widget.videoId)
+          .where('deliveryOption', isEqualTo: widget.deliveryOption)
           .get();
 
-      if (doc.exists) {
-        _videoUrl = doc['url'] as String; // Đường dẫn video
-        _initializePlayer(_videoUrl!);
+      if (videoQuery.docs.isNotEmpty) {
+        _videoUrl = videoQuery.docs.first['url'] as String;
+        await _initializePlayer(_videoUrl!);
       } else {
-        throw Exception('Tài liệu không tồn tại');
+        throw Exception('Video không tồn tại');
       }
     } catch (e) {
-      print('Lỗi khi lấy URL video từ Firestore: $e');
+      print('Lỗi khi lấy URL video: $e');
       setState(() => _hasError = true);
     }
   }
 
   Future<void> _initializePlayer(String videoUrl) async {
     try {
-      _controller = VideoPlayerController.network(videoUrl)
-        ..initialize().then((_) {
-          setState(() => _isInitialized = true);
-          _controller.play();
-        }).catchError((error) {
-          print('Lỗi khi khởi tạo trình phát video: $error');
-          setState(() => _hasError = true);
-        });
+      _controller = VideoPlayerController.network(videoUrl);
+      await _controller.initialize();
+      setState(() => _isInitialized = true);
+      _controller.play();
     } catch (e) {
-      print('Lỗi khi khởi tạo trình phát video: $e');
+      print('Lỗi khởi tạo video: $e');
       setState(() => _hasError = true);
     }
   }
@@ -72,8 +75,8 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
       body: _hasError
           ? _buildErrorUI()
           : !_isInitialized
-              ? const Center(child: CircularProgressIndicator())
-              : _buildVideoPlayerUI(),
+          ? const Center(child: CircularProgressIndicator())
+          : _buildVideoPlayerUI(),
     );
   }
 
@@ -99,66 +102,72 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
   }
 
   Widget _buildVideoPlayerUI() {
-    return Column(
-      children: [
-        // Video that fits the screen
-        Container(
-          width: double.infinity,
-          // Makes sure it uses the full width of the screen
-          height: MediaQuery.of(context).size.height * 0.6,
-          // Limit the height to 60% of screen height
-          child: AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          ),
-        ),
-        VideoProgressIndicator(
-          _controller,
-          allowScrubbing: true,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-              icon: Icon(
-                _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-                color: Colors.white,
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.7,
+            color: Colors.black,
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(_controller),
               ),
-              onPressed: () {
-                // Check if the controller is initialized
-                if (_controller.value.isInitialized) {
-                  setState(() {
-                    // Play or pause based on the current state
-                    if (_controller.value.isPlaying) {
-                      _controller.pause(); // Pause the video if it's playing
-                    } else {
-                      _controller.play(); // Play the video if it's paused
-                    }
-                  });
-                } else {
-                  print('Video controller is not initialized yet.');
-                }
-              },
             ),
-            IconButton(
-              icon: const Icon(Icons.replay),
-              onPressed: () {
-                // Check if the controller is initialized
-                if (_controller.value.isInitialized) {
-                  setState(() {
-                    _controller.seekTo(
-                        Duration.zero); // Reset the video to the beginning
-                    _controller.play(); // Play the video from the beginning
-                  });
-                } else {
-                  print('Video controller is not initialized yet.');
-                }
-              },
-            )
-          ],
-        ),
-      ],
+          ),
+          Container(
+            color: Colors.black12,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              children: [
+                VideoProgressIndicator(
+                  _controller,
+                  allowScrubbing: true,
+                  colors: VideoProgressColors(
+                    playedColor: Colors.teal,
+                    bufferedColor: Colors.teal.withOpacity(0.2),
+                    backgroundColor: Colors.grey.shade300,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      iconSize: 32,
+                      icon: Icon(
+                        _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                        color: Colors.teal,
+                      ),
+                      onPressed: () {
+                        if (_controller.value.isInitialized) {
+                          setState(() {
+                            _controller.value.isPlaying
+                                ? _controller.pause()
+                                : _controller.play();
+                          });
+                        }
+                      },
+                    ),
+                    IconButton(
+                      iconSize: 32,
+                      icon: const Icon(Icons.replay, color: Colors.teal),
+                      onPressed: () {
+                        if (_controller.value.isInitialized) {
+                          _controller.seekTo(Duration.zero);
+                          _controller.play();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 

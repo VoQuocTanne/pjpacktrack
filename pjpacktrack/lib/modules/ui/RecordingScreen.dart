@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import 'package:aws_storage_service/aws_storage_service.dart';
 import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/modules/ui/delivery_option.dart';
+import 'package:pjpacktrack/modules/ui/video_upload.dart';
 
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -24,6 +25,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
   bool _isRecording = false;
   bool _isScanning = true;
   bool _isFlashOn = false;
+  bool _isQRCode = false;
   String? _lastScannedCode;
   String? _selectedDeliveryOption;
   final List<String> _videoPaths = [];
@@ -45,7 +47,17 @@ class _RecordingScreenState extends State<RecordingScreen> {
     _scannerController = MobileScannerController(
       detectionSpeed: DetectionSpeed.normal,
       facing: CameraFacing.back,
-      formats: [BarcodeFormat.qrCode],
+      formats: [
+        BarcodeFormat.qrCode,
+        BarcodeFormat.code128,
+        BarcodeFormat.code39,
+        BarcodeFormat.code93,
+        BarcodeFormat.codabar,
+        BarcodeFormat.ean8,
+        BarcodeFormat.ean13,
+        BarcodeFormat.upcA,
+        BarcodeFormat.upcE,
+      ],
     );
   }
 
@@ -101,16 +113,23 @@ class _RecordingScreenState extends State<RecordingScreen> {
           _videoPaths.add(videoFile.path);
         });
 
-        await _uploadVideoToAWS(videoFile.path);
+        final uploader = VideoUploader(
+          context: context,
+          credentialsConfig: credentialsConfig,
+          lastScannedCode: _lastScannedCode!,
+          selectedDeliveryOption: _selectedDeliveryOption!,
+          isQRCode: _isQRCode,
+        );
 
+        await uploader.uploadVideo(videoFile.path);
+
+        // Reset state
         _cameraController?.dispose();
         _cameraController = null;
-
         setState(() {
           _isScanning = true;
           _lastScannedCode = null;
         });
-
         _initializeScannerController();
       } catch (e) {
         print('Recording stop error: $e');
@@ -128,7 +147,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quét QR & Quay Video'),
+        title: Text(_isQRCode ? 'Quét QR Code' : 'Quét Barcode'),
         backgroundColor: Colors.teal,
         elevation: 0,
         actions: [
@@ -147,7 +166,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                 if (_lastScannedCode == null) {
                   final barcode = capture.barcodes.first;
                   final String? code = barcode.rawValue;
-
+                  _isQRCode = barcode.format == BarcodeFormat.qrCode;
                   if (code != null) {
                     setState(() {
                       _isScanning = false;
@@ -155,7 +174,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                     });
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Mã QR/Barcode: $code')),
+                      SnackBar(content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
                     );
 
                     await _startRecording();
@@ -185,8 +204,12 @@ class _RecordingScreenState extends State<RecordingScreen> {
               ),
             ),
           ),
+
           if (_selectedDeliveryOption == null)
-            Center(
+            Positioned(
+              bottom: MediaQuery.of(context).size.height * 0.4, // Điều chỉnh vị trí
+              left: 16,
+              right: 16,
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -196,6 +219,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                 child: const Text(
                   'Vui lòng chọn loại giao hàng trước khi quét mã',
                   style: TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
@@ -241,107 +265,4 @@ class _RecordingScreenState extends State<RecordingScreen> {
       print('Error saving delivery option: $e');
     }
   }
-
-  Future<void> _uploadVideoToAWS(String filePath) async {
-    try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đang tải video lên AWS...')),
-      );
-
-      final videoFileName =
-          '${DateTime.now().millisecondsSinceEpoch}_${p.basename(filePath)}';
-      final videoKey = 'videos/$videoFileName';
-
-      // Cấu hình tải video lên AWS
-      UploadTaskConfig uploadConfig = UploadTaskConfig(
-        credentailsConfig: credentialsConfig,
-        url: videoKey,
-        uploadType: UploadType.file,
-        file: File(filePath),
-      );
-
-      UploadFile uploadFile = UploadFile(config: uploadConfig);
-      uploadFile.uploadProgress.listen((event) {
-        print('Tiến trình tải: ${event[0]} / ${event[1]}');
-      });
-
-      await uploadFile.upload().then((value) async {
-        final videoUrl =
-            'https://${credentialsConfig.bucketName}.s3.${credentialsConfig.region}.amazonaws.com/$videoKey';
-
-        // Kiểm tra mã đơn hàng đã tồn tại trong Firestore
-        final videoDocRef = FirebaseFirestore.instance
-            .collection('videos')
-            .doc(_lastScannedCode); // Lấy document với ID là qrCode
-
-        final videoDocSnapshot = await videoDocRef.get();
-
-        if (videoDocSnapshot.exists) {
-          // Nếu mã đơn hàng đã tồn tại, kiểm tra trạng thái deliveryOption và trạng thái hiện tại
-          final videoData = videoDocSnapshot.data()!;
-          final currentDeliveryOption = videoData['deliveryOption'];
-          final closedStatus = videoData['closedStatus'];
-          final shippingStatus = videoData['shippingStatus'];
-          final returnStatus = videoData['returnStatus'];
-
-          if (currentDeliveryOption != _selectedDeliveryOption) {
-            // Nếu deliveryOption khác nhau, cập nhật video trong mảng videos
-            final newVideoRef = videoDocRef.collection('videos').doc();
-            await newVideoRef.set({
-              'url': videoUrl,
-              'fileName': videoFileName,
-              'uploadDate': FieldValue.serverTimestamp(),
-              'status': 'completed',
-            });
-
-            // Cập nhật lại các trạng thái của mã đơn hàng
-            await videoDocRef.update({
-              'deliveryOption': _selectedDeliveryOption,
-              'closedStatus': closedStatus, // Giữ nguyên trạng thái đóng hàng
-              'shippingStatus': shippingStatus, // Giữ nguyên trạng thái giao hàng
-              'returnStatus': returnStatus, // Giữ nguyên trạng thái trả hàng
-            });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Video đã được cập nhật thành công')),
-            );
-          } else {
-            // Nếu deliveryOption giống nhau, thông báo cho người dùng
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                    'Video đã tồn tại với mã đơn hàng và deliveryOption này'),
-              ),
-            );
-          }
-        } else {
-          // Nếu mã đơn hàng chưa tồn tại, tạo mới tài liệu và lưu video
-          await videoDocRef.set({
-            'deliveryOption': _selectedDeliveryOption,
-            'closedStatus': false, // Trạng thái đóng hàng ban đầu
-            'shippingStatus': false, // Trạng thái giao hàng ban đầu
-            'returnStatus': false, // Trạng thái trả hàng ban đầu
-          });
-
-          final newVideoRef = videoDocRef.collection('videos').doc();
-          await newVideoRef.set({
-            'url': videoUrl,
-            'fileName': videoFileName,
-            'uploadDate': FieldValue.serverTimestamp(),
-            'status': 'completed',
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Video đã được tải lên và lưu thành công')),
-          );
-        }
-        uploadFile.dispose();
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi trong quá trình xử lý: $e')),
-      );
-    }
-  }
-
 }
