@@ -11,6 +11,7 @@ import 'package:pjpacktrack/modules/profile/edit_profile.dart';
 import 'package:pjpacktrack/modules/profile/hepl_center_screen.dart';
 import 'package:pjpacktrack/modules/profile/how_do_screen.dart';
 import 'package:pjpacktrack/modules/profile/settings_screen.dart';
+import 'package:pjpacktrack/modules/profile/web_view.dart';
 import 'package:pjpacktrack/routes/routes.dart';
 
 class NavigationServices {
@@ -89,6 +90,12 @@ class NavigationServices {
   Future<dynamic> gotoCountryScreen() async {
     return await _pushMaterialPageRoute(const CountryScreen(),
         fullscreenDialog: true);
+  }
+
+  Future<dynamic> gotoViewWeb(String url) async {
+    return await _pushMaterialPageRoute(WebView(
+      url: url,
+    ));
   }
 
   Future<dynamic> gotoForumScreen() async {
