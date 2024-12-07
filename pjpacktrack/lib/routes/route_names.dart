@@ -10,6 +10,7 @@ import 'package:pjpacktrack/modules/profile/edit_profile.dart';
 import 'package:pjpacktrack/modules/profile/hepl_center_screen.dart';
 import 'package:pjpacktrack/modules/profile/how_do_screen.dart';
 import 'package:pjpacktrack/modules/profile/settings_screen.dart';
+import 'package:pjpacktrack/modules/ui/web_view.dart';
 import 'package:pjpacktrack/routes/routes.dart';
 
 class NavigationServices {
@@ -59,9 +60,17 @@ class NavigationServices {
   Future<dynamic> gotoForgotPassword() async {
     return await _pushMaterialPageRoute(const ForgotPasswordScreen());
   }
+
   Future<dynamic> gotoHowDoScreen() async {
     return await _pushMaterialPageRoute(const HowDoScreen());
   }
+
+  Future<dynamic> gotoViewWeb(String url) async {
+    return await _pushMaterialPageRoute(WebView(
+      url: url,
+    ));
+  }
+
   Future<dynamic> gotoSettingsScreen() async {
     return await _pushMaterialPageRoute(const SettingsScreen());
   }
@@ -73,13 +82,16 @@ class NavigationServices {
   Future<dynamic> gotoChangepasswordScreen() async {
     return await _pushMaterialPageRoute(const ChangepasswordScreen());
   }
+
   Future<dynamic> gotoEditProfile(MyUser myUser) async {
     return await _pushMaterialPageRoute(EditProfile(myUser: myUser));
   }
+
   Future<dynamic> gotoCurrencyScreen() async {
     return await _pushMaterialPageRoute(const CurrencyScreen(),
         fullscreenDialog: true);
   }
+
   Future<dynamic> gotoCountryScreen() async {
     return await _pushMaterialPageRoute(const CountryScreen(),
         fullscreenDialog: true);

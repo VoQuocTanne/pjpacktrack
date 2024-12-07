@@ -5,6 +5,7 @@ import 'package:pjpacktrack/language/app_localizations.dart';
 class SettingsListData {
   String titleTxt;
   String subTxt;
+  String url;
   IconData iconData;
   bool isSelected;
 
@@ -12,6 +13,7 @@ class SettingsListData {
     this.titleTxt = '',
     this.isSelected = false,
     this.subTxt = '',
+    this.url='',
     this.iconData = Icons.supervised_user_circle,
   });
 
@@ -175,77 +177,88 @@ class SettingsListData {
 
   static List<SettingsListData> helpSearchList = [
     SettingsListData(
-      titleTxt: "paying_for_a_reservation",
+      titleTxt: "Shoppe",
       subTxt: "",
     ),
     SettingsListData(
       titleTxt: '',
-      subTxt: "How do I ",
+      subTxt: "Quy trình hoàn trả của shoppe",
+      url: "https://banhang.shopee.vn/edu/category?sub_cat_id=251"
     ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "What methods ",
+    // ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "When am I charged",
+    // ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "How do I edit",
+    // ),
+    // SettingsListData(
+    //   titleTxt: 'trust_and_safety',
+    //   subTxt: "",
+    // ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "I'm_a_guest_What",
+    // ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "When am I charged",
+    // ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "How do I edit",
+    // ),
     SettingsListData(
-      titleTxt: '',
-      subTxt: "What methods ",
-    ),
-    SettingsListData(
-      titleTxt: '',
-      subTxt: "When am I charged",
-    ),
-    SettingsListData(
-      titleTxt: '',
-      subTxt: "How do I edit",
-    ),
-    SettingsListData(
-      titleTxt: 'trust_and_safety',
+      titleTxt: "Lazada",
       subTxt: "",
     ),
     SettingsListData(
       titleTxt: '',
-      subTxt: "I'm_a_guest_What",
+      subTxt: "Quy trình hoàn trả của lazada",
+      url: "https://helpcenter.lazada.vn/s/faq/category?categoryId=1000027300&language=vi_VN&m_station=BuyerHelp"
     ),
     SettingsListData(
-      titleTxt: '',
-      subTxt: "When am I charged",
-    ),
-    SettingsListData(
-      titleTxt: '',
-      subTxt: "How do I edit",
-    ),
-    SettingsListData(
-      titleTxt: "paying_for_a_reservation",
+      titleTxt: "TikTok",
       subTxt: "",
     ),
     SettingsListData(
       titleTxt: '',
-      subTxt: "How do I ",
+      subTxt: "Quy trình hoàn trả của tiktok",
+      url: "https://seller-vn.tiktok.com/university/essay?knowledge_id=6837773789234946&default_language=vi-VN&identity=1"
     ),
-    SettingsListData(
-      titleTxt: '',
-      subTxt: "What methods ",
-    ),
-    SettingsListData(
-      titleTxt: '',
-      subTxt: "When am I charged",
-    ),
-    SettingsListData(
-      titleTxt: '',
-      subTxt: "How do I edit",
-    ),
-    SettingsListData(
-      titleTxt: 'trust_and_safety',
-      subTxt: "",
-    ),
-    SettingsListData(
-      titleTxt: '',
-      subTxt: "I'm_a_guest_What",
-    ),
-    SettingsListData(
-      titleTxt: '',
-      subTxt: "When am I charged",
-    ),
-    SettingsListData(
-      titleTxt: '',
-      subTxt: "How do I edit",
-    ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "What methods ",
+    // ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "When am I charged",
+    // ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "How do I edit",
+    // ),
+    // SettingsListData(
+    //   titleTxt: 'trust_and_safety',
+    //   subTxt: "",
+    // ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "I'm_a_guest_What",
+    // ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "When am I charged",
+    // ),
+    // SettingsListData(
+    //   titleTxt: '',
+    //   subTxt: "How do I edit",
+    // ),
   ];
 
   static List<SettingsListData> subHelpList = [
