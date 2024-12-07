@@ -252,6 +252,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
           '${DateTime.now().millisecondsSinceEpoch}_${p.basename(filePath)}';
       final videoKey = 'videos/$videoFileName';
 
+      // Cấu hình tải video lên AWS
       UploadTaskConfig uploadConfig = UploadTaskConfig(
         credentailsConfig: credentialsConfig,
         url: videoKey,
@@ -268,25 +269,72 @@ class _RecordingScreenState extends State<RecordingScreen> {
         final videoUrl =
             'https://${credentialsConfig.bucketName}.s3.${credentialsConfig.region}.amazonaws.com/$videoKey';
 
-        final videoDocRef = await FirebaseFirestore.instance.collection('videos').add({
-          'url': videoUrl,
-          'fileName': videoFileName,
-          'uploadDate': FieldValue.serverTimestamp(),
-          'userId': FirebaseAuth.instance.currentUser?.uid,
-          'qrCode': _lastScannedCode,
-          'deliveryOption': _selectedDeliveryOption,
-          'status': 'completed',
-        });
+        // Kiểm tra mã đơn hàng đã tồn tại trong Firestore
+        final videoDocRef = FirebaseFirestore.instance
+            .collection('videos')
+            .doc(_lastScannedCode); // Lấy document với ID là qrCode
 
-        // Use the document ID as the videoId
-        final newVideoId = videoDocRef.id;
+        final videoDocSnapshot = await videoDocRef.get();
 
-        // Update the document with the videoId
-        await videoDocRef.update({'videoId': newVideoId});
+        if (videoDocSnapshot.exists) {
+          // Nếu mã đơn hàng đã tồn tại, kiểm tra trạng thái deliveryOption và trạng thái hiện tại
+          final videoData = videoDocSnapshot.data()!;
+          final currentDeliveryOption = videoData['deliveryOption'];
+          final closedStatus = videoData['closedStatus'];
+          final shippingStatus = videoData['shippingStatus'];
+          final returnStatus = videoData['returnStatus'];
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Video đã được tải lên và lưu thành công')),
-        );
+          if (currentDeliveryOption != _selectedDeliveryOption) {
+            // Nếu deliveryOption khác nhau, cập nhật video trong mảng videos
+            final newVideoRef = videoDocRef.collection('videos').doc();
+            await newVideoRef.set({
+              'url': videoUrl,
+              'fileName': videoFileName,
+              'uploadDate': FieldValue.serverTimestamp(),
+              'status': 'completed',
+            });
+
+            // Cập nhật lại các trạng thái của mã đơn hàng
+            await videoDocRef.update({
+              'deliveryOption': _selectedDeliveryOption,
+              'closedStatus': closedStatus, // Giữ nguyên trạng thái đóng hàng
+              'shippingStatus': shippingStatus, // Giữ nguyên trạng thái giao hàng
+              'returnStatus': returnStatus, // Giữ nguyên trạng thái trả hàng
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Video đã được cập nhật thành công')),
+            );
+          } else {
+            // Nếu deliveryOption giống nhau, thông báo cho người dùng
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Video đã tồn tại với mã đơn hàng và deliveryOption này'),
+              ),
+            );
+          }
+        } else {
+          // Nếu mã đơn hàng chưa tồn tại, tạo mới tài liệu và lưu video
+          await videoDocRef.set({
+            'deliveryOption': _selectedDeliveryOption,
+            'closedStatus': false, // Trạng thái đóng hàng ban đầu
+            'shippingStatus': false, // Trạng thái giao hàng ban đầu
+            'returnStatus': false, // Trạng thái trả hàng ban đầu
+          });
+
+          final newVideoRef = videoDocRef.collection('videos').doc();
+          await newVideoRef.set({
+            'url': videoUrl,
+            'fileName': videoFileName,
+            'uploadDate': FieldValue.serverTimestamp(),
+            'status': 'completed',
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Video đã được tải lên và lưu thành công')),
+          );
+        }
         uploadFile.dispose();
       });
     } catch (e) {
@@ -295,4 +343,5 @@ class _RecordingScreenState extends State<RecordingScreen> {
       );
     }
   }
+
 }

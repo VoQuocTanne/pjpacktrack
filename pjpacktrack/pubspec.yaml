@@ -60,6 +60,7 @@ dependencies:
   smooth_page_indicator: ^1.0.0+2
   image_picker: ^0.8.5+3
   aws_client: ^0.6.0
+  freezed: ^2.5.7
 
 dev_dependencies:
   flutter_test:
