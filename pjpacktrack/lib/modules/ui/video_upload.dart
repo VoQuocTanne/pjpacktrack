@@ -65,21 +65,15 @@ class VideoUploader {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return;
 
-    // Check both collections with userId filter
-    final qrSnapshot = await FirebaseFirestore.instance
-        .collection('qr_codes')
+    final orderSnapshot = await FirebaseFirestore.instance
+        .collection('orders')
         .where('userId', isEqualTo: currentUser.uid)
         .where('code', isEqualTo: lastScannedCode)
         .get();
 
-    final barcodeSnapshot = await FirebaseFirestore.instance
-        .collection('barcodes')
-        .where('userId', isEqualTo: currentUser.uid)
-        .where('code', isEqualTo: lastScannedCode)
-        .get();
-
-    final doc = qrSnapshot.docs.firstOrNull ?? barcodeSnapshot.docs.firstOrNull;
+    final doc = orderSnapshot.docs.firstOrNull;
     final docRef = doc?.reference;
+
 
     if (docRef != null) {
       await _handleExistingDocument(docRef, videoUrl, videoFileName, doc!.data());
@@ -112,20 +106,22 @@ class VideoUploader {
   }
 
   Future<void> _createNewDocument(String videoUrl, String videoFileName, String userId) async {
-    final collection = isQRCode ? 'qr_codes' : 'barcodes';
-    final newDocRef = FirebaseFirestore.instance.collection(collection).doc();
+    final newDocRef = FirebaseFirestore.instance.collection('orders').doc();
 
+    // Add data for the new order document
     await newDocRef.set({
       'code': lastScannedCode,
       'userId': userId,
+      'type': isQRCode ? 'QR_CODE' : 'BAR_CODE',
       'closedStatus': selectedDeliveryOption == 'Đóng gói',
       'shippingStatus': selectedDeliveryOption == 'Giao hàng',
       'returnStatus': selectedDeliveryOption == 'Trả hàng',
-      'isQRCode': isQRCode,
     });
 
-    await _addNewVideo(newDocRef, videoUrl, videoFileName);
-    _showMessage('Video đã được lưu cho trạng thái $selectedDeliveryOption');
+    // Now, add a new video document to the videos subcollection and get its videoId
+    final videoDocRef = await _addNewVideo(newDocRef, videoUrl, videoFileName);
+
+    _showMessage('Video đã được lưu cho đơn hàng');
   }
 
   Future<void> _updateDeliveryStatus(
@@ -140,9 +136,12 @@ class VideoUploader {
     });
   }
 
-  Future<void> _addNewVideo(
+  Future<DocumentReference> _addNewVideo(
       DocumentReference docRef, String videoUrl, String videoFileName) async {
-    final newVideoRef = docRef.collection('videos').doc();
+    // Create a new document in the 'videos' subcollection
+    final newVideoRef = docRef.collection('videos').doc(); // This generates a new unique ID
+
+    // Set data for the video document
     await newVideoRef.set({
       'url': videoUrl,
       'fileName': videoFileName,
@@ -150,6 +149,8 @@ class VideoUploader {
       'status': 'completed',
       'deliveryOption': selectedDeliveryOption,
     });
+
+    return newVideoRef; // Return the reference of the newly created video document
   }
 
   void _showMessage(String message) {

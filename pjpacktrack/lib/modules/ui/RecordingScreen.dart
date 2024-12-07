@@ -26,6 +26,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
   bool _isScanning = true;
   bool _isFlashOn = false;
   bool _isQRCode = false;
+  bool _continuousRecording = false;
   String? _lastScannedCode;
   String? _selectedDeliveryOption;
   final List<String> _videoPaths = [];
@@ -122,7 +123,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
         );
 
         await uploader.uploadVideo(videoFile.path);
-
+        print('Upload success'); // Add log
         // Reset state
         _cameraController?.dispose();
         _cameraController = null;
@@ -133,6 +134,9 @@ class _RecordingScreenState extends State<RecordingScreen> {
         _initializeScannerController();
       } catch (e) {
         print('Recording stop error: $e');
+      }
+      if (!_continuousRecording) {
+        setState(() => _selectedDeliveryOption = null);
       }
     }
   }
@@ -159,101 +163,236 @@ class _RecordingScreenState extends State<RecordingScreen> {
       ),
       body: Stack(
         children: [
-          if (_isScanning && !_isRecording && _selectedDeliveryOption != null)
-            MobileScanner(
-              controller: _scannerController,
-              onDetect: (BarcodeCapture capture) async {
-                if (_lastScannedCode == null) {
-                  final barcode = capture.barcodes.first;
-                  final String? code = barcode.rawValue;
-                  _isQRCode = barcode.format == BarcodeFormat.qrCode;
-                  if (code != null) {
-                    setState(() {
-                      _isScanning = false;
-                      _lastScannedCode = code;
-                    });
+          // Camera preview or scanner
+          _isRecording && _cameraController != null
+              ? CameraPreview(_cameraController!)
+              : _isScanning && _selectedDeliveryOption != null
+              ? _buildScanner()
+              : Container(color: Colors.black),
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
-                    );
+          // Top section - Recording mode
+          if (_selectedDeliveryOption != null)
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.1,
+              left: 0,
 
-                    await _startRecording();
-                  }
-                }
-              },
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(_isRecording ? 0.2 : 0.4),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _selectedDeliveryOption!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildModeButton('Quay lần lượt', Icons.looks_one, !_continuousRecording),
+                        const SizedBox(height: 12),
+                        _buildModeButton('Quay liên tục', Icons.repeat, _continuousRecording),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-          if (!_isScanning && _isRecording && _cameraController != null)
-            CameraPreview(_cameraController!),
+
+          // Right side - Delivery options
           Positioned(
-            top: MediaQuery.of(context).size.height * 0.2,
+            top: 0,
+            right: 0,
             left: 0,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric( vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withOpacity(0.4),
                 borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(8),
-                  bottomRight: Radius.circular(8),
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
                 ),
               ),
               child: DeliveryOptionsWidget(
-                onOptionSelected: (String option) {
-                  setState(() => _selectedDeliveryOption = option);
-                  _saveDeliveryOption(option);
-                },
+                onOptionSelected: _handleDeliveryOptionSelected,
               ),
             ),
           ),
 
+          // Center message
           if (_selectedDeliveryOption == null)
-            Positioned(
-              bottom: MediaQuery.of(context).size.height * 0.4, // Điều chỉnh vị trí
-              left: 16,
-              right: 16,
+            Center(
               child: Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.black.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'Vui lòng chọn loại giao hàng trước khi quét mã',
-                  style: TextStyle(color: Colors.white),
-                  textAlign: TextAlign.center,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.touch_app, color: Colors.white),
+                    SizedBox(width: 12),
+                    Text(
+                      'Chọn loại giao hàng để bắt đầu',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          // Bottom status
+          if (_isRecording)
+            Positioned(
+              bottom: 100,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.fiber_manual_record, color: Colors.white, size: 12),
+                      SizedBox(width: 8),
+                      Text(
+                        'Đang quay video',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
         ],
       ),
-      bottomNavigationBar: Container(
+      bottomNavigationBar: _buildBottomBar(),
+    );
+  }
+
+  Widget _buildModeButton(String label, IconData icon, bool isSelected) {
+    return InkWell(
+      onTap: _isRecording
+          ? null
+          : () {
+        setState(() {
+          // Thay đổi trạng thái của _continuousRecording dựa trên lựa chọn
+          _continuousRecording = (label == 'Quay liên tục');
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 10,
-              color: Colors.grey.withOpacity(0.5),
-              offset: const Offset(0, -1),
+          color: isSelected ? Colors.teal : Colors.black26, // Màu nền tùy thuộc vào trạng thái
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? Colors.tealAccent : Colors.transparent, // Đường viền chỉ khi được chọn
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.grey, // Màu icon tùy thuộc vào trạng thái
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.grey, // Màu chữ tùy thuộc vào trạng thái
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ],
         ),
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton.icon(
+      ),
+    );
+  }
+
+
+
+  Widget _buildBottomBar() {
+    return Container(
+      color: Colors.black,
+      padding: const EdgeInsets.all(16),
+      child: SafeArea(
+        child: ElevatedButton(
           onPressed: _isRecording ? _stopRecording : null,
-          icon: Icon(_isRecording ? Icons.stop : Icons.videocam),
-          label: const Text('Dừng Quay Video'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
             ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(_isRecording ? Icons.stop : Icons.videocam),
+              const SizedBox(width: 8),
+              Text(
+                _isRecording ? 'Dừng quay video' : 'Chờ quét mã',
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
+  Widget _buildScanner() {
+    return MobileScanner(
+      controller: _scannerController,
+      onDetect: _handleDetection,
+    );
+  }
+
+  void _handleDeliveryOptionSelected(String option) {
+    setState(() => _selectedDeliveryOption = option);
+    _saveDeliveryOption(option);
+  }
+
+  Future<void> _handleDetection(BarcodeCapture capture) async {
+    if (_lastScannedCode == null) {
+      final barcode = capture.barcodes.first;
+      final String? code = barcode.rawValue;
+      _isQRCode = barcode.format == BarcodeFormat.qrCode;
+      if (code != null) {
+        setState(() {
+          _isScanning = false;
+          _lastScannedCode = code;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
+        );
+
+        await _startRecording();
+      }
+    }
+  }
   Future<void> _saveDeliveryOption(String option) async {
     try {
       await FirebaseFirestore.instance.collection('delivery_options').add({

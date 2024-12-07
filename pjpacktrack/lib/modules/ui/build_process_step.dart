@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pjpacktrack/modules/ui/play_video.dart';
 
@@ -129,6 +128,7 @@ class ProcessStepWidget extends StatelessWidget {
             isQRCode: orderData['isQRCode'],
             deliveryOption: title,
             userId: userId,
+            fileName: videoData['fileName'],
           ),
         ),
       ),

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'order_process_screen.dart';
 
 class OrderHistoryScreen extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -22,37 +21,28 @@ class OrderHistoryScreen extends StatelessWidget {
         ),
         body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
-                .collection('qr_codes')
+                .collection('orders')
                 .where('userId', isEqualTo: currentUser.uid)
                 .snapshots(),
-            builder: (context, qrSnapshot) {
-              return StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('barcodes')
-                      .where('userId', isEqualTo: currentUser.uid)
-                      .snapshots(),
-                  builder: (context, barcodeSnapshot) {
-                    final allDocs = [...?qrSnapshot.data?.docs, ...?barcodeSnapshot.data?.docs];
+            builder: (context, snapshot) {
+              final allDocs = snapshot.data?.docs ?? [];
 
-                    return ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: allDocs.length,
-                        itemBuilder: (context, index) {
-                          final doc = allDocs[index];
-                          final data = doc.data() as Map<String, dynamic>;
-                          final isQRCode = data['isQRCode'] ?? false;
+              return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: allDocs.length,
+                  itemBuilder: (context, index) {
+                    final doc = allDocs[index];
+                    final data = doc.data() as Map<String, dynamic>;
+                    final isQRCode = data['isQRCode'] ?? false;
 
-                          return _buildOrderCard(doc.id, data, isQRCode, context, currentUser.uid);
-                        }
-                    );
-                  }
-              );
-            }
-        )
-    );
+                    return _buildOrderCard(
+                        doc.id, data, isQRCode, context, currentUser.uid);
+                  });
+            }));
   }
 
-  Widget _buildOrderCard(String docId, Map<String, dynamic> data, bool isQRCode, BuildContext context, String userId) {
+  Widget _buildOrderCard(String docId, Map<String, dynamic> data, bool isQRCode,
+      BuildContext context, String userId) {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
@@ -60,7 +50,8 @@ class OrderHistoryScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
-        onTap: () => _navigateToOrderProcess(context, data, docId, isQRCode, userId),
+        onTap: () =>
+            _navigateToOrderProcess(context, data, docId, isQRCode, userId),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -76,7 +67,8 @@ class OrderHistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderHeader(String docId, Map<String, dynamic> data, bool isQRCode) {
+  Widget _buildOrderHeader(
+      String docId, Map<String, dynamic> data, bool isQRCode) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -127,9 +119,8 @@ class OrderHistoryScreen extends StatelessWidget {
     );
   }
 
-
-  void _navigateToOrderProcess(BuildContext context, Map<String, dynamic> data, String docId, bool isQRCode, String userId) {
-
+  void _navigateToOrderProcess(BuildContext context, Map<String, dynamic> data,
+      String docId, bool isQRCode, String userId) {
     Navigator.push(
       context,
       MaterialPageRoute(

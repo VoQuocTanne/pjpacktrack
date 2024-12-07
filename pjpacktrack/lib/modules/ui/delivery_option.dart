@@ -12,10 +12,9 @@ class DeliveryOptionsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 30),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(height: 20),
           _buildOptionButton(
             context,
             'Đóng gói',
@@ -23,7 +22,7 @@ class DeliveryOptionsWidget extends StatelessWidget {
             Colors.blue,
             () => _handleOptionTap(context, 'Đóng gói'),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(width: 20),
           _buildOptionButton(
             context,
             'Giao hàng',
@@ -31,7 +30,7 @@ class DeliveryOptionsWidget extends StatelessWidget {
             Colors.green,
             () => _handleOptionTap(context, 'Giao hàng'),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(width: 20),
           _buildOptionButton(
             context,
             'Trả hàng',
@@ -39,7 +38,6 @@ class DeliveryOptionsWidget extends StatelessWidget {
             Colors.orange,
             () => _handleOptionTap(context, 'Trả hàng'),
           ),
-          const SizedBox(height: 20),
         ],
       ),
     );

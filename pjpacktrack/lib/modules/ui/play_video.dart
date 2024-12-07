@@ -7,12 +7,14 @@ class AwsVideoPlayer extends StatefulWidget {
   final bool isQRCode;
   final String deliveryOption;
   final String userId;
+  final String fileName;
   const AwsVideoPlayer({
     super.key,
     required this.orderId,
     required this.isQRCode,
     required this.deliveryOption,
     required this.userId,
+    required this.fileName,
   });
 
   @override
@@ -32,13 +34,12 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
 
   Future<void> _fetchVideoUrl() async {
     try {
-      final collection = widget.isQRCode ? 'qr_codes' : 'barcodes';
-
       final videoQuery = await FirebaseFirestore.instance
-          .collection(collection)
+          .collection('orders')
           .doc(widget.orderId)
           .collection('videos')
           .where('deliveryOption', isEqualTo: widget.deliveryOption)
+          .where('fileName', isEqualTo: widget.fileName)
           .get();
 
       if (videoQuery.docs.isNotEmpty) {
