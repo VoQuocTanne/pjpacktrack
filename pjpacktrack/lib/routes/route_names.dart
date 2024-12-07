@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pjpacktrack/model/user_repo/my_user.dart';
+import 'package:pjpacktrack/modules/forum/screens/post_list_screen.dart';
 import 'package:pjpacktrack/modules/login/change_password.dart';
 import 'package:pjpacktrack/modules/login/forgot_password.dart';
 import 'package:pjpacktrack/modules/login/login_screen.dart';
@@ -59,9 +60,11 @@ class NavigationServices {
   Future<dynamic> gotoForgotPassword() async {
     return await _pushMaterialPageRoute(const ForgotPasswordScreen());
   }
+
   Future<dynamic> gotoHowDoScreen() async {
     return await _pushMaterialPageRoute(const HowDoScreen());
   }
+
   Future<dynamic> gotoSettingsScreen() async {
     return await _pushMaterialPageRoute(const SettingsScreen());
   }
@@ -73,15 +76,23 @@ class NavigationServices {
   Future<dynamic> gotoChangepasswordScreen() async {
     return await _pushMaterialPageRoute(const ChangepasswordScreen());
   }
+
   Future<dynamic> gotoEditProfile(MyUser myUser) async {
     return await _pushMaterialPageRoute(EditProfile(myUser: myUser));
   }
+
   Future<dynamic> gotoCurrencyScreen() async {
     return await _pushMaterialPageRoute(const CurrencyScreen(),
         fullscreenDialog: true);
   }
+
   Future<dynamic> gotoCountryScreen() async {
     return await _pushMaterialPageRoute(const CountryScreen(),
+        fullscreenDialog: true);
+  }
+
+  Future<dynamic> gotoForumScreen() async {
+    return await _pushMaterialPageRoute(PostListScreen(),
         fullscreenDialog: true);
   }
 }

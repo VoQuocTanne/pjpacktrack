@@ -63,6 +63,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     else if (index == 1) {
                       // NavigationServices(context).gotoInviteFriend();
                     }
+                    // complaint screen view
+                    else if (index == 2) {
+                      NavigationServices(context).gotoForumScreen();
+                    }
                   },
                   child: Column(
                     children: <Widget>[
