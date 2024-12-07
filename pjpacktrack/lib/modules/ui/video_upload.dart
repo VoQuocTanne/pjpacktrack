@@ -95,10 +95,10 @@ class VideoUploader {
         .where('deliveryOption', isEqualTo: selectedDeliveryOption)
         .get();
 
-    if (videoQuery.docs.isNotEmpty) {
-      // Delete old video for this deliveryOption
-      await videoQuery.docs.first.reference.delete();
-    }
+    // if (videoQuery.docs.isNotEmpty) {
+    //   // Delete old video for this deliveryOption
+    //   await videoQuery.docs.first.reference.delete();
+    // }
 
     // Add new video for this deliveryOption
     await _addNewVideo(docRef, videoUrl, videoFileName);
