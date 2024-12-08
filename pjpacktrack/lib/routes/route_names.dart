@@ -10,6 +10,7 @@ import 'package:pjpacktrack/modules/profile/currency_screen.dart';
 import 'package:pjpacktrack/modules/profile/edit_profile.dart';
 import 'package:pjpacktrack/modules/profile/hepl_center_screen.dart';
 import 'package:pjpacktrack/modules/profile/how_do_screen.dart';
+import 'package:pjpacktrack/modules/profile/package_screen.dart';
 import 'package:pjpacktrack/modules/profile/settings_screen.dart';
 import 'package:pjpacktrack/modules/profile/web_view.dart';
 import 'package:pjpacktrack/routes/routes.dart';
@@ -58,6 +59,9 @@ class NavigationServices {
     return await _pushMaterialPageRoute(const SignUpScreen());
   }
 
+  Future<dynamic> gotoServicePackageScreen() async {
+    return await _pushMaterialPageRoute(ServicePackageScreen());
+  }
   Future<dynamic> gotoForgotPassword() async {
     return await _pushMaterialPageRoute(const ForgotPasswordScreen());
   }
