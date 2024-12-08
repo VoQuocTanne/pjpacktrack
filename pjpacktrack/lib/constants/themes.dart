@@ -7,7 +7,8 @@ import 'package:pjpacktrack/model/enum.dart';
 class AppTheme {
   static bool get isLightMode {
     try {
-      return Get.find<ThemeController>().isLightMode;
+      // return Get.find<ThemeController>().isLightMode;
+      return true;
     } catch (e) {
       return true;
     }
