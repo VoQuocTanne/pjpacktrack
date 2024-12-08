@@ -62,6 +62,7 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
                           features: package.features,
                           packageId: package.packageId,
                           price: package.price,
+                          videoLimit: package.videoLimit,
                           borderColor:
                               package.isFree ? Colors.green : Colors.blue,
                           onBuyTap: package.isFree
@@ -98,6 +99,7 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
     required List<String> features,
     required String price,
     required Color borderColor,
+    required int videoLimit,
     required String packageId, // Số lượng video mà gói cung cấp
     VoidCallback? onBuyTap,
   }) {
@@ -170,7 +172,7 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
                         }
 
                         try {
-                          await updateUserPackage(userId, packageId);
+                          await updateUserPackage(userId, packageId, videoLimit);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 content: Text(

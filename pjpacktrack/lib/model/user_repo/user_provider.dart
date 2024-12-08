@@ -27,7 +27,7 @@ final uploadUserProvider =
   final userService = ref.watch(userServiceProvider);
   userService.updateUser(params);
 });
-Future<void> updateUserPackage(String userId, String packageId) async {
+Future<void> updateUserPackage(String userId, String packageId, int videoLimit) async {
   try {
     final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
 
@@ -40,6 +40,7 @@ Future<void> updateUserPackage(String userId, String packageId) async {
     // Cập nhật gói dịch vụ
     await userRef.update({
       'packageId': packageId, // Lưu ID của gói
+      'limit': videoLimit,
       // 'updatedAt': FieldValue.serverTimestamp(),
     });
   } catch (e) {
