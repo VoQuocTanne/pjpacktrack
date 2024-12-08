@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:intl/intl.dart';
 import 'package:pjpacktrack/model/package_repo/package.dart';
 import 'package:pjpacktrack/model/user_repo/user_provider.dart';
+import 'package:http/http.dart' as http;
 
+import '../../model/user_repo/firebase_user_repo.dart';
+import '../../widgets/app_constant.dart';
 class ServicePackageScreen extends StatefulWidget {
   @override
   _ServicePackageScreenState createState() => _ServicePackageScreenState();
@@ -13,7 +19,7 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
   final PageController _pageController = PageController();
   final oCcy = NumberFormat("#,##0", "vi_VN");
   int _currentIndex = 0;
-
+  Map<String, dynamic>? paymentIntent;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,7 +148,7 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
                     ),
                   ),
                 )),
-            const SizedBox(height: 30),
+
             Align(
               alignment: Alignment.center,
               child: Column(
@@ -157,7 +163,7 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
                       color: Colors.blue,
                     ),
                   ),
-                  const SizedBox(height: 8),
+
                   if (onBuyTap != null)
                     ElevatedButton(
                       onPressed: () async {
@@ -170,19 +176,18 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
                           );
                           return;
                         }
-
-                        try {
-                          await updateUserPackage(userId, packageId, videoLimit);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                content: Text(
-                                    "Giới hạn video đã được nâng cấp lên $packageId.")),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Đã xảy ra lỗi: $e")),
-                          );
-                        }
+                        makePayment(price,userId, packageId, videoLimit);
+                        // try {
+                        //   ScaffoldMessenger.of(context).showSnackBar(
+                        //     SnackBar(
+                        //         content: Text(
+                        //             "Giới hạn video đã được nâng cấp lên $packageId.")),
+                        //   );
+                        // } catch (e) {
+                        //   ScaffoldMessenger.of(context).showSnackBar(
+                        //     SnackBar(content: Text("Đã xảy ra lỗi: $e")),
+                        //   );
+                        // }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: borderColor,
@@ -216,5 +221,162 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
         color: isActive ? const Color(0xFF1E2A39) : Colors.grey,
       ),
     );
+  }
+
+  Future<void> makePayment(String amount, String userId, String packageId, int videoLimit) async {
+    try {
+      paymentIntent = await createPaymentIntent(amount, 'VND');
+      await Stripe.instance
+          .initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+              paymentIntentClientSecret: paymentIntent!['client_secret'],
+              style: ThemeMode.dark,
+              merchantDisplayName: 'Quoc Tan'))
+          .then((value) {});
+
+      //now finally display payment sheeet
+      displayPaymentSheet(amount,userId, packageId, videoLimit);
+    } catch (e, s) {
+      print('exception:$e$s');
+    }
+  }
+
+  displayPaymentSheet(String amount, String userId, String packageId, int videoLimit) async {
+    try {
+      await Stripe.instance.presentPaymentSheet().then((value) async {
+        await updateUserPackage(userId, packageId, videoLimit);
+
+        showDialog(
+          context: context,
+          barrierDismissible:
+          false, // Ngăn người dùng tắt dialog bằng cách nhấn bên ngoài
+          builder: (context) => WillPopScope(
+            onWillPop: () async =>
+            false, // Ngăn người dùng tắt dialog bằng nút back
+            child: AlertDialog(
+              content: SingleChildScrollView(
+                child: Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              // NavigationServices(context).gotoLoginApp();
+                            },
+                            child: const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 16.0,
+                          ),
+                          Center(
+                            child: Text(
+                              "Giới hạn video đã được nâng cấp lên",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.lightGreen.shade700,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20.0,
+                      ),
+                      const Text(
+                        "Cảm ơn",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            // // Điều hướng về trang chủ
+                            // NavigationServices(context).gotoLoginApp();
+                          },
+                          child: Container(
+                            width: 100,
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF008080),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Trang chủ",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        paymentIntent = null;
+      }).onError((error, stackTrace) {
+        print('Error is:--->$error $stackTrace');
+      });
+    } on StripeException catch (e) {
+      print('Error is:---> $e');
+      showDialog(
+          context: context,
+          builder: (_) => const AlertDialog(
+            content: Text("Cancelled "),
+          ));
+    } catch (e) {
+      print('$e');
+    }
+  }
+
+  //  Future<Map<String, dynamic>>
+  createPaymentIntent(String amount, String currency) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': calculateAmount(amount),
+        'currency': currency,
+        'payment_method_types[]': 'card'
+      };
+
+      var response = await http.post(
+        Uri.parse('https://api.stripe.com/v1/payment_intents'),
+        headers: {
+          'Authorization': 'Bearer $secretKey',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body,
+      );
+      // ignore: avoid_print
+      print('Payment Intent Body->>> ${response.body.toString()}');
+      return jsonDecode(response.body);
+    } catch (err) {
+      // ignore: avoid_print
+      print('err charging user: ${err.toString()}');
+    }
+  }
+
+  calculateAmount(String amount) {
+    final calculatedAmout = (int.parse(amount));
+
+    return calculatedAmout.toString();
   }
 }
