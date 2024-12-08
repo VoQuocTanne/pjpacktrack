@@ -207,7 +207,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
               ),
             ),
 
-          // Right side - Delivery options
           Positioned(
             top: 0,
             right: 0,
@@ -254,7 +253,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
                 ),
               ),
             ),
-
           // Bottom status
           if (_isRecording)
             Positioned(
