@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:path/path.dart' as p;
 import 'package:aws_storage_service/aws_storage_service.dart';
 import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/modules/ui/delivery_option.dart';
@@ -162,20 +160,20 @@ class _RecordingScreenState extends State<RecordingScreen> {
         ],
       ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
           // Camera preview or scanner
           _isRecording && _cameraController != null
               ? CameraPreview(_cameraController!)
               : _isScanning && _selectedDeliveryOption != null
-              ? _buildScanner()
-              : Container(color: Colors.black),
+                  ? _buildScanner()
+                  : Container(color: Colors.black),
 
           // Top section - Recording mode
           if (_selectedDeliveryOption != null)
             Positioned(
               top: MediaQuery.of(context).size.height * 0.1,
               left: 0,
-
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -183,7 +181,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       _selectedDeliveryOption!,
@@ -197,9 +195,11 @@ class _RecordingScreenState extends State<RecordingScreen> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildModeButton('Quay lần lượt', Icons.looks_one, !_continuousRecording),
+                        _buildModeButton('Quay lần lượt', Icons.looks_one,
+                            !_continuousRecording),
                         const SizedBox(height: 12),
-                        _buildModeButton('Quay liên tục', Icons.repeat, _continuousRecording),
+                        _buildModeButton('Quay liên tục', Icons.repeat,
+                            _continuousRecording),
                       ],
                     ),
                   ],
@@ -213,7 +213,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
             right: 0,
             left: 0,
             child: Container(
-              padding: const EdgeInsets.symmetric( vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.4),
                 borderRadius: const BorderRadius.only(
@@ -231,7 +231,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
           if (_selectedDeliveryOption == null)
             Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(12),
@@ -262,7 +263,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
               right: 0,
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.red.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(20),
@@ -270,7 +272,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: const [
-                      Icon(Icons.fiber_manual_record, color: Colors.white, size: 12),
+                      Icon(Icons.fiber_manual_record,
+                          color: Colors.white, size: 12),
                       SizedBox(width: 8),
                       Text(
                         'Đang quay video',
@@ -292,18 +295,20 @@ class _RecordingScreenState extends State<RecordingScreen> {
       onTap: _isRecording
           ? null
           : () {
-        setState(() {
-          // Thay đổi trạng thái của _continuousRecording dựa trên lựa chọn
-          _continuousRecording = (label == 'Quay liên tục');
-        });
-      },
+              setState(() {
+                // Thay đổi trạng thái của _continuousRecording dựa trên lựa chọn
+                _continuousRecording = (label == 'Quay liên tục');
+              });
+            },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.teal : Colors.black26, // Màu nền tùy thuộc vào trạng thái
+          color: isSelected ? Colors.teal : Colors.black26,
+          // Màu nền tùy thuộc vào trạng thái
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? Colors.tealAccent : Colors.transparent, // Đường viền chỉ khi được chọn
+            color: isSelected ? Colors.tealAccent : Colors.transparent,
+            // Đường viền chỉ khi được chọn
             width: 1,
           ),
         ),
@@ -312,14 +317,16 @@ class _RecordingScreenState extends State<RecordingScreen> {
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.white : Colors.grey, // Màu icon tùy thuộc vào trạng thái
+              color: isSelected ? Colors.white : Colors.grey,
+              // Màu icon tùy thuộc vào trạng thái
               size: 20,
             ),
             const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.grey, // Màu chữ tùy thuộc vào trạng thái
+                color: isSelected ? Colors.white : Colors.grey,
+                // Màu chữ tùy thuộc vào trạng thái
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
@@ -329,8 +336,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
       ),
     );
   }
-
-
 
   Widget _buildBottomBar() {
     return Container(
@@ -386,13 +391,15 @@ class _RecordingScreenState extends State<RecordingScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
+          SnackBar(
+              content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
         );
 
         await _startRecording();
       }
     }
   }
+
   Future<void> _saveDeliveryOption(String option) async {
     try {
       await FirebaseFirestore.instance.collection('delivery_options').add({

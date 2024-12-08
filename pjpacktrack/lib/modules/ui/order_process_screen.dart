@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pjpacktrack/modules/ui/play_video.dart';
-
 import 'build_process_step.dart';
 
 class OrderProcessScreen extends StatelessWidget {
