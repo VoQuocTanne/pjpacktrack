@@ -1,10 +1,12 @@
 import 'package:camera/camera.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pjpacktrack/constants/themes.dart';
 import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/modules/bottom_tab/components/tab_button_UI.dart';
 import 'package:pjpacktrack/modules/profile/profile_screen.dart';
+import 'package:pjpacktrack/modules/store/list_store_screen.dart';
 import 'package:pjpacktrack/modules/ui/RecordingScreen.dart';
 import 'package:pjpacktrack/modules/ui/odervideo.dart';
 import 'package:pjpacktrack/widgets/common_card.dart';
@@ -12,6 +14,7 @@ import 'package:pjpacktrack/widgets/common_card.dart';
 class BottomTabScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
   const BottomTabScreen({Key? key, required this.cameras}) : super(key: key);
+
   @override
   State<BottomTabScreen> createState() => _BottomTabScreenState();
 }
@@ -81,6 +84,21 @@ class _BottomTabScreenState extends State<BottomTabScreen>
               animationController: _animationController,
             );
           });
+        } else if (tabType == BottomBarType.store) {
+          // Lấy UID của người dùng đang đăng nhập từ FirebaseAuth
+          final user = FirebaseAuth.instance.currentUser;
+          final uid = user?.uid ?? ''; // Nếu không có người dùng, UID là rỗng
+
+          setState(() {
+            // Navigate to StoreListScreen khi nhấn tab store
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    StoreListScreen(uid: uid), // Truyền UID vào
+              ),
+            );
+          });
         }
       });
     }
@@ -118,6 +136,14 @@ class _BottomTabScreenState extends State<BottomTabScreen>
                   tabClick(BottomBarType.profile);
                 },
               ),
+              TabButtonUI(
+                icon: FontAwesomeIcons.store, // Icon for Store
+                isSelected: tabType == BottomBarType.store,
+                text: 'Store', // Text for Store
+                onTap: () {
+                  tabClick(BottomBarType.store);
+                },
+              ),
             ],
           ),
           SizedBox(
@@ -129,4 +155,4 @@ class _BottomTabScreenState extends State<BottomTabScreen>
   }
 }
 
-enum BottomBarType { order, camqr, profile }
+enum BottomBarType { order, camqr, profile, store } // Add store type

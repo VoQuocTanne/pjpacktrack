@@ -42,10 +42,6 @@ class PostCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    post.title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
                   SizedBox(height: 8),
                   Text(post.content,
                       maxLines: 2, overflow: TextOverflow.ellipsis),
