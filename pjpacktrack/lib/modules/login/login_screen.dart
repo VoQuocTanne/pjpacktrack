@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pjpacktrack/future/authentication_bloc/authentication_bloc.dart';
 import 'package:pjpacktrack/language/app_localizations.dart';
-import 'package:pjpacktrack/modules/login/facebook_google_button_view.dart';
 import 'package:pjpacktrack/routes/route_names.dart';
 import 'package:pjpacktrack/utils/validator.dart';
 import 'package:pjpacktrack/widgets/common_appbar_view.dart';

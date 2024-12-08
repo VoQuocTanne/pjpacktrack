@@ -129,14 +129,6 @@ class _BottomTabScreenState extends State<BottomTabScreen>
                 },
               ),
               TabButtonUI(
-                icon: FontAwesomeIcons.user,
-                isSelected: tabType == BottomBarType.profile,
-                text: Loc.alized.profile,
-                onTap: () {
-                  tabClick(BottomBarType.profile);
-                },
-              ),
-              TabButtonUI(
                 icon: FontAwesomeIcons.store, // Icon for Store
                 isSelected: tabType == BottomBarType.store,
                 text: 'Store', // Text for Store
@@ -144,6 +136,15 @@ class _BottomTabScreenState extends State<BottomTabScreen>
                   tabClick(BottomBarType.store);
                 },
               ),
+              TabButtonUI(
+                icon: FontAwesomeIcons.user,
+                isSelected: tabType == BottomBarType.profile,
+                text: Loc.alized.profile,
+                onTap: () {
+                  tabClick(BottomBarType.profile);
+                },
+              ),
+
             ],
           ),
           SizedBox(

@@ -31,6 +31,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _fnameController = TextEditingController();
   String _errorPNum = '';
   final TextEditingController _pnumController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,17 +126,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         onTap: () {
                           if (_allValidation()) {
                             final myUser = MyUser(
-                                userId:
-                                    '', // Hoặc để trống nếu không cần tại thời điểm này
+                                userId: '',
+                                // Hoặc để trống nếu không cần tại thời điểm này
                                 email: _emailController.text.trim(),
                                 fullname: _fnameController.text.trim(),
-                                picture: null, // Nếu không có ảnh
-                                phonenumber: _pnumController.text
-                                    .trim(), // Nếu chưa có số điện thoại
-                                birthday: DateTime
-                                    .now(), // Nếu không có ngày sinh cụ thể
-                                role: 'user', // Gán quyền mặc định
-                                status: 'active');
+                                picture: null,
+                                // Nếu không có ảnh
+                                phonenumber: _pnumController.text.trim(),
+                                // Nếu chưa có số điện thoại
+                                birthday: DateTime.now(),
+                                // Nếu không có ngày sinh cụ thể
+                                role: 'user',
+                                // Gán quyền mặc định
+                                status: 'active',
+                                rank: 'free',
+                                limit: 50,
+                                quantity: 0);
                             setState(() {
                               context
                                   .read<AuthenticationBloc>()

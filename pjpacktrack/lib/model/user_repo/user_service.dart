@@ -14,15 +14,17 @@ class UserService {
         final data = snapshot.data();
         if (data != null) {
           return MyUser(
-            userId: userId,
-            email: data['email'],
-            fullname: data['fullname'] ?? 'Unknown User',
-            picture: data['picture'],
-            phonenumber: data['phonenumber'],
-            birthday: (data['birthday'] as Timestamp).toDate(),
-            role: data['role'],
-            status: data['status'],
-          );
+              userId: userId,
+              email: data['email'],
+              fullname: data['fullname'] ?? 'Unknown User',
+              picture: data['picture'],
+              phonenumber: data['phonenumber'],
+              birthday: (data['birthday'] as Timestamp).toDate(),
+              role: data['role'],
+              status: data['status'],
+              rank: data['free'],
+              limit: 50,
+              quantity: 0);
         }
       }
       return null;
@@ -70,25 +72,25 @@ class UserService {
     }
   }
 
-  // Future<String> _getCurrentUserName() async {
-  //   User? user = FirebaseAuth.instance.currentUser;
+// Future<String> _getCurrentUserName() async {
+//   User? user = FirebaseAuth.instance.currentUser;
 
-  //   if (user != null) {
-  //     // Assuming you store the username in Firestore or some other place
-  //     DocumentSnapshot userDoc = await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(user.uid)
-  //         .get();
+//   if (user != null) {
+//     // Assuming you store the username in Firestore or some other place
+//     DocumentSnapshot userDoc = await FirebaseFirestore.instance
+//         .collection('users')
+//         .doc(user.uid)
+//         .get();
 
-  //     if (userDoc.exists) {
-  //       // Get the 'name' field from the user document (make sure to replace 'name' with the actual field name)
-  //       return userDoc['name'] ??
-  //           'Tên người dùng'; // Return a fallback name if not found
-  //     } else {
-  //       return 'Tên người dùng'; // Fallback if user document doesn't exist
-  //     }
-  //   } else {
-  //     throw Exception('User is not logged in');
-  //   }
-  // }
+//     if (userDoc.exists) {
+//       // Get the 'name' field from the user document (make sure to replace 'name' with the actual field name)
+//       return userDoc['name'] ??
+//           'Tên người dùng'; // Return a fallback name if not found
+//     } else {
+//       return 'Tên người dùng'; // Fallback if user document doesn't exist
+//     }
+//   } else {
+//     throw Exception('User is not logged in');
+//   }
+// }
 }
