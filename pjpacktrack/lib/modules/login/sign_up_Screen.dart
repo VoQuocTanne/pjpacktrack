@@ -130,18 +130,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 // Hoặc để trống nếu không cần tại thời điểm này
                                 email: _emailController.text.trim(),
                                 fullname: _fnameController.text.trim(),
-                                picture: null,
-                                // Nếu không có ảnh
-                                phonenumber: _pnumController.text.trim(),
-                                // Nếu chưa có số điện thoại
-                                birthday: DateTime.now(),
-                                // Nếu không có ngày sinh cụ thể
-                                role: 'user',
-                                // Gán quyền mặc định
+                                picture: null, // Nếu không có ảnh
+                                phonenumber: _pnumController.text
+                                    .trim(), // Nếu chưa có số điện thoại
+                                birthday: DateTime
+                                    .now(), // Nếu không có ngày sinh cụ thể
+                                role: 'user', // Gán quyền mặc định
                                 status: 'active',
-                                rank: 'free',
-                                limit: 50,
-                                quantity: 0);
+                                quantily: 0,
+                                limit: 600,
+                                packageId: 'I9DKf6eLpXDqtLnu5t0l');
                             setState(() {
                               context
                                   .read<AuthenticationBloc>()

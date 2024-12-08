@@ -10,9 +10,9 @@ class MyUserEntity extends Equatable {
   final DateTime birthday;
   final String role;
   final String status;
-  final String rank;
-  final int quantity;
   final int limit;
+  final String packageId; // Thêm trường packageId
+  final int quantily; // Thêm trường quantily
 
   const MyUserEntity({
     required this.userId,
@@ -23,9 +23,9 @@ class MyUserEntity extends Equatable {
     required this.birthday,
     required this.role,
     required this.status,
-    required this.rank,
-    required this.quantity,
     required this.limit,
+    required this.packageId, // Bắt buộc trường packageId
+    required this.quantily, // Bắt buộc trường quantily
   });
 
   Map<String, dynamic> toDocument() {
@@ -35,13 +35,12 @@ class MyUserEntity extends Equatable {
       'fullname': fullname,
       'picture': picture,
       'phonenumber': phonenumber,
-      'birthday':
-          Timestamp.fromDate(birthday), // Chuyển DateTime thành Timestamp
+      'birthday': Timestamp.fromDate(birthday), // Chuyển DateTime thành Timestamp
       'role': role,
       'status': status,
-      'rank': rank,
-      'quantity': quantity,
       'limit': limit,
+      'packageId': packageId, // Thêm packageId
+      'quantily': quantily, // Thêm quantily
     };
   }
 
@@ -52,19 +51,29 @@ class MyUserEntity extends Equatable {
       fullname: doc['fullname'] as String,
       picture: doc['picture'] as String?,
       phonenumber: doc['phonenumber'] as String,
-      birthday: (doc['birthday'] as Timestamp).toDate(),
-      // Chuyển Timestamp thành DateTime
+      birthday: (doc['birthday'] as Timestamp).toDate(), // Chuyển Timestamp thành DateTime
       role: doc['role'] as String,
       status: doc['status'] as String,
-      rank: doc['rank'] as String,
-      quantity: doc['quantity'],
       limit: doc['limit'],
+      packageId: doc['packageId'] ?? 'I9DKf6eLpXDqtLnu5t0l', // Đảm bảo giá trị mặc định nếu không tồn tại
+      quantily: doc['quantily'] ?? 0, // Đảm bảo giá trị mặc định nếu không tồn tại
     );
   }
 
   @override
-  List<Object?> get props =>
-      [userId, email, fullname, picture, phonenumber, birthday, role, status, rank, quantity, limit];
+  List<Object?> get props => [
+        userId,
+        email,
+        fullname,
+        picture,
+        phonenumber,
+        birthday,
+        role,
+        status,
+        limit,
+        packageId, // Thêm packageId vào props
+        quantily, // Thêm quantily vào props
+      ];
 
   @override
   String toString() {
@@ -77,9 +86,9 @@ class MyUserEntity extends Equatable {
       birthday: $birthday,
       role: $role,
       status: $status,
-       rank: $rank,
-      quantity: $quantity,
       limit: $limit,
+      packageId: $packageId, // In ra packageId
+      quantily: $quantily // In ra quantily
     }''';
   }
 }

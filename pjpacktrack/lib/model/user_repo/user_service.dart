@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:pjpacktrack/model/user_repo/my_user.dart';
 
 class UserService {
@@ -14,17 +14,24 @@ class UserService {
         final data = snapshot.data();
         if (data != null) {
           return MyUser(
-              userId: userId,
-              email: data['email'],
-              fullname: data['fullname'] ?? 'Unknown User',
-              picture: data['picture'],
-              phonenumber: data['phonenumber'],
-              birthday: (data['birthday'] as Timestamp).toDate(),
-              role: data['role'],
-              status: data['status'],
-              rank: data['free'],
-              limit: 50,
-              quantity: 0);
+            userId: userId,
+            email: data['email'] ??
+                '', // Giá trị mặc định là chuỗi rỗng nếu không tồn tại
+            fullname: data['fullname'] ??
+                'Unknown User', // Giá trị mặc định là 'Unknown User'
+            picture: data['picture'], // Có thể là null
+            phonenumber:
+                data['phonenumber'] ?? '', // Giá trị mặc định là chuỗi rỗng
+            birthday: (data['birthday'] as Timestamp)
+                .toDate(), // Chuyển Timestamp thành DateTime
+            role: data['role'] ?? 'user', // Giá trị mặc định là 'user'
+            status: data['status'] ?? 'active', // Giá trị mặc định là 'active'
+            packageId: data['packageId'] ??
+                'I9DKf6eLpXDqtLnu5t0l', // Giá trị mặc định là 0 nếu không tồn tại
+            quantily: data['quantily'] ??
+                0, // Giá trị mặc định là 0 nếu không tồn tại
+                limit: 600,
+          );
         }
       }
       return null;
@@ -47,6 +54,8 @@ class UserService {
         'phonenumber': user.phonenumber,
         'picture': user.picture,
         'birthday': user.birthday,
+        'packageId': user.packageId,
+        'quantily': user.quantily,
       };
 
       // Cập nhật dữ liệu lên Firestore

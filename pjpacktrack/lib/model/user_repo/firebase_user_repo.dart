@@ -88,9 +88,9 @@ class FirebaseUserRepository implements UserRepository {
             birthday: DateTime.now(), // Nếu không có ngày sinh cụ thể
             role: 'user', // Gán quyền mặc định
             status: 'active',
-            rank: 'free',
-            limit: 50,
-            quantity: 0);
+            limit: 600,
+            quantily: 0,
+            packageId: 'I9DKf6eLpXDqtLnu5t0l');
 
         return myUser;
       } else {

@@ -10,9 +10,9 @@ class MyUser extends Equatable {
   late DateTime birthday; // Chuyển đổi sang DateTime
   final String role;
   final String status;
-  final String rank;
   final int limit;
-  final int quantity;
+  late String packageId; // Thêm packageId
+  late int quantily; // Thêm quantily
 
   MyUser({
     required this.userId,
@@ -23,9 +23,9 @@ class MyUser extends Equatable {
     required this.birthday, // Chuyển đổi sang DateTime
     required this.role,
     required this.status,
-    required this.rank,
     required this.limit,
-    required this.quantity,
+    required this.packageId, // Thêm packageId
+    required this.quantily, // Thêm quantily
   });
 
   /// Empty user which represents an unauthenticated user.
@@ -38,9 +38,9 @@ class MyUser extends Equatable {
     birthday: DateTime.now(),
     role: 'user',
     status: 'active',
-    rank: 'free',
-    limit: 50,
-    quantity: 0,
+    limit: 600,
+    packageId: 'I9DKf6eLpXDqtLnu5t0l', // Giá trị mặc định
+    quantily: 0, // Giá trị mặc định
   );
 
   /// Modify MyUser parameters
@@ -53,9 +53,9 @@ class MyUser extends Equatable {
     DateTime? birthday, // Chuyển đổi sang DateTime
     String? role,
     String? status,
-    String? rank,
     int? limit,
-    int? quantity,
+    String? packageId, // Thêm packageId
+    int? quantily, // Thêm quantily
   }) {
     return MyUser(
       userId: userId ?? this.userId,
@@ -67,9 +67,9 @@ class MyUser extends Equatable {
       // Chuyển đổi sang DateTime
       role: role ?? this.role,
       status: status ?? this.status,
-      rank: rank ?? this.rank,
       limit: limit ?? this.limit,
-      quantity: quantity ?? this.quantity,
+      packageId: packageId ?? this.packageId, // Thêm packageId
+      quantily: quantily ?? this.quantily, // Thêm quantily
     );
   }
 
@@ -91,9 +91,9 @@ class MyUser extends Equatable {
       // Sử dụng DateTime
       role: role,
       status: status,
-      rank: rank,
-      quantity: quantity,
       limit: limit,
+      packageId: packageId, // Thêm packageId
+      quantily: quantily, // Thêm quantily (tên trường trong entity là quantity)
     );
   }
 
@@ -109,9 +109,9 @@ class MyUser extends Equatable {
       // Sử dụng DateTime từ entity
       role: entity.role,
       status: entity.status,
-      rank: entity.rank,
-      quantity: entity.quantity,
       limit: entity.limit,
+      packageId: entity.packageId, // Thêm packageId
+      quantily: entity.quantily, // Thêm quantily (tên trường trong entity là quantity)
     );
   }
 
@@ -125,8 +125,8 @@ class MyUser extends Equatable {
         birthday,
         role,
         status,
-        rank,
-        quantity,
-        limit
+        limit,
+        packageId, // Thêm packageId vào props
+        quantily, // Thêm quantily vào props
       ];
 }

@@ -39,6 +39,56 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
             child: Container(child: appBar(ref)), // Truyền ref vào appBar
           ),
+          // Thêm khu vực bán gói dịch vụ
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.0),
+                color: Theme.of(context).cardColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    blurRadius: 6.0,
+                    spreadRadius: 2.0,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Dịch vụ Premium',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    'Trải nghiệm các tính năng cao cấp với gói dịch vụ Premium của chúng tôi!',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      NavigationServices(context).gotoServicePackageScreen();
+                    },
+                    child: const Text('Mua ngay'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 16.0),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               physics: const BouncingScrollPhysics(),
