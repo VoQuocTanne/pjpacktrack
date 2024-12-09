@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:aws_storage_service/aws_storage_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,6 +20,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final _contentController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   List<XFile> _imageFiles = [];
+
+  final user = FirebaseAuth.instance.currentUser;
 
   void _pickImages() async {
     final List<XFile>? selectedImages = await _picker.pickMultiImage();
@@ -88,29 +91,46 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       return;
     }
 
+    // Kiểm tra nếu user là null
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vui lòng đăng nhập trước khi tạo bài viết')),
+      );
+      return;
+    }
+
     try {
       List<String> imageUrls = [];
       if (_imageFiles.isNotEmpty) {
-        imageUrls =
-            await _uploadImagesToAWS(); // Đảm bảo gọi đúng phương thức và đợi kết quả
+        imageUrls = await _uploadImagesToAWS();
       }
+
+      // Lấy thông tin người dùng từ Firestore
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid) // Đảm bảo user không null
+          .get();
+
+      String authorName = userDoc.exists && userDoc['fullname'] != null
+          ? userDoc['fullname']
+          : 'Người Dùng';
 
       final post = PostModel(
         content: _contentController.text.trim(),
-        authorId: 'current_user_id', // Replace with actual user ID
-        authorName: 'Nhà Bán Hàng', // Replace with actual user name
-        imageUrls: imageUrls, // Lưu trữ danh sách URL ảnh
+        authorId: user!.uid, // Sử dụng uid của người dùng hiện tại
+        authorName: authorName, // Gán tên người dùng vào đây
+        imageUrls: imageUrls,
         createdAt: DateTime.now(),
         viewCount: 0,
         commentCount: 0,
       );
 
-      // Add post to Firestore and retrieve the generated ID
+      // Thêm bài viết vào Firestore và nhận ID được tạo
       DocumentReference postRef = await FirebaseFirestore.instance
           .collection('posts')
           .add(post.toFirestore());
 
-      // Update the PostModel with the Firestore document ID
+      // Cập nhật PostModel với ID của bài viết
       post.id = postRef.id;
 
       Navigator.pop(context);

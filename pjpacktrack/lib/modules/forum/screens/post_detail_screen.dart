@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pjpacktrack/modules/forum/models/comment_model.dart';
@@ -14,15 +15,16 @@ class PostDetailScreen extends StatefulWidget {
 
 class _PostDetailScreenState extends State<PostDetailScreen> {
   final TextEditingController _commentController = TextEditingController();
+  final user = FirebaseAuth.instance.currentUser;
 
   void _addComment() async {
     if (_commentController.text.trim().isEmpty) return;
 
     final comment = CommentModel(
-      postId:
-          widget.post.id!, // The id will now be non-null after saving the post
-      authorId: 'current_user_id', // Replace with actual user ID
-      authorName: 'Nhà Bán Hàng', // Replace with actual user name
+      postId: widget.post.id!,
+      authorId: user!.uid, // Use actual user ID from FirebaseAuth
+      authorName:
+          'Nhà Bán Hàng', // This can be updated to use the actual user name
       content: _commentController.text.trim(),
       createdAt: DateTime.now(),
     );
@@ -51,7 +53,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       ),
       body: Column(
         children: [
-          // Combined post content and comments
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
@@ -59,21 +60,25 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Text(
-                    //   widget.post.title,
-                    //   style:
-                    //       TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    // ),
-                    SizedBox(height: 8),
+                    // Post Author and Date
                     Row(
                       children: [
                         Icon(Icons.person, color: Colors.grey),
                         SizedBox(width: 8),
-                        Text(widget.post.authorName),
+                        Text(
+                          widget.post.authorName,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
                       ],
                     ),
                     SizedBox(height: 16),
-                    Text(widget.post.content),
+                    Text(
+                      widget.post.content,
+                      style: TextStyle(fontSize: 16, height: 1.5),
+                    ),
                     SizedBox(height: 16),
 
                     // Display Post Images
@@ -81,12 +86,15 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       Column(
                         children: widget.post.imageUrls.map((imageUrl) {
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Image.network(
-                              imageUrl,
-                              width: double.infinity,
-                              fit: BoxFit
-                                  .contain, // Ensure image is displayed as is
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                imageUrl,
+                                width: double.infinity,
+                                fit: BoxFit.contain,
+                                height: 300, // Adjust height as needed
+                              ),
                             ),
                           );
                         }).toList(),
@@ -94,7 +102,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
                     Divider(height: 32, color: Colors.grey),
 
-                    // Display Comments
+                    // Display Comments Section
                     StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('comments')
@@ -139,6 +147,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           return Center(child: Text('Chưa có bình luận nào.'));
                         }
 
+                        // Lấy danh sách các bình luận từ Firestore
                         var comments = snapshot.data!.docs
                             .map((doc) => CommentModel.fromFirestore(doc))
                             .toList();
@@ -148,14 +157,54 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           physics: NeverScrollableScrollPhysics(),
                           itemCount: comments.length,
                           itemBuilder: (context, index) {
-                            return ListTile(
-                              title: Text(comments[index].authorName),
-                              subtitle: Text(comments[index].content),
-                              trailing: Text(
-                                '${comments[index].createdAt.day}/${comments[index].createdAt.month}/${comments[index].createdAt.year} ${comments[index].createdAt.hour}:${comments[index].createdAt.minute}',
-                                style:
-                                    TextStyle(color: Colors.grey, fontSize: 12),
-                              ),
+                            return FutureBuilder<DocumentSnapshot>(
+                              future: FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(
+                                      comments[index].authorId) // Get user data
+                                  .get(),
+                              builder: (context, userSnapshot) {
+                                if (userSnapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return ListTile(
+                                    title: Text('Đang tải tên người dùng...'),
+                                  );
+                                }
+
+                                if (userSnapshot.hasError) {
+                                  return ListTile(
+                                    title: Text('Lỗi tải tên người dùng'),
+                                  );
+                                }
+
+                                // Retrieve the author's name
+                                String authorName = userSnapshot.hasData &&
+                                        userSnapshot.data!.exists &&
+                                        userSnapshot.data!['fullname'] != null
+                                    ? userSnapshot.data!['fullname']
+                                    : 'Người Dùng';
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    title: Text(
+                                      authorName,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Text(
+                                      comments[index].content,
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    trailing: Text(
+                                      '${comments[index].createdAt.day}/${comments[index].createdAt.month}/${comments[index].createdAt.year} ${comments[index].createdAt.hour}:${comments[index].createdAt.minute}',
+                                      style: TextStyle(
+                                          color: Colors.grey, fontSize: 12),
+                                    ),
+                                  ),
+                                );
+                              },
                             );
                           },
                         );
@@ -179,7 +228,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       hintText: 'Nhập bình luận...',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(color: Colors.grey),
                       ),
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                     ),
                   ),
                 ),

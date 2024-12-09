@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:aws_storage_service/aws_storage_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -9,9 +10,11 @@ import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/model/setting_list_data.dart';
 import 'package:pjpacktrack/model/user_repo/my_user.dart';
 import 'package:pjpacktrack/model/user_repo/user_provider.dart';
+import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/widgets/common_appbar_view.dart';
 import 'package:pjpacktrack/widgets/common_card.dart';
 import 'package:pjpacktrack/widgets/remove_focuse.dart';
+import 'package:path/path.dart' as p;
 
 class EditProfile extends ConsumerStatefulWidget {
   final MyUser myUser;
@@ -42,6 +45,13 @@ class _EditProfileState extends ConsumerState<EditProfile> {
       text: DateFormat('dd/MM/yyyy').format(widget.myUser.birthday),
     );
   }
+
+  final AwsCredentialsConfig credentialsConfig = AwsCredentialsConfig(
+    accessKey: AwsConfig.accessKey, // Sử dụng giá trị từ AwsConfig
+    secretKey: AwsConfig.secretKey,
+    bucketName: AwsConfig.bucketName,
+    region: AwsConfig.region,
+  );
 
   // Hàm chọn ảnh từ thư viện
   Future<void> _pickImage() async {
@@ -75,24 +85,29 @@ class _EditProfileState extends ConsumerState<EditProfile> {
     try {
       String? photoURL;
 
-      // Kiểm tra nếu có ảnh mới thì tải ảnh lên và lấy URL
+      // Kiểm tra nếu có ảnh mới thì tải ảnh lên AWS và lấy URL
       if (_imageFile != null) {
         final userId = widget.myUser.userId;
-        final storageRef =
-            FirebaseStorage.instance.ref().child('user_images/$userId.jpg');
-        await storageRef.putFile(_imageFile!);
-        photoURL = await storageRef.getDownloadURL();
+        String filePath = _imageFile!.path;
+        String fileName = p.basename(filePath);
+
+        // Tải ảnh lên AWS
+        List<String> imageUrls = await _uploadImagesToAWS(filePath);
+
+        if (imageUrls.isNotEmpty) {
+          photoURL = imageUrls[0]; // Lấy URL của ảnh đầu tiên nếu có
+        }
       }
 
       // Cập nhật thông tin người dùng với dữ liệu mới
       final updatedUser = widget.myUser.copyWith(
         fullname: _nameController.text,
         phonenumber: _phoneController.text,
-        picture: photoURL ?? widget.myUser.picture,
+        picture: photoURL ?? widget.myUser.picture, // Cập nhật hình ảnh
         birthday: DateFormat('dd/MM/yyyy').parse(_birthdayController.text),
       );
 
-      // Sử dụng provider để cập nhật Firestore
+      // Cập nhật Firestore với thông tin người dùng mới
       await ref.read(userServiceProvider).updateUser(updatedUser);
 
       setState(() {
@@ -103,7 +118,9 @@ class _EditProfileState extends ConsumerState<EditProfile> {
         widget.myUser.birthday =
             DateFormat('dd/MM/yyyy').parse(_birthdayController.text);
       });
+
       Navigator.pop(context);
+
       // Hiển thị thông báo thành công
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -114,6 +131,48 @@ class _EditProfileState extends ConsumerState<EditProfile> {
       print("Đã cập nhật thông tin người dùng thành công");
     } catch (e) {
       print("Lỗi khi cập nhật thông tin người dùng: $e");
+    }
+  }
+
+// Hàm tải ảnh lên AWS
+  Future<List<String>> _uploadImagesToAWS(String filePath) async {
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đang tải ảnh lên AWS...')),
+      );
+
+      List<String> imageUrls = [];
+      String fileName = p.basename(filePath);
+
+      // Tạo cấu hình tải ảnh lên AWS
+      UploadTaskConfig uploadConfig = UploadTaskConfig(
+        credentailsConfig: credentialsConfig,
+        url: 'avatar/$fileName', // Lưu ảnh vào thư mục "avatar"
+        uploadType: UploadType.file,
+        file: File(filePath),
+      );
+
+      UploadFile uploadFile = UploadFile(config: uploadConfig);
+
+      await uploadFile.upload().then((value) async {
+        // Sau khi tải lên thành công, lấy URL công khai từ S3
+        String imageUrl =
+            'https://${AwsConfig.bucketName}.s3.${AwsConfig.region}.amazonaws.com/avatar/$fileName';
+
+        imageUrls.add(imageUrl);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tải ảnh lên thành công: $fileName')),
+        );
+        uploadFile.dispose(); // Giải phóng tài nguyên
+      });
+
+      return imageUrls;
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi tải ảnh lên AWS: $e')),
+      );
+      return [];
     }
   }
 
@@ -210,11 +269,12 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                   child: ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(60.0)),
                     child: (_imageFile != null)
-                        ? Image.file(_imageFile!, fit: BoxFit.cover)
+                        ? Image.file(_imageFile!,
+                            fit: BoxFit.cover) // Hiển thị ảnh đã chọn
                         : (widget.myUser.picture != null &&
                                 widget.myUser.picture!.isNotEmpty)
                             ? Image.network(widget.myUser.picture!,
-                                fit: BoxFit.cover)
+                                fit: BoxFit.cover) // Hiển thị ảnh từ URL
                             : Icon(Icons.person,
                                 size: 70.0,
                                 color: const Color.fromARGB(179, 41, 40, 40)),
@@ -231,7 +291,7 @@ class _EditProfileState extends ConsumerState<EditProfile> {
                       child: InkWell(
                         borderRadius:
                             const BorderRadius.all(Radius.circular(24.0)),
-                        onTap: _pickImage,
+                        onTap: _pickImage, // Chọn ảnh
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Icon(

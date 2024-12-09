@@ -74,24 +74,21 @@ class PostListScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Display the author's name
-                  Text(post.authorName,
+                  Text(post.authorName, // Hiển thị tên người đăng
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                   SizedBox(height: 4),
-                  // Display the post's creation date
                   Text(
                     '${post.createdAt.day}/${post.createdAt.month}/${post.createdAt.year} ${post.createdAt.hour}:${post.createdAt.minute}',
                     style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                   SizedBox(height: 8),
-                  // Display the post content summary
                   Text(post.content,
-                      maxLines: 2,
+                      maxLines:
+                          4, // Tăng số dòng để hiển thị nhiều nội dung hơn
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 14)),
                   SizedBox(height: 8),
-                  // Display the comment count
                   Row(
                     children: [
                       Icon(Icons.comment, size: 16, color: Colors.grey),
@@ -109,10 +106,12 @@ class PostListScreen extends StatelessWidget {
                 child: Image.network(
                   post.imageUrls[0],
                   width: double.infinity,
-                  height: 180,
-                  fit: BoxFit.cover,
+                  height: 400, // Tăng chiều cao hình ảnh nếu cần
+                  fit: BoxFit.contain, // Đảm bảo hình ảnh không bị cắt
                 ),
               ),
+
+            SizedBox(height: 16), // Thêm khoảng cách dưới hình ảnh
           ],
         ),
       ),
