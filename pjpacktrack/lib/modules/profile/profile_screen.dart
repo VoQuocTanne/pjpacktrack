@@ -113,10 +113,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     else if (index == 1) {
                       // NavigationServices(context).gotoInviteFriend();
                     }
-                    // complaint screen view
-                    else if (index == 2) {
-                      NavigationServices(context).gotoForumScreen();
-                    }
+                    // store screen view
+                    // else if (index == 2) {
+                    //   final String uid =
+                    //       FirebaseAuth.instance.currentUser?.uid ?? '';
+                    //   if (uid.isNotEmpty) {
+                    //     NavigationServices(context).gotoStoreScreen(uid);
+                    //   } else {
+                    //     ScaffoldMessenger.of(context).showSnackBar(
+                    //       SnackBar(
+                    //           content: Text('Không tìm thấy UID người dùng')),
+                    //     );
+                    //   }
+                    // }
                   },
                   child: Column(
                     children: <Widget>[

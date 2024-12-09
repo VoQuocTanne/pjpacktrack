@@ -63,7 +63,19 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     // Post Author and Date
                     Row(
                       children: [
-                        Icon(Icons.person, color: Colors.grey),
+                        widget.post.authorAvatar != null &&
+                                widget.post.authorAvatar!.isNotEmpty
+                            ? CircleAvatar(
+                                radius: 20,
+                                backgroundImage:
+                                    NetworkImage(widget.post.authorAvatar!),
+                                backgroundColor: Colors.grey[300],
+                              )
+                            : CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Colors.grey[300],
+                                child: Icon(Icons.person, color: Colors.white),
+                              ),
                         SizedBox(width: 8),
                         Text(
                           widget.post.authorName,

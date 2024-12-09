@@ -39,6 +39,15 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     region: AwsConfig.region,
   );
 
+  // Cập nhật ảnh đại diện trong Firestore
+  Future<void> updateProfileAvatar(String avatarUrl) async {
+    final userDoc =
+        FirebaseFirestore.instance.collection('users').doc(user!.uid);
+    await userDoc.update({
+      'avatar': avatarUrl, // Lưu URL ảnh đại diện vào Firestore
+    });
+  }
+
   Future<List<String>> _uploadImagesToAWS() async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -53,7 +62,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
         UploadTaskConfig uploadConfig = UploadTaskConfig(
           credentailsConfig: credentialsConfig,
-          url: 'images/$fileName', // Lưu ảnh vào thư mục "images"
+          url: 'avatar/$fileName', // Lưu ảnh vào thư mục "images"
           uploadType: UploadType.file,
           file: File(filePath),
         );
@@ -63,7 +72,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         await uploadFile.upload().then((value) async {
           // Sau khi tải lên thành công, lấy URL công khai từ S3
           String imageUrl =
-              'https://${AwsConfig.bucketName}.s3.${AwsConfig.region}.amazonaws.com/images/$fileName';
+              'https://${AwsConfig.bucketName}.s3.${AwsConfig.region}.amazonaws.com/avatar/$fileName';
 
           imageUrls.add(imageUrl);
 
@@ -91,7 +100,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       return;
     }
 
-    // Kiểm tra nếu user là null
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Vui lòng đăng nhập trước khi tạo bài viết')),
@@ -105,20 +113,25 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         imageUrls = await _uploadImagesToAWS();
       }
 
-      // Lấy thông tin người dùng từ Firestore
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user!.uid) // Đảm bảo user không null
+          .doc(user!.uid) // Ensure user is not null
           .get();
 
       String authorName = userDoc.exists && userDoc['fullname'] != null
           ? userDoc['fullname']
           : 'Người Dùng';
 
+// Access the 'picture' field for avatar
+      String? authorAvatar = userDoc.exists && userDoc['picture'] != null
+          ? userDoc['picture']
+          : null; // Set to null if picture does not exist
+
       final post = PostModel(
         content: _contentController.text.trim(),
-        authorId: user!.uid, // Sử dụng uid của người dùng hiện tại
-        authorName: authorName, // Gán tên người dùng vào đây
+        authorId: user!.uid, // Using current user ID
+        authorName: authorName, // Assigning user's name
+        authorAvatar: authorAvatar, // Add the picture field here
         imageUrls: imageUrls,
         createdAt: DateTime.now(),
         viewCount: 0,
@@ -149,10 +162,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Tạo Bài Viết Mới',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+        // title: Text(
+        //   'Tạo Bài Viết Mới',
+        //   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        // ),
         backgroundColor: Color(0xFF284B8C),
       ),
       body: SingleChildScrollView(

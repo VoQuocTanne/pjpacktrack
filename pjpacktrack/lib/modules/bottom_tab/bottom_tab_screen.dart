@@ -6,7 +6,7 @@ import 'package:pjpacktrack/constants/themes.dart';
 import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/modules/bottom_tab/components/tab_button_UI.dart';
 import 'package:pjpacktrack/modules/profile/profile_screen.dart';
-import 'package:pjpacktrack/modules/store/list_store_screen.dart';
+import 'package:pjpacktrack/modules/forum/screens/post_list_screen.dart';
 import 'package:pjpacktrack/modules/ui/RecordingScreen.dart';
 import 'package:pjpacktrack/modules/ui/odervideo.dart';
 import 'package:pjpacktrack/widgets/common_card.dart';
@@ -84,20 +84,9 @@ class _BottomTabScreenState extends State<BottomTabScreen>
               animationController: _animationController,
             );
           });
-        } else if (tabType == BottomBarType.store) {
-          // Lấy UID của người dùng đang đăng nhập từ FirebaseAuth
-          final user = FirebaseAuth.instance.currentUser;
-          final uid = user?.uid ?? ''; // Nếu không có người dùng, UID là rỗng
-
+        } else if (tabType == BottomBarType.forum) {
           setState(() {
-            // Navigate to StoreListScreen khi nhấn tab store
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    StoreListScreen(uid: uid), // Truyền UID vào
-              ),
-            );
+            _indexView = PostListScreen();
           });
         }
       });
@@ -130,10 +119,10 @@ class _BottomTabScreenState extends State<BottomTabScreen>
               ),
               TabButtonUI(
                 icon: FontAwesomeIcons.store, // Icon for Store
-                isSelected: tabType == BottomBarType.store,
-                text: 'Store', // Text for Store
+                isSelected: tabType == BottomBarType.forum,
+                text: 'Diễn đàn', // Text for Store
                 onTap: () {
-                  tabClick(BottomBarType.store);
+                  tabClick(BottomBarType.forum);
                 },
               ),
               TabButtonUI(
@@ -144,7 +133,6 @@ class _BottomTabScreenState extends State<BottomTabScreen>
                   tabClick(BottomBarType.profile);
                 },
               ),
-
             ],
           ),
           SizedBox(
@@ -156,4 +144,4 @@ class _BottomTabScreenState extends State<BottomTabScreen>
   }
 }
 
-enum BottomBarType { order, camqr, profile, store } // Add store type
+enum BottomBarType { order, camqr, profile, forum } // Add store type

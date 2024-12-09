@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pjpacktrack/model/user_repo/my_user.dart';
 import 'package:pjpacktrack/modules/forum/screens/post_list_screen.dart';
@@ -13,6 +14,7 @@ import 'package:pjpacktrack/modules/profile/how_do_screen.dart';
 import 'package:pjpacktrack/modules/profile/package_screen.dart';
 import 'package:pjpacktrack/modules/profile/settings_screen.dart';
 import 'package:pjpacktrack/modules/profile/web_view.dart';
+import 'package:pjpacktrack/modules/store/list_store_screen.dart';
 import 'package:pjpacktrack/routes/routes.dart';
 
 class NavigationServices {
@@ -103,8 +105,8 @@ class NavigationServices {
     ));
   }
 
-  Future<dynamic> gotoForumScreen() async {
-    return await _pushMaterialPageRoute(PostListScreen(),
-        fullscreenDialog: true);
-  }
+  // Future<dynamic> gotoStoreScreen(String uid) async {
+  //   return await _pushMaterialPageRoute(StoreListScreen(uid: uid),
+  //       fullscreenDialog: true);
+  // }
 }

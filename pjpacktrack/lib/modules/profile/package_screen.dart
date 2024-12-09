@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 
 import '../../model/user_repo/firebase_user_repo.dart';
 import '../../widgets/app_constant.dart';
+
 class ServicePackageScreen extends StatefulWidget {
   @override
   _ServicePackageScreenState createState() => _ServicePackageScreenState();
@@ -86,7 +87,7 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  //const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -94,7 +95,7 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
                       buildPageIndicator(isActive: _currentIndex == 1),
                     ],
                   ),
-                  const SizedBox(height: 380),
+                  //const SizedBox(height: 380),
                 ],
               );
             }));
@@ -148,22 +149,21 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
                     ),
                   ),
                 )),
-
             Align(
               alignment: Alignment.center,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    num.parse(price) == 0?'Miễn phí':
-                    "${(oCcy.format(num.parse(price)))}₫",
+                    num.parse(price) == 0
+                        ? 'Miễn phí'
+                        : "${(oCcy.format(num.parse(price)))}₫",
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
                     ),
                   ),
-
                   if (onBuyTap != null)
                     ElevatedButton(
                       onPressed: () async {
@@ -176,7 +176,7 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
                           );
                           return;
                         }
-                        makePayment(price,userId, packageId, videoLimit);
+                        makePayment(price, userId, packageId, videoLimit);
                         // try {
                         //   ScaffoldMessenger.of(context).showSnackBar(
                         //     SnackBar(
@@ -223,25 +223,27 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
     );
   }
 
-  Future<void> makePayment(String amount, String userId, String packageId, int videoLimit) async {
+  Future<void> makePayment(
+      String amount, String userId, String packageId, int videoLimit) async {
     try {
       paymentIntent = await createPaymentIntent(amount, 'VND');
       await Stripe.instance
           .initPaymentSheet(
-          paymentSheetParameters: SetupPaymentSheetParameters(
-              paymentIntentClientSecret: paymentIntent!['client_secret'],
-              style: ThemeMode.dark,
-              merchantDisplayName: 'Quoc Tan'))
+              paymentSheetParameters: SetupPaymentSheetParameters(
+                  paymentIntentClientSecret: paymentIntent!['client_secret'],
+                  style: ThemeMode.dark,
+                  merchantDisplayName: 'Quoc Tan'))
           .then((value) {});
 
       //now finally display payment sheeet
-      displayPaymentSheet(amount,userId, packageId, videoLimit);
+      displayPaymentSheet(amount, userId, packageId, videoLimit);
     } catch (e, s) {
       print('exception:$e$s');
     }
   }
 
-  displayPaymentSheet(String amount, String userId, String packageId, int videoLimit) async {
+  displayPaymentSheet(
+      String amount, String userId, String packageId, int videoLimit) async {
     try {
       await Stripe.instance.presentPaymentSheet().then((value) async {
         await updateUserPackage(userId, packageId, videoLimit);
@@ -249,10 +251,10 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
         showDialog(
           context: context,
           barrierDismissible:
-          false, // Ngăn người dùng tắt dialog bằng cách nhấn bên ngoài
+              false, // Ngăn người dùng tắt dialog bằng cách nhấn bên ngoài
           builder: (context) => WillPopScope(
             onWillPop: () async =>
-            false, // Ngăn người dùng tắt dialog bằng nút back
+                false, // Ngăn người dùng tắt dialog bằng nút back
             child: AlertDialog(
               content: SingleChildScrollView(
                 child: Container(
@@ -341,8 +343,8 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
       showDialog(
           context: context,
           builder: (_) => const AlertDialog(
-            content: Text("Cancelled "),
-          ));
+                content: Text("Cancelled "),
+              ));
     } catch (e) {
       print('$e');
     }
