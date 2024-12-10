@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pjpacktrack/future/store_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pjpacktrack/future/store_selected_provider.dart';
+import 'package:pjpacktrack/modules/profile/profile_screen.dart';
+import 'package:pjpacktrack/routes/routes.dart';
 
 class AddStoreScreen extends ConsumerStatefulWidget {
   final String uid;
@@ -22,7 +24,11 @@ class _AddStoreScreenState extends ConsumerState<AddStoreScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Thêm Cửa Hàng'),
+        title: Text(
+          'Thêm Cửa Hàng',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        backgroundColor: Color(0xFF284B8C),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -32,7 +38,12 @@ class _AddStoreScreenState extends ConsumerState<AddStoreScreen> {
             children: [
               TextFormField(
                 controller: _storeNameController,
-                decoration: InputDecoration(labelText: 'Tên cửa hàng'),
+                decoration: InputDecoration(
+                  labelText: 'Tên cửa hàng',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12), // Bo tròn khung
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập tên cửa hàng';
@@ -40,9 +51,15 @@ class _AddStoreScreenState extends ConsumerState<AddStoreScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 12),
               TextFormField(
                 controller: _storePhoneController,
-                decoration: InputDecoration(labelText: 'Số điện thoại'),
+                decoration: InputDecoration(
+                  labelText: 'Số điện thoại',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12), // Bo tròn khung
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập số điện thoại';
@@ -50,9 +67,15 @@ class _AddStoreScreenState extends ConsumerState<AddStoreScreen> {
                   return null;
                 },
               ),
+              SizedBox(height: 12),
               TextFormField(
                 controller: _storeAddressController,
-                decoration: InputDecoration(labelText: 'Địa chỉ cửa hàng'),
+                decoration: InputDecoration(
+                  labelText: 'Địa chỉ cửa hàng',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12), // Bo tròn khung
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập địa chỉ cửa hàng';
@@ -70,23 +93,32 @@ class _AddStoreScreenState extends ConsumerState<AddStoreScreen> {
                         storePhone: _storePhoneController.text,
                         storeAddress: _storeAddressController.text,
                       );
+
+                      // Thêm cửa hàng qua Riverpod provider
                       await ref
                           .read(storeProvider(widget.uid).notifier)
                           .addStore(widget.uid, store);
+
+                      // Hiển thị thông báo thành công
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Đã thêm cửa hàng thành công')),
                       );
-                      Navigator.pop(
-                          context); // Quay lại trang danh sách cửa hàng
+
+                      // Chuyển hướng đến home
+                      Navigator.pushNamed(context, RoutesName.home);
                     } catch (e) {
-                      // Hiển thị lỗi khi không thể thêm cửa hàng (ví dụ: đã vượt quá 2 cửa hàng)
+                      // Hiển thị lỗi khi không thể thêm cửa hàng
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(e.toString())),
                       );
                     }
                   }
                 },
-                child: Text('Thêm cửa hàng'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Color(0xFF284B8C), // Màu chữ của nút
+                ),
+                child: Text('Đăng ký cửa hàng'),
               ),
             ],
           ),

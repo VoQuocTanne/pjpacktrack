@@ -118,7 +118,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
                 },
               ),
               TabButtonUI(
-                icon: FontAwesomeIcons.store, // Icon for Store
+                icon: FontAwesomeIcons.comment, // Icon for Store
                 isSelected: tabType == BottomBarType.forum,
                 text: 'Diễn đàn', // Text for Store
                 onTap: () {

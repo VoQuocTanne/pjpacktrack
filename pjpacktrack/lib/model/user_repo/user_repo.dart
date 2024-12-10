@@ -12,7 +12,30 @@ abstract class UserRepository {
 
   Future<void> logOut();
 
-  Future<MyUser> signUp(MyUser myUser, String password);
+  //Future<MyUser> signUp(MyUser myUser, String password);
+  Future<MyUser> signUp(MyUser user, String password) async {
+    final UserCredential userCredential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: user.email, password: password);
+
+    final User? firebaseUser = userCredential.user;
+    if (firebaseUser == null) {
+      throw Exception("Unable to sign up user.");
+    }
+
+    return MyUser(
+      userId: firebaseUser.uid,
+      email: user.email,
+      fullname: user.fullname,
+      phonenumber: user.phonenumber,
+      picture: user.picture,
+      birthday: user.birthday,
+      role: user.role,
+      status: user.status,
+      quantily: user.quantily,
+      limit: user.limit,
+      packageId: user.packageId,
+    );
+  }
 
   Future<void> resetPassword(String email);
 

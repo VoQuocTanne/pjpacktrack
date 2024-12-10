@@ -89,30 +89,31 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     SizedBox(height: 16),
                     Text(
                       widget.post.content,
-                      style: TextStyle(fontSize: 16, height: 1.5),
+                      style: TextStyle(
+                          fontSize: 18, height: 2, fontFamily: 'Roboto'),
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 5),
 
                     // Display Post Images
                     if (widget.post.imageUrls.isNotEmpty)
                       Column(
                         children: widget.post.imageUrls.map((imageUrl) {
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
+                            padding: const EdgeInsets.only(),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: Image.network(
                                 imageUrl,
                                 width: double.infinity,
-                                fit: BoxFit.contain,
-                                height: 300, // Adjust height as needed
+                                fit: BoxFit.cover,
+                                height: 400, // Adjust height as needed
                               ),
                             ),
                           );
                         }).toList(),
                       ),
 
-                    Divider(height: 32, color: Colors.grey),
+                    //Divider(height: 10, color: Colors.grey),
 
                     // Display Comments Section
                     StreamBuilder<QuerySnapshot>(
@@ -156,7 +157,19 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         }
 
                         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                          return Center(child: Text('Chưa có bình luận nào.'));
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                    height: 20), // Tạo khoảng cách phía trên
+                                Text(
+                                  'Chưa có bình luận nào.',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          );
                         }
 
                         // Lấy danh sách các bình luận từ Firestore
@@ -196,18 +209,45 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                     ? userSnapshot.data!['fullname']
                                     : 'Người Dùng';
 
+                                // Retrieve the author's picture
+                                String authorPicture = userSnapshot.hasData &&
+                                        userSnapshot.data!.exists &&
+                                        userSnapshot.data!['picture'] != null
+                                    ? userSnapshot.data!['picture']
+                                    : ''; // Empty string if no picture
+
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12),
                                   child: ListTile(
                                     contentPadding: EdgeInsets.zero,
+                                    leading: userSnapshot.hasData &&
+                                            userSnapshot.data!.exists
+                                        ? CircleAvatar(
+                                            radius: 20,
+                                            backgroundImage: authorPicture
+                                                    .isNotEmpty
+                                                ? NetworkImage(authorPicture)
+                                                : AssetImage(
+                                                        'assets/default_avatar.png')
+                                                    as ImageProvider,
+                                            backgroundColor: Colors.grey[300],
+                                          )
+                                        : CircleAvatar(
+                                            radius: 20,
+                                            backgroundColor: Colors.grey[300],
+                                            child: Icon(Icons.person,
+                                                color: Colors.white),
+                                          ),
                                     title: Text(
                                       authorName,
                                       style: TextStyle(
+                                          fontSize: 14,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     subtitle: Text(
                                       comments[index].content,
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(
+                                          fontSize: 14, fontFamily: 'Roboto'),
                                     ),
                                     trailing: Text(
                                       '${comments[index].createdAt.day}/${comments[index].createdAt.month}/${comments[index].createdAt.year} ${comments[index].createdAt.hour}:${comments[index].createdAt.minute}',

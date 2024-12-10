@@ -114,12 +114,12 @@ class PostListScreen extends StatelessWidget {
                     post.content,
                     maxLines: 4,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 14),
+                    style: TextStyle(fontSize: 18, fontFamily: 'Roboto'),
                   ),
                   SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.comment, size: 16, color: Colors.grey),
+                      Icon(Icons.comment, size: 18, color: Colors.grey),
                       SizedBox(width: 4),
                       Text(
                         '${post.commentCount}',
@@ -139,11 +139,10 @@ class PostListScreen extends StatelessWidget {
                     post.imageUrls[0],
                     width: double.infinity,
                     height: 400, // Tăng chiều cao hình ảnh nếu cần
-                    fit: BoxFit.contain, // Đảm bảo hình ảnh không bị cắt
+                    fit: BoxFit.cover, // Đảm bảo hình ảnh không bị cắt
                   ),
                 ),
               ),
-            SizedBox(height: 16),
           ],
         ),
       ),

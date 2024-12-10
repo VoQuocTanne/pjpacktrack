@@ -105,8 +105,8 @@ class NavigationServices {
     ));
   }
 
-  // Future<dynamic> gotoStoreScreen(String uid) async {
-  //   return await _pushMaterialPageRoute(StoreListScreen(uid: uid),
-  //       fullscreenDialog: true);
-  // }
+  Future<dynamic> gotoStoreScreen(String uid) async {
+    return await _pushMaterialPageRoute(StoreListScreen(uid: uid),
+        fullscreenDialog: true);
+  }
 }
