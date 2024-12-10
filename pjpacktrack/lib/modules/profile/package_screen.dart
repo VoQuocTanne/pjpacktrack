@@ -24,81 +24,63 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).primaryColor,
-          title: const Text(
-            'Pack Track',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop(),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        title: const Text(
+          'Pack Track',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        body: FutureBuilder<List<Package>>(
-            future: fetchPackages(),
-            builder: (context, snapshot) {
-              // if (snapshot.connectionState == ConnectionState.waiting) {
-              //   return const Center(child: CircularProgressIndicator());
-              // }
-              if (snapshot.hasError) {
-                return Center(child: Text("Lỗi: ${snapshot.error}"));
-              }
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: FutureBuilder<List<Package>>(
+        future: fetchPackages(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text("Lỗi: ${snapshot.error}"));
+          }
 
-              final packages = snapshot.data ?? [];
-              return Column(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentIndex = index;
-                        });
-                      },
-                      itemCount: packages.length,
-                      itemBuilder: (context, index) {
-                        final package = packages[index];
-                        return buildPackageCard(
-                          title: package.name,
-                          features: package.features,
-                          packageId: package.packageId,
-                          price: package.price,
-                          videoLimit: package.videoLimit,
-                          borderColor:
-                              package.isFree ? Colors.green : Colors.blue,
-                          onBuyTap: package.isFree
-                              ? null // Gói miễn phí không có hành động mua
-                              : () {
-                                  // Xử lý sự kiện mua gói
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                          'Đã chọn mua gói ${package.name}'),
-                                    ),
-                                  );
-                                },
-                        );
-                      },
-                    ),
-                  ),
-                  //const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      buildPageIndicator(isActive: _currentIndex == 0),
-                      buildPageIndicator(isActive: _currentIndex == 1),
-                    ],
-                  ),
-                  //const SizedBox(height: 380),
-                ],
+          final packages = snapshot.data ?? [];
+          return ListView.builder(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: packages.length,
+            itemBuilder: (context, index) {
+              final package = packages[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10.0),
+                child: buildPackageCard(
+                  title: package.name,
+                  features: package.features,
+                  packageId: package.packageId,
+                  price: package.price,
+                  videoLimit: package.videoLimit,
+                  borderColor: package.isFree ? Colors.green : Colors.blue,
+                  onBuyTap: package.isFree
+                      ? null // Gói miễn phí không có hành động mua
+                      : () {
+                          // Xử lý sự kiện mua gói
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Đã chọn mua gói ${package.name}'),
+                            ),
+                          );
+                        },
+                ),
               );
-            }));
+            },
+          );
+        },
+      ),
+    );
   }
 
   Widget buildPackageCard({
@@ -253,85 +235,38 @@ class _ServicePackageScreenState extends State<ServicePackageScreen> {
           barrierDismissible:
               false, // Ngăn người dùng tắt dialog bằng cách nhấn bên ngoài
           builder: (context) => WillPopScope(
-            onWillPop: () async =>
-                false, // Ngăn người dùng tắt dialog bằng nút back
-            child: AlertDialog(
-              content: SingleChildScrollView(
-                child: Container(
+              onWillPop: () async =>
+                  false, // Ngăn người dùng tắt dialog bằng nút back
+              child: AlertDialog(
+                content: SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              // NavigationServices(context).gotoLoginApp();
-                            },
-                            child: const Icon(
-                              Icons.check_circle,
-                              color: Colors.green,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 16.0,
-                          ),
-                          Center(
-                            child: Text(
-                              "Giới hạn video đã được nâng cấp lên",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.lightGreen.shade700,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 22,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
-                      const Text(
-                        "Cảm ơn",
+                      Icon(Icons.check_circle, color: Colors.green, size: 50),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Giới hạn video đã được nâng cấp lên",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.lightGreen.shade700,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
                         ),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
                       ),
-                      const SizedBox(
-                        height: 10.0,
-                      ),
-                      const SizedBox(
-                        height: 10.0,
-                      ),
-                      Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            // // Điều hướng về trang chủ
-                            // NavigationServices(context).gotoLoginApp();
-                          },
-                          child: Container(
-                            width: 100,
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF008080),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                "Trang chủ",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Đóng màn hình hiện tại
+                          Navigator.of(context).pop(); // Đóng màn hình trước đó
+                        },
+                        child: const Text("Trang chủ"),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ),
-          ),
+              )),
         );
 
         paymentIntent = null;
