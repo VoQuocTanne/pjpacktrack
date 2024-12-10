@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kommunicate_flutter/kommunicate_flutter.dart';
 import 'package:pjpacktrack/constants/text_styles.dart';
 import 'package:pjpacktrack/constants/themes.dart';
 import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/model/setting_list_data.dart';
+import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/routes/route_names.dart';
 import 'package:pjpacktrack/widgets/common_appbar_view.dart';
 import 'package:pjpacktrack/widgets/common_card.dart';
@@ -21,6 +24,7 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
   @override
   Widget build(BuildContext context) {
     List<SettingsListData> helpSearchList = SettingsListData.helpSearchList;
+
     return Scaffold(
       body: RemoveFocuse(
         onClick: () {
@@ -46,7 +50,8 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
                   return InkWell(
                     onTap: helpSearchList[index].subTxt != ""
                         ? () {
-                            NavigationServices(context).gotoViewWeb(helpSearchList[index].url);
+                            NavigationServices(context)
+                                .gotoViewWeb(helpSearchList[index].url);
                           }
                         : null,
                     child: Column(
@@ -105,32 +110,62 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).primaryColor,
+        onPressed: () async {
+          try {
+            // Cấu hình chatbot với App ID của bạn từ Kommunicate
+            var conversationObject = {
+              'appId':
+                  AwsConfig.appKey, // Thay bằng App ID từ Kommunicate Dashboard
+            };
+
+            dynamic result = await KommunicateFlutterPlugin.buildConversation(
+              conversationObject,
+            );
+
+            print("Chatbot mở thành công: $result");
+          } catch (e) {
+            print("Lỗi khi mở chatbot: $e");
+          }
+        },
+        child: const Icon(Icons.chat),
+      ),
     );
   }
 
   Widget appBar() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        CommonAppbarView(
-          onBackClick: () {
-            Navigator.pop(context);
-          },
-          iconData: Icons.arrow_back,
-          titleText: "Chính sách hoàn trả",
+    return AppBar(
+      backgroundColor: Theme.of(context).primaryColor,
+      title: Text(
+        'Chính sách hoàn trả',
+        style: TextStyle(
+          fontSize: 25,
+          fontWeight: FontWeight.bold,
+          color: Color.fromARGB(255, 255, 255, 255),
         ),
-        Padding(
-            padding: const EdgeInsets.only(left: 24, right: 24, top: 16),
-            child: CommonCard(
-              color: AppTheme.backgroundColor,
-              radius: 36,
-              child: CommonSearchBar(
-                iconData: FontAwesomeIcons.magnifyingGlass,
-                text: Loc.alized.search_help_artical,
-              ),
-            )),
-      ],
+      ),
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => Navigator.of(context).pop(),
+        color: Color.fromARGB(255, 255, 255, 255),
+      ),
+    );
+  }
+}
+
+class ChatBotScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chatbot'),
+        backgroundColor: Theme.of(context).primaryColor,
+      ),
+      body: Center(
+        child: Text('Đây là trang Chatbot'),
+      ),
     );
   }
 }
