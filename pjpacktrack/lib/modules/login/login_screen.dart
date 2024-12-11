@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pjpacktrack/future/authentication_bloc/authentication_bloc.dart';
 import 'package:pjpacktrack/language/app_localizations.dart';
+import 'package:pjpacktrack/modules/store/list_store_screen.dart';
 import 'package:pjpacktrack/routes/route_names.dart';
 import 'package:pjpacktrack/utils/validator.dart';
 import 'package:pjpacktrack/widgets/common_appbar_view.dart';
@@ -83,22 +84,32 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     // Ngăn các widget tiếp tục xây dựng khi tài khoản không hợp lệ
                     SizedBox();
-                  } else if (role == 'admin') {
-                    // Điều hướng đến trang Admin nếu role là admin
-                    Navigator.pushNamed(context, '/admin/dashboard');
-                  } else if (role == 'user') {
-                    // Điều hướng đến trang chủ nếu role là user
-                    Navigator.pushNamed(context, RoutesName.home);
-                  } else if (role == 'owner') {
-                    // Điều hướng đến trang chủ nếu role là user
-                    Navigator.pushNamed(context, RoutesName.owner);
                   } else {
-                    // Trường hợp không xác định vai trò
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Vai trò của bạn không hợp lệ')),
+                    // Điều hướng đến trang StoreListScreen thay vì các trang khác
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StoreListScreen(uid: user.uid),
+                      ),
                     );
                   }
+
+                  // else if (role == 'admin') {
+                  //   // Điều hướng đến trang Admin nếu role là admin
+                  //   Navigator.pushNamed(context, '/admin/dashboard');
+                  // } else if (role == 'user') {
+                  //   // Điều hướng đến trang chủ nếu role là user
+                  //   Navigator.pushNamed(context, RoutesName.home);
+                  // } else if (role == 'owner') {
+                  //   // Điều hướng đến trang chủ nếu role là user
+                  //   Navigator.pushNamed(context, RoutesName.owner);
+                  // } else {
+                  //   // Trường hợp không xác định vai trò
+                  //   ScaffoldMessenger.of(context).showSnackBar(
+                  //     const SnackBar(
+                  //         content: Text('Vai trò của bạn không hợp lệ')),
+                  //   );
+                  // }
                 } else {
                   // Nếu không tìm thấy user trong Firestore
                   ScaffoldMessenger.of(context).showSnackBar(

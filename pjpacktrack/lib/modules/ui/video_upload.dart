@@ -33,9 +33,8 @@ class VideoUploader {
   Future<void> uploadMultipleVideos(List<String> filePaths) async {
     try {
       _showMessage('Đang tải videos lên AWS...');
-      final uploadResults = await Future.wait(
-          filePaths.map((path) => _prepareVideoUpload(path))
-      );
+      final uploadResults =
+          await Future.wait(filePaths.map((path) => _prepareVideoUpload(path)));
       await _handleFirestoreUpload(uploadResults);
     } catch (e) {
       _showMessage('Lỗi trong quá trình xử lý: $e');
@@ -43,7 +42,8 @@ class VideoUploader {
   }
 
   Future<Map<String, dynamic>> _prepareVideoUpload(String filePath) async {
-    final videoFileName = '${DateTime.now().millisecondsSinceEpoch}_${p.basename(filePath)}';
+    final videoFileName =
+        '${DateTime.now().millisecondsSinceEpoch}_${p.basename(filePath)}';
     final videoKey = 'videos/$videoFileName';
 
     final uploadFile = await _uploadToAWS(filePath, videoKey);
@@ -80,10 +80,8 @@ class VideoUploader {
   }
 
   Future<bool> _canUploadMore(String userId, int uploadCount) async {
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .get();
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
 
     if (!userDoc.exists) return false;
 
@@ -95,11 +93,10 @@ class VideoUploader {
     return (quantity + uploadCount) <= limit;
   }
 
-  Future<void> _incrementQuantity(String userId, int increment, WriteBatch batch) async {
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .get();
+  Future<void> _incrementQuantity(
+      String userId, int increment, WriteBatch batch) async {
+    final userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
 
     if (!userDoc.exists) return;
 
@@ -110,14 +107,14 @@ class VideoUploader {
 
     final newQuantity = currentQuantity + increment;
     if (newQuantity <= limit) {
-      final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
-      batch.update(userRef, {
-        'quantity': newQuantity
-      });
+      final userRef =
+          FirebaseFirestore.instance.collection('users').doc(userId);
+      batch.update(userRef, {'quantity': newQuantity});
     }
   }
 
-  Future<void> _handleFirestoreUpload(List<Map<String, dynamic>> uploadData) async {
+  Future<void> _handleFirestoreUpload(
+      List<Map<String, dynamic>> uploadData) async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return;
 
@@ -161,21 +158,19 @@ class VideoUploader {
     await _incrementQuantity(currentUser.uid, uploadData.length, batch);
     await batch.commit();
 
-    _showMessage(
-        uploadData.length > 1
-            ? 'Tất cả videos đã được lưu'
-            : 'Video đã được lưu cho đơn hàng'
-    );
+    _showMessage(uploadData.length > 1
+        ? 'Tất cả videos đã được lưu'
+        : 'Video đã được lưu cho đơn hàng');
   }
 
   void _handleExistingDocument(
-      DocumentReference docRef,
-      String videoUrl,
-      String videoFileName,
-      String deliveryOption,
-      Map<String, dynamic> data,
-      WriteBatch batch,
-      ) {
+    DocumentReference docRef,
+    String videoUrl,
+    String videoFileName,
+    String deliveryOption,
+    Map<String, dynamic> data,
+    WriteBatch batch,
+  ) {
     final videoRef = docRef.collection('videos').doc();
     batch.set(videoRef, {
       'url': videoUrl,
@@ -186,20 +181,23 @@ class VideoUploader {
     });
 
     batch.update(docRef, {
-      'closedStatus': deliveryOption == 'Đóng gói' ? true : data['closedStatus'],
-      'shippingStatus': deliveryOption == 'Giao hàng' ? true : data['shippingStatus'],
-      'returnStatus': deliveryOption == 'Trả hàng' ? true : data['returnStatus'],
+      'closedStatus':
+          deliveryOption == 'Đóng gói' ? true : data['closedStatus'],
+      'shippingStatus':
+          deliveryOption == 'Giao hàng' ? true : data['shippingStatus'],
+      'returnStatus':
+          deliveryOption == 'Trả hàng' ? true : data['returnStatus'],
     });
   }
 
   void _createNewDocument(
-      String videoUrl,
-      String videoFileName,
-      String userId,
-      String code,
-      String deliveryOption,
-      WriteBatch batch,
-      ) {
+    String videoUrl,
+    String videoFileName,
+    String userId,
+    String code,
+    String deliveryOption,
+    WriteBatch batch,
+  ) {
     final newDocRef = FirebaseFirestore.instance.collection('orders').doc();
 
     batch.set(newDocRef, {

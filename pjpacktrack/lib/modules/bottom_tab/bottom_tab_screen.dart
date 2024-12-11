@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pjpacktrack/constants/themes.dart';
 import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/modules/bottom_tab/components/tab_button_UI.dart';
+import 'package:pjpacktrack/modules/profile/hepl_center_screen.dart';
 import 'package:pjpacktrack/modules/profile/profile_screen.dart';
 import 'package:pjpacktrack/modules/forum/screens/post_list_screen.dart';
 import 'package:pjpacktrack/modules/ui/RecordingScreen.dart';
@@ -88,6 +89,10 @@ class _BottomTabScreenState extends State<BottomTabScreen>
           setState(() {
             _indexView = PostListScreen();
           });
+        } else if (tabType == BottomBarType.helpCenter) {
+          setState(() {
+            _indexView = HeplCenterScreen(); // Màn hình Help Center
+          });
         }
       });
     }
@@ -126,6 +131,14 @@ class _BottomTabScreenState extends State<BottomTabScreen>
                 },
               ),
               TabButtonUI(
+                icon: FontAwesomeIcons.headset, // Icon cho Help Center
+                isSelected: tabType == BottomBarType.helpCenter,
+                text: 'Hỗ trợ', // Text cho Help Center
+                onTap: () {
+                  tabClick(BottomBarType.helpCenter);
+                },
+              ),
+              TabButtonUI(
                 icon: FontAwesomeIcons.user,
                 isSelected: tabType == BottomBarType.profile,
                 text: Loc.alized.profile,
@@ -144,4 +157,10 @@ class _BottomTabScreenState extends State<BottomTabScreen>
   }
 }
 
-enum BottomBarType { order, camqr, profile, forum } // Add store type
+enum BottomBarType {
+  order,
+  camqr,
+  profile,
+  forum,
+  helpCenter
+} // Add store type
