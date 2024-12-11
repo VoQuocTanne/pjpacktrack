@@ -121,7 +121,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 }
               }
 
-              return BottomTabScreen(cameras: cameras);
+              // return BottomTabScreen(cameras: cameras);
+              return StoreListScreen(uid: userId);
             },
           );
         } else {

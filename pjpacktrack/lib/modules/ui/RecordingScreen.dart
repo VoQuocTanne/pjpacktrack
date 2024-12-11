@@ -10,8 +10,8 @@ import 'package:pjpacktrack/modules/ui/video_upload.dart';
 
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
-
-  const RecordingScreen({super.key, required this.cameras});
+  String storeId;
+  RecordingScreen({super.key, required this.cameras, required this.storeId});
 
   @override
   _RecordingScreenState createState() => _RecordingScreenState();
@@ -402,6 +402,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
     try {
       await FirebaseFirestore.instance.collection('delivery_options').add({
         'option': option,
+        'storeId': widget.storeId,
         'userId': FirebaseAuth.instance.currentUser?.uid,
         'timestamp': FieldValue.serverTimestamp(),
       });

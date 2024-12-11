@@ -14,7 +14,8 @@ import 'package:pjpacktrack/widgets/common_card.dart';
 
 class BottomTabScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
-  const BottomTabScreen({Key? key, required this.cameras}) : super(key: key);
+  String storeId;
+  BottomTabScreen({Key? key, required this.cameras, required this.storeId}) : super(key: key);
 
   @override
   State<BottomTabScreen> createState() => _BottomTabScreenState();
@@ -77,7 +78,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
           });
         } else if (tabType == BottomBarType.camqr) {
           setState(() {
-            _indexView = RecordingScreen(cameras: widget.cameras);
+            _indexView = RecordingScreen(cameras: widget.cameras, storeId: widget.storeId,);
           });
         } else if (tabType == BottomBarType.profile) {
           setState(() {

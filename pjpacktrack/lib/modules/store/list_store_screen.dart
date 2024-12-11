@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pjpacktrack/future/store_provider.dart';
 import 'package:pjpacktrack/future/store_selected_provider.dart';
+import 'package:pjpacktrack/modules/bottom_tab/bottom_tab_screen.dart';
 import 'package:pjpacktrack/routes/routes.dart';
+import '../../main.dart';
 import 'add_store_screen.dart'; // Đảm bảo import đúng file AddStoreScreen
 
 class StoreListScreen extends ConsumerWidget {
@@ -48,10 +50,14 @@ class StoreListScreen extends ConsumerWidget {
                   child: InkWell(
                     onTap: () {
                       // Điều hướng đến home khi nhấn vào bất kỳ đâu trong khung
-                      Navigator.pushNamed(
+                      Navigator.push(
                         context,
-                        RoutesName.home,
-                        arguments: {'storeId': store.storeId},
+                        MaterialPageRoute(
+                          builder: (context) => BottomTabScreen(
+                            cameras: cameras,
+                            storeId: store.storeId,
+                          ),
+                        ),
                       );
                     },
                     child: Container(
