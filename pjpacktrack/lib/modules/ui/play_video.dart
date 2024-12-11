@@ -1,20 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
 class AwsVideoPlayer extends StatefulWidget {
   final String orderId;
-  final bool isQRCode;
   final String deliveryOption;
-  final String userId;
-  final String fileName;
+
   const AwsVideoPlayer({
     super.key,
     required this.orderId,
-    required this.isQRCode,
     required this.deliveryOption,
-    required this.userId,
-    required this.fileName,
   });
 
   @override
@@ -26,6 +22,7 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
   bool _isInitialized = false;
   bool _hasError = false;
   String? _videoUrl;
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +36,6 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
           .doc(widget.orderId)
           .collection('videos')
           .where('deliveryOption', isEqualTo: widget.deliveryOption)
-          .where('fileName', isEqualTo: widget.fileName)
           .get();
 
       if (videoQuery.docs.isNotEmpty) {
@@ -76,8 +72,8 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
       body: _hasError
           ? _buildErrorUI()
           : !_isInitialized
-          ? const Center(child: CircularProgressIndicator())
-          : _buildVideoPlayerUI(),
+              ? const Center(child: CircularProgressIndicator())
+              : _buildVideoPlayerUI(),
     );
   }
 
@@ -139,7 +135,9 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
                     IconButton(
                       iconSize: 32,
                       icon: Icon(
-                        _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                        _controller.value.isPlaying
+                            ? Icons.pause
+                            : Icons.play_arrow,
                         color: Colors.teal,
                       ),
                       onPressed: () {
@@ -162,6 +160,23 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
                         }
                       },
                     ),
+                    // Thêm nút copy URL
+                    IconButton(
+                      iconSize: 32,
+                      icon: const Icon(Icons.copy, color: Colors.teal),
+                      onPressed: () {
+                        if (_videoUrl != null) {
+                          Clipboard.setData(ClipboardData(text: _videoUrl!));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Đã sao chép đường dẫn video'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
+                      tooltip: 'Sao chép đường dẫn video',
+                    ),
                   ],
                 ),
               ],
@@ -174,7 +189,9 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    if (_isInitialized) {
+      _controller.dispose();
+    }
     super.dispose();
   }
 }

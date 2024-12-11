@@ -8,6 +8,9 @@ import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/modules/ui/delivery_option.dart';
 import 'package:pjpacktrack/modules/ui/video_upload.dart';
 
+import 'bua.dart';
+import 'bua1.dart';
+
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
 
@@ -28,7 +31,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
   String? _lastScannedCode;
   String? _selectedDeliveryOption;
   final List<String> _videoPaths = [];
-
+  double _currentBrightness = 0;
+  String _brightnessWarning = "";
   final AwsCredentialsConfig credentialsConfig = AwsCredentialsConfig(
     accessKey: AwsConfig.accessKey,
     secretKey: AwsConfig.secretKey,
@@ -302,11 +306,9 @@ class _RecordingScreenState extends State<RecordingScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected ? Colors.teal : Colors.black26,
-          // Màu nền tùy thuộc vào trạng thái
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected ? Colors.tealAccent : Colors.transparent,
-            // Đường viền chỉ khi được chọn
             width: 1,
           ),
         ),
@@ -366,9 +368,17 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
   Widget _buildScanner() {
-    return MobileScanner(
-      controller: _scannerController,
-      onDetect: _handleDetection,
+    return BrightnessPreview(
+      onBrightnessChanged: (brightness) {
+        setState(() {
+          _currentBrightness = brightness;
+          _brightnessWarning = BrightnessAnalyzer.getBrightnessWarning(brightness);
+        });
+      },
+      child: MobileScanner(
+        controller: _scannerController,
+        onDetect: _handleDetection,
+      ),
     );
   }
 

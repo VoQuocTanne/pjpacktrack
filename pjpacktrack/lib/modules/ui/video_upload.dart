@@ -138,7 +138,7 @@ class VideoUploader {
       final doc = orderSnapshot.docs.firstOrNull;
 
       if (doc != null) {
-        _handleExistingDocument(
+        await _handleExistingDocument(
           doc.reference,
           data['videoUrl'],
           data['videoFileName'],
@@ -163,19 +163,31 @@ class VideoUploader {
 
     _showMessage(
         uploadData.length > 1
-            ? 'Tất cả videos đã được lưu'
-            : 'Video đã được lưu cho đơn hàng'
+            ? 'Tất cả videos đã được cập nhật'
+            : 'Video đã được cập nhật cho đơn hàng'
     );
   }
 
-  void _handleExistingDocument(
+  Future<void> _handleExistingDocument(
       DocumentReference docRef,
       String videoUrl,
       String videoFileName,
       String deliveryOption,
       Map<String, dynamic> data,
       WriteBatch batch,
-      ) {
+      ) async {
+    // Tìm video cũ với cùng deliveryOption
+    final existingVideos = await docRef
+        .collection('videos')
+        .where('deliveryOption', isEqualTo: deliveryOption)
+        .get();
+
+    // Xóa tất cả videos cũ có cùng deliveryOption
+    for (var doc in existingVideos.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // Tạo document mới cho video trong collection videos
     final videoRef = docRef.collection('videos').doc();
     batch.set(videoRef, {
       'url': videoUrl,
@@ -189,6 +201,7 @@ class VideoUploader {
       'closedStatus': deliveryOption == 'Đóng gói' ? true : data['closedStatus'],
       'shippingStatus': deliveryOption == 'Giao hàng' ? true : data['shippingStatus'],
       'returnStatus': deliveryOption == 'Trả hàng' ? true : data['returnStatus'],
+      'lastUpdated': FieldValue.serverTimestamp(), // Thêm thời gian cập nhật
     });
   }
 
