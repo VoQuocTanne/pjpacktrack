@@ -9,10 +9,10 @@ class PostListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Diễn Đàn Nhà Bán Hàng',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+        // title: Text(
+        //   'Diễn Đàn Nhà Bán Hàng',
+        //   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        // ),
         backgroundColor: Color(0xFF284B8C),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -71,46 +71,76 @@ class PostListScreen extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Hiển thị avatar
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundImage: (post.authorAvatar != null &&
+                            post.authorAvatar!.isNotEmpty)
+                        ? NetworkImage(post
+                            .authorAvatar!) // Use the 'picture' field if available
+                        : AssetImage('assets/default_avatar.png')
+                            as ImageProvider, // Default avatar if no picture
+                  ),
+
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        post.authorName, // Hiển thị tên người đăng
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        '${post.createdAt.day}/${post.createdAt.month}/${post.createdAt.year} ${post.createdAt.hour}:${post.createdAt.minute}',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Display the author's name
-                  Text(post.authorName,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  SizedBox(height: 4),
-                  // Display the post's creation date
+                  SizedBox(height: 8),
                   Text(
-                    '${post.createdAt.day}/${post.createdAt.month}/${post.createdAt.year} ${post.createdAt.hour}:${post.createdAt.minute}',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                    post.content,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 18, fontFamily: 'Roboto'),
                   ),
                   SizedBox(height: 8),
-                  // Display the post content summary
-                  Text(post.content,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 14)),
-                  SizedBox(height: 8),
-                  // Display the comment count
                   Row(
                     children: [
-                      Icon(Icons.comment, size: 16, color: Colors.grey),
+                      Icon(Icons.comment, size: 18, color: Colors.grey),
                       SizedBox(width: 4),
-                      Text('${post.commentCount}',
-                          style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(
+                        '${post.commentCount}',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
             if (post.imageUrls.isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                child: Image.network(
-                  post.imageUrls[0],
-                  width: double.infinity,
-                  height: 180,
-                  fit: BoxFit.cover,
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                  child: Image.network(
+                    post.imageUrls[0],
+                    width: double.infinity,
+                    height: 400, // Tăng chiều cao hình ảnh nếu cần
+                    fit: BoxFit.cover, // Đảm bảo hình ảnh không bị cắt
+                  ),
                 ),
               ),
           ],

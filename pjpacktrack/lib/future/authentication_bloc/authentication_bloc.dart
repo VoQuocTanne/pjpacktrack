@@ -61,10 +61,16 @@ class AuthenticationBloc
     on<SignUpRequired>((event, emit) async {
       emit(SignUpProcess());
       try {
+        // Gọi phương thức đăng ký
         MyUser user = await userRepository.signUp(event.user, event.password);
+
+        // Lưu dữ liệu người dùng vào Firestore
         await userRepository.setUserData(user);
-        emit(SignUpSuccess());
+
+        // Phát trạng thái đăng ký thành công, truyền userId
+        emit(SignUpSuccess(userId: user.userId));
       } catch (e) {
+        // Phát trạng thái thất bại nếu có lỗi
         emit(SignUpFailure(e.toString()));
       }
     });

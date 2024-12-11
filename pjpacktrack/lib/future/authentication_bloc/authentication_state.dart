@@ -47,7 +47,14 @@ class SignInFailure extends AuthenticationState {
 class SignUpProcess extends AuthenticationState {}
 
 // Trạng thái đăng ký thành công
-class SignUpSuccess extends AuthenticationState {}
+class SignUpSuccess extends AuthenticationState {
+  final String userId;
+
+  const SignUpSuccess({required this.userId});
+
+  @override
+  List<Object?> get props => [userId];
+}
 
 // Trạng thái đăng ký thất bại
 class SignUpFailure extends AuthenticationState {

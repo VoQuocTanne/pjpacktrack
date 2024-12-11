@@ -27,6 +27,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final String userId = auth.currentUser?.uid ?? '';
+
+    if (userId.isEmpty) {
+      return Scaffold(
+        body: Center(
+          child: Text('Không tìm thấy UID người dùng. Vui lòng đăng nhập lại.'),
+        ),
+      );
+    }
+
+    final userAsyncValue = ref.watch(userProvider(userId));
     List<SettingsListData> userSettingsList = SettingsListData.userSettingsList;
 
     return BottomTopMoveAnimationView(
@@ -113,9 +125,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     else if (index == 1) {
                       // NavigationServices(context).gotoInviteFriend();
                     }
-                    // complaint screen view
+                    // store screen view
                     else if (index == 2) {
-                      NavigationServices(context).gotoForumScreen();
+                      final String uid =
+                          FirebaseAuth.instance.currentUser?.uid ?? '';
+                      if (uid.isNotEmpty) {
+                        NavigationServices(context).gotoStoreScreen(uid);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text('Không tìm thấy UID người dùng')),
+                        );
+                      }
                     }
                   },
                   child: Column(

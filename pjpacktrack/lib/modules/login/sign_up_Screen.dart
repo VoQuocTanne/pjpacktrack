@@ -6,6 +6,7 @@ import 'package:pjpacktrack/future/authentication_bloc/authentication_bloc.dart'
 import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/model/user_repo/my_user.dart';
 import 'package:pjpacktrack/modules/login/facebook_google_button_view.dart';
+import 'package:pjpacktrack/modules/store/add_store_screen.dart';
 import 'package:pjpacktrack/routes/route_names.dart';
 import 'package:pjpacktrack/utils/validator.dart';
 import 'package:pjpacktrack/widgets/common_appbar_view.dart';
@@ -47,7 +48,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           } else if (state is SignUpSuccess) {
             // Điều hướng đến TabScreen nếu đăng ký thành công
             Navigator.of(context).pop(); // Đóng loading dialog
-            Navigator.pushNamed(context, RoutesName.home);
+            //Navigator.pushNamed(context, RoutesName.home);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    AddStoreScreen(uid: state.userId), // Truyền UID
+              ),
+            );
           }
         },
         child: RemoveFocuse(

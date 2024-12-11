@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:aws_storage_service/aws_storage_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,6 +21,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   final ImagePicker _picker = ImagePicker();
   List<XFile> _imageFiles = [];
 
+  final user = FirebaseAuth.instance.currentUser;
+
   void _pickImages() async {
     final List<XFile>? selectedImages = await _picker.pickMultiImage();
     if (selectedImages != null) {
@@ -36,6 +39,15 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     region: AwsConfig.region,
   );
 
+  // Cập nhật ảnh đại diện trong Firestore
+  Future<void> updateProfileAvatar(String avatarUrl) async {
+    final userDoc =
+        FirebaseFirestore.instance.collection('users').doc(user!.uid);
+    await userDoc.update({
+      'avatar': avatarUrl, // Lưu URL ảnh đại diện vào Firestore
+    });
+  }
+
   Future<List<String>> _uploadImagesToAWS() async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,7 +62,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
         UploadTaskConfig uploadConfig = UploadTaskConfig(
           credentailsConfig: credentialsConfig,
-          url: 'images/$fileName', // Lưu ảnh vào thư mục "images"
+          url: 'avatar/$fileName', // Lưu ảnh vào thư mục "images"
           uploadType: UploadType.file,
           file: File(filePath),
         );
@@ -60,7 +72,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         await uploadFile.upload().then((value) async {
           // Sau khi tải lên thành công, lấy URL công khai từ S3
           String imageUrl =
-              'https://${AwsConfig.bucketName}.s3.${AwsConfig.region}.amazonaws.com/images/$fileName';
+              'https://${AwsConfig.bucketName}.s3.${AwsConfig.region}.amazonaws.com/avatar/$fileName';
 
           imageUrls.add(imageUrl);
 
@@ -88,29 +100,50 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       return;
     }
 
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vui lòng đăng nhập trước khi tạo bài viết')),
+      );
+      return;
+    }
+
     try {
       List<String> imageUrls = [];
       if (_imageFiles.isNotEmpty) {
-        imageUrls =
-            await _uploadImagesToAWS(); // Đảm bảo gọi đúng phương thức và đợi kết quả
+        imageUrls = await _uploadImagesToAWS();
       }
+
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid) // Ensure user is not null
+          .get();
+
+      String authorName = userDoc.exists && userDoc['fullname'] != null
+          ? userDoc['fullname']
+          : 'Người Dùng';
+
+// Access the 'picture' field for avatar
+      String? authorAvatar = userDoc.exists && userDoc['picture'] != null
+          ? userDoc['picture']
+          : null; // Set to null if picture does not exist
 
       final post = PostModel(
         content: _contentController.text.trim(),
-        authorId: 'current_user_id', // Replace with actual user ID
-        authorName: 'Nhà Bán Hàng', // Replace with actual user name
-        imageUrls: imageUrls, // Lưu trữ danh sách URL ảnh
+        authorId: user!.uid, // Using current user ID
+        authorName: authorName, // Assigning user's name
+        authorAvatar: authorAvatar, // Add the picture field here
+        imageUrls: imageUrls,
         createdAt: DateTime.now(),
         viewCount: 0,
         commentCount: 0,
       );
 
-      // Add post to Firestore and retrieve the generated ID
+      // Thêm bài viết vào Firestore và nhận ID được tạo
       DocumentReference postRef = await FirebaseFirestore.instance
           .collection('posts')
           .add(post.toFirestore());
 
-      // Update the PostModel with the Firestore document ID
+      // Cập nhật PostModel với ID của bài viết
       post.id = postRef.id;
 
       Navigator.pop(context);
@@ -129,10 +162,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Tạo Bài Viết Mới',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+        // title: Text(
+        //   'Tạo Bài Viết Mới',
+        //   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        // ),
         backgroundColor: Color(0xFF284B8C),
       ),
       body: SingleChildScrollView(

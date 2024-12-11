@@ -1393,6 +1393,23 @@ PODS:
     - GTMSessionFetcher/Core
   - image_picker_ios (0.0.1):
     - Flutter
+  - iOSDropDown (0.4.0)
+  - Kingfisher (7.6.2)
+  - Kommunicate (7.2.4):
+    - KommunicateChatUI-iOS-SDK (= 1.3.8)
+  - kommunicate_flutter (0.0.1):
+    - Flutter
+    - Kommunicate (~> 7.2.3)
+  - KommunicateChatUI-iOS-SDK (1.3.8):
+    - KommunicateChatUI-iOS-SDK/Complete (= 1.3.8)
+  - KommunicateChatUI-iOS-SDK/Complete (1.3.8):
+    - iOSDropDown
+    - Kingfisher (~> 7.6.2)
+    - KommunicateChatUI-iOS-SDK/RichMessageKit
+    - KommunicateCore-iOS-SDK (= 1.2.4)
+    - SwipeCellKit (~> 2.7.1)
+  - KommunicateChatUI-iOS-SDK/RichMessageKit (1.3.8)
+  - KommunicateCore-iOS-SDK (1.2.4)
   - leveldb-library (1.22.6)
   - MLImage (1.0.0-beta6)
   - MLKitBarcodeScanning (6.0.0):
@@ -1463,6 +1480,7 @@ PODS:
     - StripeUICore (= 23.30.0)
   - StripeUICore (23.30.0):
     - StripeCore (= 23.30.0)
+  - SwipeCellKit (2.7.1)
   - video_compress (0.3.0):
     - Flutter
   - video_player_avfoundation (0.0.1):
@@ -1482,6 +1500,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/darwin`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - kommunicate_flutter (from `.symlinks/plugins/kommunicate_flutter/ios`)
   - mobile_scanner (from `.symlinks/plugins/mobile_scanner/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -1516,6 +1535,11 @@ SPEC REPOS:
     - gRPC-Core
     - GTMAppAuth
     - GTMSessionFetcher
+    - iOSDropDown
+    - Kingfisher
+    - Kommunicate
+    - KommunicateChatUI-iOS-SDK
+    - KommunicateCore-iOS-SDK
     - leveldb-library
     - MLImage
     - MLKitBarcodeScanning
@@ -1532,6 +1556,7 @@ SPEC REPOS:
     - StripePaymentSheet
     - StripePaymentsUI
     - StripeUICore
+    - SwipeCellKit
 
 EXTERNAL SOURCES:
   camera_avfoundation:
@@ -1552,6 +1577,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/google_sign_in_ios/darwin"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
+  kommunicate_flutter:
+    :path: ".symlinks/plugins/kommunicate_flutter/ios"
   mobile_scanner:
     :path: ".symlinks/plugins/mobile_scanner/ios"
   path_provider_foundation:
@@ -1601,6 +1628,12 @@ SPEC CHECKSUMS:
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
+  iOSDropDown: ce9daa584eaa5567cafc1b633e3cc7eb6d9cea42
+  Kingfisher: 6c5449c6450c5239166510ba04afe374a98afc4f
+  Kommunicate: 3d18f7229fbf1ff7e16a027cbc5e3d6fe3316f30
+  kommunicate_flutter: 87abbae1132a9e722da061a6490bf3b48f8c23c5
+  KommunicateChatUI-iOS-SDK: 4ca12728c40d134b330f1e8ac5335e1b98ca6552
+  KommunicateCore-iOS-SDK: 2adcd775f5ed6fdcdbcac47986144c177fc44ab0
   leveldb-library: cc8b8f8e013647a295ad3f8cd2ddf49a6f19be19
   MLImage: 0ad1c5f50edd027672d8b26b0fee78a8b4a0fc56
   MLKitBarcodeScanning: 0a3064da0a7f49ac24ceb3cb46a5bc67496facd2
@@ -1621,6 +1654,7 @@ SPEC CHECKSUMS:
   StripePaymentSheet: eac031f76d7fbb4f52df9b9c39be5be671ca4c07
   StripePaymentsUI: 7d7cffb2ecfc0d6b5ac3a4488c02893a5ff6cc77
   StripeUICore: bb102d453b1e1a10a37f810bc0a9aa0675fb17fd
+  SwipeCellKit: 3972254a826da74609926daf59b08d6c72e619ea
   video_compress: fce97e4fb1dfd88175aa07d2ffc8a2f297f87fbe
   video_player_avfoundation: 7c6c11d8470e1675df7397027218274b6d2360b3
   webview_flutter_wkwebview: 0982481e3d9c78fd5c6f62a002fcd24fc791f1e4
