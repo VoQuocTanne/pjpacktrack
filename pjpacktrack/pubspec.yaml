@@ -66,12 +66,9 @@ dependencies:
   flutter_launcher_icons: ^0.14.2
   webview_flutter: ^4.2.1
   intl: ^0.19.0
-<<<<<<< HEAD
   tflite_flutter: ^0.11.0
-=======
   file_picker: ^8.1.4
   kommunicate_flutter: ^1.9.8
->>>>>>> fff12a86ee0947eeb0b208cbf579e92f46c46445
 
 dev_dependencies:
   flutter_test:
