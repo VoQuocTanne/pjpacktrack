@@ -123,11 +123,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content:
-                                  Text('Chức năng nâng cấp gói chưa khả dụng')),
-                        );
+                        NavigationServices(context).gotoServicePackageScreen();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
