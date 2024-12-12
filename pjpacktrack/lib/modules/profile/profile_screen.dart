@@ -52,12 +52,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: Container(child: appBar(ref)), // Truyền ref vào appBar
           ),
           // Thêm khu vực bán gói dịch vụ
+          // Thêm vào phần thay thế "Dịch vụ Premium"
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(12.0), // Giảm padding tổng thể
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
-                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(10.0), // Giảm bo góc
+                color: Colors.blue.shade50, // Màu nền nhẹ nhàng
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.2),
@@ -67,34 +68,82 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                 ],
               ),
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(12.0), // Giảm padding bên trong
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Dịch vụ Premium',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Gói miễn phí',
+                        style: const TextStyle(
+                          fontSize: 16, // Giảm kích thước chữ tiêu đề
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                      Text(
+                        'Hết hạn',
+                        style: TextStyle(
+                          fontSize: 12, // Giảm kích thước chữ trạng thái
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8.0),
-                  Text(
-                    'Trải nghiệm các tính năng cao cấp với gói dịch vụ Premium của chúng tôi!',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
-                    ),
+                  const Divider(color: Colors.blueAccent, thickness: 1),
+                  const SizedBox(
+                      height: 8), // Giảm khoảng cách giữa các thành phần
+                  _buildFeatureRowWithIcon(
+                    context,
+                    'Video đóng hàng',
+                    Icons.inbox_rounded,
+                    300,
+                    600,
                   ),
-                  const SizedBox(height: 12.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      NavigationServices(context).gotoServicePackageScreen();
-                    },
-                    child: const Text('Mua ngay'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 16.0),
+                  const SizedBox(height: 10), // Giảm khoảng cách giữa các dòng
+                  _buildFeatureRowWithIcon(
+                    context,
+                    'Video đơn vị vận chuyển',
+                    Icons.local_shipping,
+                    0,
+                    600,
+                  ),
+                  const SizedBox(height: 10),
+                  _buildFeatureRowWithIcon(
+                    context,
+                    'Video trả hàng',
+                    Icons.assignment_return,
+                    0,
+                    600,
+                  ),
+                  const SizedBox(height: 16), // Giảm khoảng cách trước nút
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content:
+                                  Text('Chức năng nâng cấp gói chưa khả dụng')),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 20), // Giảm padding của nút
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'Nâng cấp gói',
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white), // Giảm kích thước chữ
+                      ),
                     ),
                   ),
                 ],
@@ -177,6 +226,80 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                 );
               },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureRowWithIcon(
+      BuildContext context, String title, IconData icon, int used, int total) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.blue.shade100, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 4.0,
+            spreadRadius: 1.0,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.blue.shade100,
+            ),
+            padding: const EdgeInsets.all(6),
+            child: Icon(
+              icon,
+              color: Colors.blueAccent,
+              size: 18, // Giảm kích thước icon
+            ),
+          ),
+          const SizedBox(width: 10), // Giảm khoảng cách
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13, // Giảm kích thước chữ
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      '$used video / $total video/tháng',
+                      style: TextStyle(
+                        fontSize:
+                            11, // Giảm kích thước chữ của thông tin chi tiết
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: LinearProgressIndicator(
+                        value: used / total,
+                        backgroundColor: Colors.grey.shade300,
+                        color: Colors.blueAccent,
+                        minHeight: 4, // Giảm chiều cao của progress bar
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],

@@ -6,6 +6,7 @@ class SettingsListData {
   String titleTxt;
   String subTxt;
   String url;
+  String iconimg;
   IconData iconData;
   bool isSelected;
 
@@ -13,7 +14,8 @@ class SettingsListData {
     this.titleTxt = '',
     this.isSelected = false,
     this.subTxt = '',
-    this.url='',
+    this.url = '',
+    this.iconimg = "assets/images/icons8-shopee.svg",
     this.iconData = Icons.supervised_user_circle,
   });
 
@@ -179,86 +181,38 @@ class SettingsListData {
     SettingsListData(
       titleTxt: "Shoppe",
       subTxt: "",
+      iconimg: "assets/images/icons8-shopee.svg",
     ),
     SettingsListData(
       titleTxt: '',
-      subTxt: "Quy trình hoàn trả của shoppe",
-      url: "https://banhang.shopee.vn/edu/category?sub_cat_id=251"
+      subTxt: "Quy trình hoàn trả của shopee",
+      iconimg: "assets/images/default-icon.svg", // Giá trị mặc định
+      url: "https://banhang.shopee.vn/edu/category?sub_cat_id=251",
     ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "What methods ",
-    // ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "When am I charged",
-    // ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "How do I edit",
-    // ),
-    // SettingsListData(
-    //   titleTxt: 'trust_and_safety',
-    //   subTxt: "",
-    // ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "I'm_a_guest_What",
-    // ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "When am I charged",
-    // ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "How do I edit",
-    // ),
     SettingsListData(
       titleTxt: "Lazada",
       subTxt: "",
+      iconimg: "assets/images/icons8-lazada.svg",
     ),
     SettingsListData(
       titleTxt: '',
       subTxt: "Quy trình hoàn trả của lazada",
-      url: "https://helpcenter.lazada.vn/s/faq/category?categoryId=1000027300&language=vi_VN&m_station=BuyerHelp"
+      iconimg: "assets/images/default-icon.svg", // Giá trị mặc định
+      url:
+          "https://helpcenter.lazada.vn/s/faq/category?categoryId=1000027300&language=vi_VN&m_station=BuyerHelp",
     ),
     SettingsListData(
       titleTxt: "TikTok",
       subTxt: "",
+      iconimg: "assets/images/icons8-tiktok.svg",
     ),
     SettingsListData(
       titleTxt: '',
       subTxt: "Quy trình hoàn trả của tiktok",
-      url: "https://seller-vn.tiktok.com/university/essay?knowledge_id=6837773789234946&default_language=vi-VN&identity=1"
+      iconimg: "assets/images/default-icon.svg", // Giá trị mặc định
+      url:
+          "https://seller-vn.tiktok.com/university/essay?knowledge_id=6837773789234946&default_language=vi-VN&identity=1",
     ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "What methods ",
-    // ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "When am I charged",
-    // ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "How do I edit",
-    // ),
-    // SettingsListData(
-    //   titleTxt: 'trust_and_safety',
-    //   subTxt: "",
-    // ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "I'm_a_guest_What",
-    // ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "When am I charged",
-    // ),
-    // SettingsListData(
-    //   titleTxt: '',
-    //   subTxt: "How do I edit",
-    // ),
   ];
 
   static List<SettingsListData> subHelpList = [

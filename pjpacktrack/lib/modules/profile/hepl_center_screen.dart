@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:kommunicate_flutter/kommunicate_flutter.dart';
 import 'package:pjpacktrack/constants/text_styles.dart';
 import 'package:pjpacktrack/model/setting_list_data.dart';
@@ -34,71 +35,80 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).padding.bottom),
-                itemCount: helpSearchList.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: helpSearchList[index].subTxt != ""
-                        ? () {
-                            NavigationServices(context)
-                                .gotoViewWeb(helpSearchList[index].url);
-                          }
-                        : null,
-                    child: Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8, right: 16),
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Text(
-                                    helpSearchList[index].titleTxt != ""
-                                        ? helpSearchList[index].titleTxt
-                                        : helpSearchList[index].subTxt,
-                                    style: TextStyles(context)
-                                        .getRegularStyle()
-                                        .copyWith(
-                                            fontWeight: helpSearchList[index]
-                                                        .titleTxt !=
-                                                    ""
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                            fontSize: helpSearchList[index]
-                                                        .titleTxt !=
-                                                    ""
-                                                ? 18
-                                                : 14),
-                                  ),
+                child: ListView.builder(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).padding.bottom),
+              itemCount: helpSearchList.length,
+              itemBuilder: (context, index) {
+                final item = helpSearchList[index];
+                return InkWell(
+                  onTap: item.subTxt.isNotEmpty
+                      ? () {
+                          NavigationServices(context).gotoViewWeb(item.url);
+                        }
+                      : null,
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8, right: 16),
+                        child: Row(
+                          children: <Widget>[
+                            if (item.titleTxt.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    left:
+                                        12.0), // Thêm khoảng cách giữa icon và text
+                                child: SvgPicture.asset(
+                                  index == 0
+                                      ? "assets/images/icons8-shopee.svg"
+                                      : index == 2
+                                          ? "assets/images/icons8-lazada.svg"
+                                          : "assets/images/icons8-tiktok.svg",
+                                  height: 24,
+                                  width: 24,
                                 ),
                               ),
-                              helpSearchList[index].subTxt != ""
-                                  ? Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: Icon(Icons.keyboard_arrow_right,
-                                          color: Theme.of(context)
-                                              .disabledColor
-                                              .withOpacity(0.3)),
-                                    )
-                                  : const SizedBox()
-                            ],
-                          ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  item.titleTxt.isNotEmpty
+                                      ? item.titleTxt
+                                      : item.subTxt,
+                                  style: TextStyles(context)
+                                      .getRegularStyle()
+                                      .copyWith(
+                                        fontWeight: item.titleTxt.isNotEmpty
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        fontSize:
+                                            item.titleTxt.isNotEmpty ? 18 : 14,
+                                      ),
+                                ),
+                              ),
+                            ),
+                            if (item.subTxt.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Icon(
+                                  Icons.keyboard_arrow_right,
+                                  color: Theme.of(context)
+                                      .disabledColor
+                                      .withOpacity(0.3),
+                                ),
+                              ),
+                          ],
                         ),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 16, right: 16),
-                          child: Divider(
-                            height: 1,
-                          ),
-                        )
-                      ],
-                    ),
-                  );
-                },
-              ),
-            )
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 16, right: 16),
+                        child: Divider(height: 1),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ))
           ],
         ),
       ),

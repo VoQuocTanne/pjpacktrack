@@ -1159,7 +1159,7 @@ PODS:
   - BoringSSL-GRPC/Interface (0.0.36)
   - camera_avfoundation (0.0.1):
     - Flutter
-  - cloud_firestore (5.5.1):
+  - cloud_firestore (5.5.0):
     - Firebase/Firestore (= 11.4.0)
     - firebase_core
     - Flutter
@@ -1211,18 +1211,18 @@ PODS:
   - Firebase/Storage (11.4.0):
     - Firebase/CoreOnly
     - FirebaseStorage (~> 11.4.0)
-  - firebase_auth (5.3.4):
+  - firebase_auth (5.3.3):
     - Firebase/Auth (= 11.4.0)
     - firebase_core
     - Flutter
-  - firebase_core (3.8.1):
+  - firebase_core (3.8.0):
     - Firebase/CoreOnly (= 11.4.0)
     - Flutter
-  - firebase_database (11.2.0):
+  - firebase_database (11.1.6):
     - Firebase/Database (= 11.4.0)
     - firebase_core
     - Flutter
-  - firebase_storage (12.3.7):
+  - firebase_storage (12.3.6):
     - Firebase/Storage (= 11.4.0)
     - firebase_core
     - Flutter
@@ -1671,15 +1671,15 @@ SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   BoringSSL-GRPC: ca6a8e5d04812fce8ffd6437810c2d46f925eaeb
   camera_avfoundation: dd002b0330f4981e1bbcb46ae9b62829237459a4
-  cloud_firestore: 3fafe78d755b01fe1fd267a87bb52e80b7dacacc
+  cloud_firestore: 8794ea2885e367f0a2096338964ddfd49739b2c7
   DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c
   DKPhotoGallery: b3834fecb755ee09a593d7c9e389d8b5d6deed60
   file_picker: 09aa5ec1ab24135ccd7a1621c46c84134bfd6655
   Firebase: cf1b19f21410b029b6786a54e9764a0cacad3c99
-  firebase_auth: c4bdd9d7b338ac004008cb5024a643584e0ec03f
-  firebase_core: 418aed674e9a0b8b6088aec16cde82a811f6261f
-  firebase_database: eaa98d5fd998bd2b76318df35b1ebe5dd12449b5
-  firebase_storage: 8826dc971e5029b48826613f7265952e55191585
+  firebase_auth: 42718683069d35d73af7a986b55b194589039e5e
+  firebase_core: 9efc3ecf689cdbc90f13f4dc58108c83ea46b266
+  firebase_database: ec66bb7993ba6e50a80fdf6b17ea843ad569428d
+  firebase_storage: 942caaa628c22c941bff8af058347cc5c38a70bf
   FirebaseAppCheckInterop: d265d9f4484e7ec1c591086408840fdd383d1213
   FirebaseAuth: c359af98bd703cbf4293eec107a40de08ede6ce6
   FirebaseAuthInterop: 1219bee9b23e6ebe84c256a0d95adab53d11c331
