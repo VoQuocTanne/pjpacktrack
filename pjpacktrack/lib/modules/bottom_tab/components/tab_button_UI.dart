@@ -7,14 +7,18 @@ class TabButtonUI extends StatelessWidget {
   final Function()? onTap;
   final bool isSelected;
   final String text;
+  final double iconSize; // Kích thước icon
+  final double fontSize; // Kích thước chữ
 
-  const TabButtonUI(
-      {Key? key,
-      this.onTap,
-      required this.icon,
-      required this.isSelected,
-      required this.text})
-      : super(key: key);
+  const TabButtonUI({
+    Key? key,
+    this.onTap,
+    required this.icon,
+    required this.isSelected,
+    required this.text,
+    this.iconSize = 20, // Mặc định 20
+    this.fontSize = 10, // Mặc định 12
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +41,7 @@ class TabButtonUI extends StatelessWidget {
                 height: 32,
                 child: Icon(
                   icon,
-                  size: 26,
+                  size: iconSize,
                   color: color,
                 ),
               ),
@@ -47,6 +51,7 @@ class TabButtonUI extends StatelessWidget {
                   fit: BoxFit.fill,
                   child: Text(
                     text,
+                    textAlign: TextAlign.center,
                     style: TextStyles(context).getDescriptionStyle().copyWith(
                           color: color,
                         ),

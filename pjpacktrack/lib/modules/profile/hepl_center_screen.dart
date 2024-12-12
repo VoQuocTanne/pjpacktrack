@@ -35,8 +35,16 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
+<<<<<<< HEAD
               // color: Theme.of(context).primaryColor,
               child: appBar(),
+=======
+              color: Theme.of(context).primaryColor,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 0),
+                child: appBar(),
+              ),
+>>>>>>> origin/Dev_Kelo
             ),
             Expanded(
               child: ListView.builder(
