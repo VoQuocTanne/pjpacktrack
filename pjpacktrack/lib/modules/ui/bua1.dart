@@ -39,7 +39,6 @@ class BrightnessPreview extends StatelessWidget {
   }
 
   double _calculateBrightness(BoxConstraints constraints) {
-    // Tính toán độ sáng dựa trên màu và kích thước
     return constraints.maxWidth * constraints.maxHeight / 255;
   }
 }

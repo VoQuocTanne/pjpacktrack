@@ -12,6 +12,7 @@ import 'bua1.dart';
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
   final String storeId;
+
   RecordingScreen({super.key, required this.cameras, required this.storeId});
 
   @override
@@ -64,30 +65,18 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   Future<void> _initializeCamera() async {
     try {
-      _cameraController = CameraController(
-        widget.cameras[0],
-        ResolutionPreset.high,
-        enableAudio: true,
-      );
-      await _cameraController!.initialize();
-      if (mounted) setState(() {});
+      if (_cameraController == null ||
+          !_cameraController!.value.isInitialized) {
+        _cameraController = CameraController(
+          widget.cameras[0],
+          ResolutionPreset.high,
+          enableAudio: true,
+        );
+        await _cameraController!.initialize();
+        if (mounted) setState(() {});
+      }
     } catch (e) {
       print('Camera initialization error: $e');
-    }
-  }
-
-  void _toggleFlash() async {
-    if (_isScanning) {
-      await _scannerController?.toggleTorch();
-      setState(() => _isFlashOn = !_isFlashOn);
-    } else if (_cameraController != null) {
-      try {
-        final newFlashMode = _isFlashOn ? FlashMode.off : FlashMode.torch;
-        await _cameraController!.setFlashMode(newFlashMode);
-        setState(() => _isFlashOn = !_isFlashOn);
-      } catch (e) {
-        print('Flash toggle error: $e');
-      }
     }
   }
 
@@ -124,7 +113,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
         );
 
         await uploader.uploadVideo(videoFile.path);
-        print('Upload success'); // Add log
+        print('Upload success');
+
         // Reset state
         _cameraController?.dispose();
         _cameraController = null;
@@ -145,14 +135,29 @@ class _RecordingScreenState extends State<RecordingScreen> {
   @override
   void dispose() {
     _cameraController?.dispose();
+    _scannerController?.dispose();
     super.dispose();
+  }
+
+  void _toggleFlash() async {
+    if (_isScanning) {
+      await _scannerController?.toggleTorch();
+      setState(() => _isFlashOn = !_isFlashOn);
+    } else if (_cameraController != null) {
+      try {
+        final newFlashMode = _isFlashOn ? FlashMode.off : FlashMode.torch;
+        await _cameraController!.setFlashMode(newFlashMode);
+        setState(() => _isFlashOn = !_isFlashOn);
+      } catch (e) {
+        print('Flash toggle error: $e');
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: Text(_isQRCode ? 'Quét QR Code' : 'Quét Barcode'),
         backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
         actions: [
@@ -165,14 +170,11 @@ class _RecordingScreenState extends State<RecordingScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Camera preview or scanner
           _isRecording && _cameraController != null
               ? CameraPreview(_cameraController!)
               : _isScanning && _selectedDeliveryOption != null
                   ? _buildScanner()
                   : Container(color: Colors.black),
-
-          // Top section - Recording mode
           if (_selectedDeliveryOption != null)
             Positioned(
               top: MediaQuery.of(context).size.height * 0.1,
@@ -209,7 +211,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
                 ),
               ),
             ),
-
           Positioned(
             top: 0,
             right: 0,
@@ -228,8 +229,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
               ),
             ),
           ),
-
-          // Center message
           if (_selectedDeliveryOption == null)
             Center(
               child: Container(
@@ -245,7 +244,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                     Icon(Icons.touch_app, color: Colors.white),
                     SizedBox(width: 12),
                     Text(
-                      'Chọn loại giao hàng để bắt đầu',
+                      'Chọn hình thức để bắt đầu',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -371,7 +370,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
       onBrightnessChanged: (brightness) {
         setState(() {
           _currentBrightness = brightness;
-          _brightnessWarning = BrightnessAnalyzer.getBrightnessWarning(brightness);
+          _brightnessWarning =
+              BrightnessAnalyzer.getBrightnessWarning(brightness);
         });
       },
       child: MobileScanner(
@@ -383,7 +383,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   void _handleDeliveryOptionSelected(String option) {
     setState(() => _selectedDeliveryOption = option);
-    //_saveDeliveryOption(option);
   }
 
   Future<void> _handleDetection(BarcodeCapture capture) async {

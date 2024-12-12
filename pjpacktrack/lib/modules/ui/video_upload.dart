@@ -175,18 +175,16 @@ class VideoUploader {
       Map<String, dynamic> data,
       WriteBatch batch,
       ) async {
-    // Tìm video cũ với cùng deliveryOption
+
     final existingVideos = await docRef
         .collection('videos')
         .where('deliveryOption', isEqualTo: deliveryOption)
         .get();
 
-    // Xóa tất cả videos cũ có cùng deliveryOption
     for (var doc in existingVideos.docs) {
       batch.delete(doc.reference);
     }
 
-    // Tạo document mới cho video trong collection videos
     final videoRef = docRef.collection('videos').doc();
     batch.set(videoRef, {
       'url': videoUrl,

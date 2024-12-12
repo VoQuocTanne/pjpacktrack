@@ -16,6 +16,8 @@ class OrderHistoryScreen extends StatefulWidget {
 }
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
+  String? searchQuery;
+
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -131,7 +133,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final orders = snapshot.data!.docs;
+        var orders = snapshot.data!.docs;
+
+        if (searchQuery != null && searchQuery!.isNotEmpty) {
+          orders = orders.where((order) {
+            final data = order.data() as Map<String, dynamic>;
+            final code = data['code']?.toString() ?? '';
+            return code.toLowerCase().contains(searchQuery!.toLowerCase());
+          }).toList();
+        }
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,6 +204,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value;
+                });
+              },
               decoration: InputDecoration(
                 hintText: 'Tìm kiếm mã vận đơn',
                 border: InputBorder.none,
