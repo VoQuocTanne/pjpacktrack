@@ -32,6 +32,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
   final List<String> _videoPaths = [];
   double _currentBrightness = 0;
   String _brightnessWarning = "";
+  static const String STOP_CODE = "STOP";
+  bool _isContinuousScanning = false;
   final AwsCredentialsConfig credentialsConfig = AwsCredentialsConfig(
     accessKey: AwsConfig.accessKey,
     secretKey: AwsConfig.secretKey,
@@ -69,7 +71,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
           !_cameraController!.value.isInitialized) {
         _cameraController = CameraController(
           widget.cameras[0],
-          ResolutionPreset.high,
+          ResolutionPreset.veryHigh,
           enableAudio: true,
         );
         await _cameraController!.initialize();
@@ -81,28 +83,28 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
   Future<void> _startRecording() async {
-    await _scannerController?.stop();
     await _initializeCamera();
 
     if (_cameraController != null && !_isRecording) {
       try {
         await _cameraController!.startVideoRecording();
-        setState(() => _isRecording = true);
+        setState(() {
+          _isRecording = true;
+          _isContinuousScanning = _continuousRecording;
+        });
       } catch (e) {
         print('Recording start error: $e');
       }
     }
   }
 
-  Future<void> _stopRecording() async {
+  Future<void> _stopAndReset() async {
     if (_cameraController != null && _isRecording) {
       try {
         final XFile videoFile = await _cameraController!.stopVideoRecording();
         setState(() {
-          _isRecording = false;
           _videoPaths.add(videoFile.path);
         });
-
         final uploader = VideoUploader(
           context: context,
           credentialsConfig: credentialsConfig,
@@ -111,23 +113,33 @@ class _RecordingScreenState extends State<RecordingScreen> {
           isQRCode: _isQRCode,
           storeId: widget.storeId,
         );
-
         await uploader.uploadVideo(videoFile.path);
         print('Upload success');
 
-        // Reset state
-        _cameraController?.dispose();
+        // Clean up camera completely
+        await _cameraController?.dispose();
         _cameraController = null;
+
+        // Clean up scanner completely
+        await _scannerController?.dispose();
+        _scannerController = null;
+
         setState(() {
+          _isRecording = false;
           _isScanning = true;
+          _isContinuousScanning = false;
           _lastScannedCode = null;
         });
+
+        if (!_continuousRecording) {
+          setState(() => _selectedDeliveryOption = null);
+        }
+
+        // Initialize fresh instances
         _initializeScannerController();
+        await _initializeCamera();
       } catch (e) {
         print('Recording stop error: $e');
-      }
-      if (!_continuousRecording) {
-        setState(() => _selectedDeliveryOption = null);
       }
     }
   }
@@ -170,11 +182,28 @@ class _RecordingScreenState extends State<RecordingScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          _isRecording && _cameraController != null
-              ? CameraPreview(_cameraController!)
-              : _isScanning && _selectedDeliveryOption != null
-                  ? _buildScanner()
-                  : Container(color: Colors.black),
+          // Show both camera preview and scanner when recording continuously
+          if (_isRecording && _continuousRecording)
+            Stack(
+              children: [
+                if (_cameraController != null)
+                  Positioned.fill(
+                    child: CameraPreview(_cameraController!),
+                  ),
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 1,
+                    child: _buildScanner(),
+                  ),
+                ),
+              ],
+            )
+          else if (_isRecording && _cameraController != null)
+            CameraPreview(_cameraController!)
+          else if (_isScanning && _selectedDeliveryOption != null)
+              _buildScanner()
+          else
+              Container(color: Colors.black),
           if (_selectedDeliveryOption != null)
             Positioned(
               top: MediaQuery.of(context).size.height * 0.1,
@@ -341,7 +370,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
       padding: const EdgeInsets.all(16),
       child: SafeArea(
         child: ElevatedButton(
-          onPressed: _isRecording ? _stopRecording : null,
+          onPressed: _isRecording ? _stopAndReset : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -366,19 +395,10 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
   Widget _buildScanner() {
-    return BrightnessPreview(
-      onBrightnessChanged: (brightness) {
-        setState(() {
-          _currentBrightness = brightness;
-          _brightnessWarning =
-              BrightnessAnalyzer.getBrightnessWarning(brightness);
-        });
-      },
-      child: MobileScanner(
+    return MobileScanner(
         controller: _scannerController,
         onDetect: _handleDetection,
-      ),
-    );
+      );
   }
 
   void _handleDeliveryOptionSelected(String option) {
@@ -386,19 +406,25 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
   Future<void> _handleDetection(BarcodeCapture capture) async {
-    if (_lastScannedCode == null) {
-      final barcode = capture.barcodes.first;
-      final String? code = barcode.rawValue;
-      _isQRCode = barcode.format == BarcodeFormat.qrCode;
-      if (code != null) {
+    final barcode = capture.barcodes.first;
+    final String? code = barcode.rawValue;
+
+    if (code != null) {
+      if (_isRecording && _continuousRecording) {
+        // During continuous recording, only process STOP code
+        if (code == STOP_CODE) {
+          await _stopAndReset();
+        }
+      } else if (!_isRecording) {
+        // Normal scanning mode
+        _isQRCode = barcode.format == BarcodeFormat.qrCode;
         setState(() {
           _isScanning = false;
           _lastScannedCode = code;
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
+          SnackBar(content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
         );
 
         await _startRecording();
