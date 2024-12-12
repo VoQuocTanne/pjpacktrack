@@ -37,7 +37,7 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
             Container(
               color: Theme.of(context).primaryColor,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 24),
+                padding: const EdgeInsets.only(bottom: 0),
                 child: appBar(),
               ),
             ),
