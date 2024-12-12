@@ -5,9 +5,11 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
 migrate_working_dir/
 /lib/modules/ui/aws_config.dart
 /assets/dialog_flow_auth.json

@@ -105,6 +105,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
         setState(() {
           _videoPaths.add(videoFile.path);
         });
+
+        // Tải video lên
         final uploader = VideoUploader(
           context: context,
           credentialsConfig: credentialsConfig,
@@ -116,26 +118,20 @@ class _RecordingScreenState extends State<RecordingScreen> {
         await uploader.uploadVideo(videoFile.path);
         print('Upload success');
 
-        // Clean up camera completely
+        // Dừng và khởi tạo lại camera và scanner
         await _cameraController?.dispose();
-        _cameraController = null;
-
-        // Clean up scanner completely
         await _scannerController?.dispose();
-        _scannerController = null;
 
         setState(() {
+          _cameraController = null;
+          _scannerController = null;
           _isRecording = false;
           _isScanning = true;
           _isContinuousScanning = false;
           _lastScannedCode = null;
         });
 
-        if (!_continuousRecording) {
-          setState(() => _selectedDeliveryOption = null);
-        }
-
-        // Initialize fresh instances
+        // Khởi tạo lại
         _initializeScannerController();
         await _initializeCamera();
       } catch (e) {
@@ -201,9 +197,9 @@ class _RecordingScreenState extends State<RecordingScreen> {
           else if (_isRecording && _cameraController != null)
             CameraPreview(_cameraController!)
           else if (_isScanning && _selectedDeliveryOption != null)
-              _buildScanner()
+            _buildScanner()
           else
-              Container(color: Colors.black),
+            Container(color: Colors.black),
           if (_selectedDeliveryOption != null)
             Positioned(
               top: MediaQuery.of(context).size.height * 0.1,
@@ -396,9 +392,9 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   Widget _buildScanner() {
     return MobileScanner(
-        controller: _scannerController,
-        onDetect: _handleDetection,
-      );
+      controller: _scannerController,
+      onDetect: _handleDetection,
+    );
   }
 
   void _handleDeliveryOptionSelected(String option) {
@@ -410,13 +406,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
     final String? code = barcode.rawValue;
 
     if (code != null) {
-      if (_isRecording && _continuousRecording) {
-        // During continuous recording, only process STOP code
-        if (code == STOP_CODE) {
-          await _stopAndReset();
-        }
-      } else if (!_isRecording) {
-        // Normal scanning mode
+       if (!_isRecording && code != STOP_CODE) {
+        // Chế độ quét bình thường
         _isQRCode = barcode.format == BarcodeFormat.qrCode;
         setState(() {
           _isScanning = false;
@@ -424,11 +415,24 @@ class _RecordingScreenState extends State<RecordingScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
+          SnackBar(
+              content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
         );
 
-        await _startRecording();
-      }
+        try {
+          await _startRecording();
+        } catch (e) {
+          print('Error during recording: $e');
+        }
+      }else if (_isRecording && _continuousRecording && code == STOP_CODE) {
+        // Chỉ xử lý mã "STOP" khi quay liên tục
+          try {
+            await _stopAndReset();
+          } catch (e) {
+            print('Error during stopping: $e');
+          }
+        
+      } 
     }
   }
 }
