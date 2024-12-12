@@ -6,7 +6,6 @@ import 'package:video_player/video_player.dart';
 class AwsVideoPlayer extends StatefulWidget {
   final String orderId;
   final String deliveryOption;
-
   const AwsVideoPlayer({
     super.key,
     required this.orderId,

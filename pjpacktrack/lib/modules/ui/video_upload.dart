@@ -11,6 +11,7 @@ class VideoUploader {
   final String lastScannedCode;
   final String selectedDeliveryOption;
   final bool isQRCode;
+  final String storeId;
 
   VideoUploader({
     required this.context,
@@ -18,6 +19,7 @@ class VideoUploader {
     required this.lastScannedCode,
     required this.selectedDeliveryOption,
     required this.isQRCode,
+    required this.storeId,
   });
 
   Future<void> uploadVideo(String filePath) async {
@@ -215,6 +217,7 @@ class VideoUploader {
     batch.set(newDocRef, {
       'code': code,
       'userId': userId,
+      'storeId':storeId,
       'type': isQRCode ? 'QR_CODE' : 'BAR_CODE',
       'closedStatus': deliveryOption == 'Đóng gói',
       'shippingStatus': deliveryOption == 'Giao hàng',

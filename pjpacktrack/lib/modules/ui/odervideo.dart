@@ -3,7 +3,19 @@ import 'package:pjpacktrack/modules/ui/play_video.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class OrderHistoryScreen extends StatelessWidget {
+class OrderHistoryScreen extends StatefulWidget {
+  final String storeId;
+
+  const OrderHistoryScreen({
+    super.key,
+    required this.storeId,
+  });
+
+  @override
+  _OrderHistoryScreenState createState() => _OrderHistoryScreenState();
+}
+
+class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -112,6 +124,7 @@ class OrderHistoryScreen extends StatelessWidget {
       stream: FirebaseFirestore.instance
           .collection('orders')
           .where('userId', isEqualTo: userId)
+          .where('storeId', isEqualTo: widget.storeId)
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -202,8 +215,6 @@ class OrderHistoryScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
-        // onTap: () =>
-        //     _navigateToOrderProcess(context, data, code, isQRCode, userId),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -270,13 +281,10 @@ class OrderHistoryScreen extends StatelessWidget {
     // Debug
     print('Data received: $data');
 
-    // Lấy orderId từ id của document thay vì orderId
     final orderId = data['id'] ?? '';
 
-    // Debug
     print('OrderId: $orderId');
 
-    // Kiểm tra orderId trước khi navigate
     void navigateToVideo(String deliveryOption) {
       if (orderId.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(

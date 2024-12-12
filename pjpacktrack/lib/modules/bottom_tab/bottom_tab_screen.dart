@@ -41,7 +41,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
     await Future.delayed(const Duration(milliseconds: 480));
     setState(() {
       _isFirstTime = false;
-      _indexView = OrderHistoryScreen();
+      _indexView = OrderHistoryScreen(storeId: widget.storeId,);
     });
     _animationController.forward();
   }
@@ -74,7 +74,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
       _animationController.reverse().then((f) {
         if (tabType == BottomBarType.order) {
           setState(() {
-            _indexView = OrderHistoryScreen();
+            _indexView = OrderHistoryScreen(storeId: widget.storeId);
           });
         } else if (tabType == BottomBarType.camqr) {
           setState(() {

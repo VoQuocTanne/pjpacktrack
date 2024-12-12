@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -13,7 +11,7 @@ import 'bua1.dart';
 
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
-  String storeId;
+  final String storeId;
   RecordingScreen({super.key, required this.cameras, required this.storeId});
 
   @override
@@ -122,6 +120,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
           lastScannedCode: _lastScannedCode!,
           selectedDeliveryOption: _selectedDeliveryOption!,
           isQRCode: _isQRCode,
+          storeId: widget.storeId,
         );
 
         await uploader.uploadVideo(videoFile.path);
@@ -384,7 +383,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   void _handleDeliveryOptionSelected(String option) {
     setState(() => _selectedDeliveryOption = option);
-    _saveDeliveryOption(option);
+    //_saveDeliveryOption(option);
   }
 
   Future<void> _handleDetection(BarcodeCapture capture) async {
@@ -405,19 +404,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
         await _startRecording();
       }
-    }
-  }
-
-  Future<void> _saveDeliveryOption(String option) async {
-    try {
-      await FirebaseFirestore.instance.collection('delivery_options').add({
-        'option': option,
-        'storeId': widget.storeId,
-        'userId': FirebaseAuth.instance.currentUser?.uid,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-    } catch (e) {
-      print('Error saving delivery option: $e');
     }
   }
 }

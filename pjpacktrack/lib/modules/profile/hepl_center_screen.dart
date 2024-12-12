@@ -1,16 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kommunicate_flutter/kommunicate_flutter.dart';
 import 'package:pjpacktrack/constants/text_styles.dart';
-import 'package:pjpacktrack/constants/themes.dart';
-import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/model/setting_list_data.dart';
 import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/routes/route_names.dart';
-import 'package:pjpacktrack/widgets/common_appbar_view.dart';
-import 'package:pjpacktrack/widgets/common_card.dart';
-import 'package:pjpacktrack/widgets/common_search_bar.dart';
 import 'package:pjpacktrack/widgets/remove_focuse.dart';
 
 class HeplCenterScreen extends StatefulWidget {
@@ -35,16 +28,10 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
-<<<<<<< HEAD
-              // color: Theme.of(context).primaryColor,
-              child: appBar(),
-=======
-              color: Theme.of(context).primaryColor,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 0),
                 child: appBar(),
               ),
->>>>>>> origin/Dev_Kelo
             ),
             Expanded(
               child: ListView.builder(
