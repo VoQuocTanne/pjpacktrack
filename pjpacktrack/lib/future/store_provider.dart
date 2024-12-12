@@ -2,11 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Store {
+  final String storeId;
   final String storeName;
   final String storePhone;
   final String storeAddress;
 
   Store({
+    required this.storeId,
     required this.storeName,
     required this.storePhone,
     required this.storeAddress,
@@ -16,6 +18,7 @@ class Store {
   factory Store.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return Store(
+      storeId: doc.id, // Lấy ID từ Firestore document
       storeName: data['storeName'] ?? '',
       storePhone: data['storePhone'] ?? '',
       storeAddress: data['storeAddress'] ?? '',
@@ -35,44 +38,51 @@ class Store {
 class StoreNotifier extends StateNotifier<List<Store>> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  StoreNotifier() : super([]); // List<Store> is the state
+  StoreNotifier() : super([]);
 
-  // Fetch stores from Firestore
+  // Phương thức để tải danh sách cửa hàng từ Firestore
   Future<void> fetchStores(String uid) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('stores')
-          .get();
+      final userStoresCollection =
+          _firestore.collection('users').doc(uid).collection('stores');
+      final querySnapshot = await userStoresCollection.get();
 
-      state =
+      // Chuyển đổi dữ liệu từ Firestore thành danh sách các cửa hàng
+      final stores =
           querySnapshot.docs.map((doc) => Store.fromFirestore(doc)).toList();
+
+      // Cập nhật state với danh sách cửa hàng
+      state = stores;
     } catch (e) {
-      throw Exception('Lỗi khi lấy dữ liệu cửa hàng: $e');
+      throw Exception('Không thể tải danh sách cửa hàng: $e');
     }
   }
 
-  // Add a store to Firestore
+  // Phương thức thêm cửa hàng
   Future<void> addStore(String uid, Store store) async {
     try {
-      final querySnapshot = await _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('stores')
-          .get();
+      final userStoresCollection =
+          _firestore.collection('users').doc(uid).collection('stores');
 
-      // Kiểm tra nếu số lượng cửa hàng đã vượt quá 2
-      if (querySnapshot.docs.length >= 1) {
-        throw Exception('Bạn không thể thêm quá 1 cửa hàng');
+      // Kiểm tra số lượng cửa hàng của người dùng
+      final querySnapshot = await userStoresCollection.get();
+      if (querySnapshot.docs.length >= 2) {
+        throw Exception('Bạn không thể thêm quá 2 cửa hàng');
       }
 
-      await _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('stores')
-          .add(store.toMap());
-      state = [...state, store]; // Update the list immediately
+      // Tạo document mới trong Firestore và lấy ID của nó
+      final newDoc = await userStoresCollection.add(store.toMap());
+
+      // Gắn ID của cửa hàng với document ID mới
+      final storeWithId = Store(
+        storeId: newDoc.id, // Gán ID của document Firestore
+        storeName: store.storeName,
+        storePhone: store.storePhone,
+        storeAddress: store.storeAddress,
+      );
+
+      // Cập nhật lại state sau khi thêm cửa hàng
+      state = [...state, storeWithId];
     } catch (e) {
       throw Exception('Không thể thêm cửa hàng: $e');
     }

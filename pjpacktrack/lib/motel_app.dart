@@ -118,8 +118,8 @@ class _MotelAppState extends State<MotelApp> {
           SplashScreen(cameras: cameras),
       RoutesName.introductionScreen: (BuildContext context) =>
           IntroductionScreen(FirebaseUserRepository()),
-      RoutesName.home: (BuildContext context) =>
-          BottomTabScreen(cameras: cameras),
+      // RoutesName.home: (BuildContext context) =>
+      //     BottomTabScreen(cameras: cameras),
       RoutesName.login: (BuildContext context) => const LoginScreen(),
     };
   }

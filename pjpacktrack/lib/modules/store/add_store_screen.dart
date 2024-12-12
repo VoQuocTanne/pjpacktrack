@@ -3,6 +3,7 @@ import 'package:pjpacktrack/future/store_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pjpacktrack/future/store_selected_provider.dart';
 import 'package:pjpacktrack/modules/profile/profile_screen.dart';
+import 'package:pjpacktrack/modules/store/list_store_screen.dart';
 import 'package:pjpacktrack/routes/routes.dart';
 
 class AddStoreScreen extends ConsumerStatefulWidget {
@@ -89,6 +90,8 @@ class _AddStoreScreenState extends ConsumerState<AddStoreScreen> {
                   if (_formKey.currentState?.validate() ?? false) {
                     try {
                       final store = Store(
+                        storeId:
+                            '', // Tạm thời để trống, ID sẽ được gán sau khi thêm vào Firestore
                         storeName: _storeNameController.text,
                         storePhone: _storePhoneController.text,
                         storeAddress: _storeAddressController.text,
@@ -104,8 +107,14 @@ class _AddStoreScreenState extends ConsumerState<AddStoreScreen> {
                         SnackBar(content: Text('Đã thêm cửa hàng thành công')),
                       );
 
-                      // Chuyển hướng đến home
-                      Navigator.pushNamed(context, RoutesName.home);
+                      // Chuyển hướng đến StoreListScreen
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              StoreListScreen(uid: widget.uid),
+                        ),
+                      );
                     } catch (e) {
                       // Hiển thị lỗi khi không thể thêm cửa hàng
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -116,7 +125,7 @@ class _AddStoreScreenState extends ConsumerState<AddStoreScreen> {
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  backgroundColor: Color(0xFF284B8C), // Màu chữ của nút
+                  backgroundColor: Color(0xFF284B8C),
                 ),
                 child: Text('Đăng ký cửa hàng'),
               ),

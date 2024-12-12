@@ -146,11 +146,11 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
         ),
       ),
       centerTitle: true,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
-        color: Color.fromARGB(255, 255, 255, 255),
-      ),
+      // leading: IconButton(
+      //   icon: const Icon(Icons.arrow_back),
+      //   onPressed: () => Navigator.of(context).pop(),
+      //   color: Color.fromARGB(255, 255, 255, 255),
+      // ),
     );
   }
 }

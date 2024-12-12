@@ -10,6 +10,7 @@ import 'package:pjpacktrack/language/app_localizations.dart';
 import 'package:pjpacktrack/logic/controllers/theme_provider.dart';
 import 'package:pjpacktrack/main.dart';
 import 'package:pjpacktrack/modules/bottom_tab/bottom_tab_screen.dart';
+import 'package:pjpacktrack/modules/store/list_store_screen.dart';
 import 'package:pjpacktrack/routes/route_names.dart';
 import 'package:pjpacktrack/widgets/common_button.dart';
 
@@ -109,7 +110,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 } else if (role == 'owner') {
                   // return OwnerDashboard();
                 } else if (role == 'user') {
-                  return BottomTabScreen(cameras: cameras);
+                  // return BottomTabScreen(cameras: cameras);
+                  return StoreListScreen(uid: userId);
                 } else {
                   return Scaffold(
                     body: Center(
@@ -119,7 +121,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 }
               }
 
-              return BottomTabScreen(cameras: cameras);
+              // return BottomTabScreen(cameras: cameras);
+              return StoreListScreen(uid: userId);
             },
           );
         } else {
