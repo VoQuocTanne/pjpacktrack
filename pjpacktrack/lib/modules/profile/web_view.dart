@@ -25,7 +25,6 @@ class _WebViewState extends State<WebView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('WebView Example'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
