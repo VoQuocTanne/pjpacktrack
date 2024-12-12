@@ -153,8 +153,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isQRCode ? 'Quét QR Code' : 'Quét Barcode'),
-        backgroundColor: Colors.teal,
+        // title: Text(_isQRCode ? 'Quét QR Code' : 'Quét Barcode'),
+        backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
         actions: [
           IconButton(

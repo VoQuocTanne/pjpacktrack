@@ -11,43 +11,40 @@ class OrderHistoryScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/images/appIcon.png',
+              height: 32,
+              width: 32,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Pack Track',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1A1A1A),
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(width: 50),
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
+            const SizedBox(height: 30),
             _buildStatusCards(),
             Expanded(
               child: _buildOrdersList(currentUser.uid),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/images/appIcon.png',
-            height: 32,
-            width: 32,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(width: 12),
-          const Text(
-            'Pack Track',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1A1A1A),
-              letterSpacing: 0.5,
-            ),
-          ),
-        ],
       ),
     );
   }

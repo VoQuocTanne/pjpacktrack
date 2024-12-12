@@ -35,11 +35,8 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Container(
-              color: Theme.of(context).primaryColor,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: appBar(),
-              ),
+              // color: Theme.of(context).primaryColor,
+              child: appBar(),
             ),
             Expanded(
               child: ListView.builder(
@@ -136,13 +133,13 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
 
   Widget appBar() {
     return AppBar(
-      backgroundColor: Theme.of(context).primaryColor,
+      // backgroundColor: Theme.of(context).primaryColor,
       title: Text(
-        'Chính sách hoàn trả',
+        'Hỗ trợ',
         style: TextStyle(
-          fontSize: 25,
+          // fontSize: 25,
           fontWeight: FontWeight.bold,
-          color: Color.fromARGB(255, 255, 255, 255),
+          color: Colors.black,
         ),
       ),
       centerTitle: true,
@@ -151,21 +148,6 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
       //   onPressed: () => Navigator.of(context).pop(),
       //   color: Color.fromARGB(255, 255, 255, 255),
       // ),
-    );
-  }
-}
-
-class ChatBotScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Chatbot'),
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
-      body: Center(
-        child: Text('Đây là trang Chatbot'),
-      ),
     );
   }
 }

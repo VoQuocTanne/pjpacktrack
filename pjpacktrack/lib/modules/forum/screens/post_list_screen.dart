@@ -9,11 +9,11 @@ class PostListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: Text(
-        //   'Diễn Đàn Nhà Bán Hàng',
-        //   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        // ),
-        backgroundColor: Color(0xFF284B8C),
+        title: Text(
+          'Diễn đàn',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        // backgroundColor: Color(0xFF284B8C),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
