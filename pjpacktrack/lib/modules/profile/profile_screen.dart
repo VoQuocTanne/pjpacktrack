@@ -83,14 +83,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           color: Colors.blueAccent,
                         ),
                       ),
-                      Text(
-                        'Hết hạn',
-                        style: TextStyle(
-                          fontSize: 12, // Giảm kích thước chữ trạng thái
-                          color: Colors.redAccent,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      // Text(
+                      //   'Hết hạn',
+                      //   style: TextStyle(
+                      //     fontSize: 12, // Giảm kích thước chữ trạng thái
+                      //     color: Colors.redAccent,
+                      //     fontWeight: FontWeight.bold,
+                      //   ),
+                      // ),
                     ],
                   ),
                   const Divider(color: Colors.blueAccent, thickness: 1),
