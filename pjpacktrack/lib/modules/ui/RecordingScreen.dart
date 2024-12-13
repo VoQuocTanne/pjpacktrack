@@ -6,8 +6,6 @@ import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/modules/ui/delivery_option.dart';
 import 'package:pjpacktrack/modules/ui/video_upload.dart';
 
-import 'bua.dart';
-import 'bua1.dart';
 
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -99,46 +97,67 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
   Future<void> _stopAndReset() async {
-    if (_cameraController != null && _isRecording) {
-      try {
-        final XFile videoFile = await _cameraController!.stopVideoRecording();
-        setState(() {
-          _videoPaths.add(videoFile.path);
-        });
+  if (_cameraController != null && _isRecording) {
+    try {
+      // 1. Dừng quay và lấy file video
+      final XFile videoFile = await _cameraController!.stopVideoRecording();
+      setState(() {
+        _videoPaths.add(videoFile.path);
+      });
 
-        // Tải video lên
-        final uploader = VideoUploader(
-          context: context,
-          credentialsConfig: credentialsConfig,
-          lastScannedCode: _lastScannedCode!,
-          selectedDeliveryOption: _selectedDeliveryOption!,
-          isQRCode: _isQRCode,
-          storeId: widget.storeId,
-        );
-        await uploader.uploadVideo(videoFile.path);
-        print('Upload success');
+      // 2. Upload video
+      final uploader = VideoUploader(
+        context: context,
+        credentialsConfig: credentialsConfig,
+        lastScannedCode: _lastScannedCode ?? 'UNKNOWN',
+        selectedDeliveryOption: _selectedDeliveryOption ?? 'UNKNOWN',
+        isQRCode: _isQRCode,
+        storeId: widget.storeId,
+      );
+      await uploader.uploadVideo(videoFile.path);
+      print('Upload completed successfully');
 
-        // Dừng và khởi tạo lại camera và scanner
+      // 3. Cleanup controllers
+      if (_cameraController != null) {
         await _cameraController?.dispose();
-        await _scannerController?.dispose();
-
-        setState(() {
-          _cameraController = null;
-          _scannerController = null;
-          _isRecording = false;
-          _isScanning = true;
-          _isContinuousScanning = false;
-          _lastScannedCode = null;
-        });
-
-        // Khởi tạo lại
-        _initializeScannerController();
-        await _initializeCamera();
-      } catch (e) {
-        print('Recording stop error: $e');
+        _cameraController = null;
       }
+      if (_scannerController != null) {
+        await _scannerController?.dispose();
+        _scannerController = null;
+      }
+
+      // 4. Reset state
+      setState(() {
+        _isRecording = false;
+        _isScanning = true;
+        _lastScannedCode = null;
+      });
+
+      // 5. Khởi tạo lại scanner TRƯỚC
+      await Future.delayed(const Duration(milliseconds: 500)); // Đợi một chút
+      _initializeScannerController();
+      
+      // 6. Sau đó mới khởi tạo camera
+      if (!_continuousRecording) {
+        setState(() => _selectedDeliveryOption = null);
+        await Future.delayed(const Duration(milliseconds: 500)); // Đợi thêm
+        await _initializeCamera();
+      }
+
+      // 7. Đảm bảo scanner được kích hoạt
+      setState(() {
+        _isScanning = true;
+      });
+      
+    } catch (e) {
+      print('Stop and reset error: $e');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Lỗi: $e')),
+      // );
     }
   }
+}
 
   @override
   void dispose() {
@@ -414,10 +433,10 @@ class _RecordingScreenState extends State<RecordingScreen> {
           _lastScannedCode = code;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //       content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
+        // );
 
         try {
           await _startRecording();
