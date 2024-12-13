@@ -28,9 +28,9 @@ class UserService {
             status: data['status'] ?? 'active', // Giá trị mặc định là 'active'
             packageId: data['packageId'] ??
                 'I9DKf6eLpXDqtLnu5t0l', // Giá trị mặc định là 0 nếu không tồn tại
-            quantily: data['quantily'] ??
+            quantily: data['quantity'] ??
                 0, // Giá trị mặc định là 0 nếu không tồn tại
-                limit: 600,
+            limit: data['limit'] ?? 600,
           );
         }
       }
