@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:pjpacktrack/modules/ui/recording/recording_controller.dart';
-import 'package:pjpacktrack/modules/ui/recording/recording_indicator.dart';
 import 'package:pjpacktrack/modules/ui/recording/recording_repo/recording_state.dart';
 import 'package:pjpacktrack/modules/ui/recording/start_prompt.dart';
 import 'delivery_option.dart';
@@ -123,6 +122,33 @@ class RecordingScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildUploadStatus(String status) {
+    return Positioned(
+      top: 60,
+      left: 0,
+      right: 0,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.black87,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          status,
+          style: const TextStyle(color: Colors.white),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 }

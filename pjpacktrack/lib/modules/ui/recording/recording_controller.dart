@@ -45,10 +45,10 @@ class RecordingController extends StateNotifier<RecordingState> {
   Future<void> initializeCamera(List<CameraDescription> cameras) async {
     if (cameras.isEmpty) return;
 
-    _cameras = cameras; // Lưu lại cameras list
+    _cameras = cameras;
 
     if (_cameraController != null) {
-      await _cameraController!.dispose(); // Cleanup trước khi tạo mới
+      await _cameraController!.dispose();
     }
 
     _cameraController = CameraController(
@@ -72,9 +72,8 @@ class RecordingController extends StateNotifier<RecordingState> {
   }
 
   Future<void> startRecording() async {
-    if (_cameraController != null && !state.isRecording) {
+    if (_cameraController != null && !state.isRecording && state.isQRCode != STOP_CODE) {
       try {
-        // Không tắt scanner nữa, chỉ bật camera recording
         await _cameraController!.startVideoRecording();
         state = state.copyWith(
           isRecording: true,
@@ -91,12 +90,12 @@ class RecordingController extends StateNotifier<RecordingState> {
     if (_cameraController == null || !state.isRecording) {
       return;
     }
+
     try {
       if (!_cameraController!.value.isRecordingVideo) {
         debugPrint('No video is recording, skip stopping recording');
         return;
       }
-
       // Lấy video uploader và config
       final videoUploader = ref.read(videoUploadProvider.notifier);
       final credentialsConfig = AwsCredentialsConfig(
@@ -136,11 +135,9 @@ class RecordingController extends StateNotifier<RecordingState> {
         isScanning: true,
         lastScannedCode: null,
       );
-
     } catch (e) {
       debugPrint('Error during stop & upload: $e');
 
-      // Nếu lỗi, vẫn reset state để tránh bị kẹt
       state = state.copyWith(
         isRecording: false,
         isScanning: true,
@@ -201,15 +198,12 @@ class RecordingController extends StateNotifier<RecordingState> {
 
     try {
       if (state.isRecording) {
-        // Đang recording thì chỉ xử lý STOP_CODE
         if (code == STOP_CODE && _currentStoreId != null) {
           await stopAndReset(_currentStoreId!);
         }
-        // Bỏ qua các mã khác khi đang recording
         return;
       }
 
-      // Chưa recording và có delivery option -> bắt đầu recording
       if (state.selectedDeliveryOption != null) {
         state = state.copyWith(
           lastScannedCode: code,
