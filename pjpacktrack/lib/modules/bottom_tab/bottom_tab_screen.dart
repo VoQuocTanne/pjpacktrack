@@ -15,7 +15,8 @@ import 'package:pjpacktrack/widgets/common_card.dart';
 class BottomTabScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
   String storeId;
-  BottomTabScreen({Key? key, required this.cameras, required this.storeId}) : super(key: key);
+  BottomTabScreen({Key? key, required this.cameras, required this.storeId})
+      : super(key: key);
 
   @override
   State<BottomTabScreen> createState() => _BottomTabScreenState();
@@ -41,7 +42,9 @@ class _BottomTabScreenState extends State<BottomTabScreen>
     await Future.delayed(const Duration(milliseconds: 480));
     setState(() {
       _isFirstTime = false;
-      _indexView = OrderHistoryScreen(storeId: widget.storeId,);
+      _indexView = OrderHistoryScreen(
+        storeId: widget.storeId,
+      );
     });
     _animationController.forward();
   }
@@ -78,7 +81,10 @@ class _BottomTabScreenState extends State<BottomTabScreen>
           });
         } else if (tabType == BottomBarType.camqr) {
           setState(() {
-            _indexView = RecordingScreen(cameras: widget.cameras, storeId: widget.storeId,);
+            _indexView = RecordingScreen(
+              cameras: widget.cameras,
+              storeId: widget.storeId,
+            );
           });
         } else if (tabType == BottomBarType.profile) {
           setState(() {
@@ -116,19 +122,19 @@ class _BottomTabScreenState extends State<BottomTabScreen>
                 },
               ),
               TabButtonUI(
-                icon: FontAwesomeIcons.qrcode,
-                isSelected: tabType == BottomBarType.camqr,
-                text: Loc.alized.trips,
-                onTap: () {
-                  tabClick(BottomBarType.camqr);
-                },
-              ),
-              TabButtonUI(
                 icon: FontAwesomeIcons.comment, // Icon for Store
                 isSelected: tabType == BottomBarType.forum,
                 text: 'Diễn đàn', // Text for Store
                 onTap: () {
                   tabClick(BottomBarType.forum);
+                },
+              ),
+              TabButtonUI(
+                icon: FontAwesomeIcons.qrcode,
+                isSelected: tabType == BottomBarType.camqr,
+                text: Loc.alized.trips,
+                onTap: () {
+                  tabClick(BottomBarType.camqr);
                 },
               ),
               TabButtonUI(
