@@ -5,12 +5,18 @@ import 'package:camera/camera.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:pjpacktrack/modules/ui/recording/recording_repo/recording_state.dart';
 import '../aws_config.dart';
+import '../video/video_repo/video_upload_state.dart';
 import '../video/video_upload_provider.dart';
 
 final recordingControllerProvider =
     StateNotifierProvider.autoDispose<RecordingController, RecordingState>(
         (ref) {
   return RecordingController(ref);
+});
+final videoUploadProvider =
+    StateNotifierProvider<VideoUploadNotifier, VideoUploadState>((ref) {
+  // Bỏ autoDispose
+  return VideoUploadNotifier();
 });
 
 final cameraControllerProvider =
@@ -26,8 +32,10 @@ class RecordingController extends StateNotifier<RecordingState> {
   static const String STOP_CODE = "STOP";
   List<CameraDescription>? _cameras;
   String? _currentStoreId;
+  late final VideoUploadNotifier _uploader;
 
   RecordingController(this.ref) : super(const RecordingState()) {
+    _uploader = ref.read(videoUploadProvider.notifier);
     _initializeScannerController();
   }
 
@@ -72,7 +80,9 @@ class RecordingController extends StateNotifier<RecordingState> {
   }
 
   Future<void> startRecording() async {
-    if (_cameraController != null && !state.isRecording && state.isQRCode != STOP_CODE) {
+    if (_cameraController != null &&
+        !state.isRecording &&
+        state.isQRCode != STOP_CODE) {
       try {
         await _cameraController!.startVideoRecording();
         state = state.copyWith(
@@ -87,81 +97,64 @@ class RecordingController extends StateNotifier<RecordingState> {
   }
 
   Future<void> stopAndReset(String storeId) async {
-    if (_cameraController == null || !state.isRecording) {
-      return;
-    }
+    if (!state.isRecording || _cameraController == null) return;
 
     try {
-      if (!_cameraController!.value.isRecordingVideo) {
-        debugPrint('No video is recording, skip stopping recording');
-        return;
-      }
-      // Lấy video uploader và config
-      final videoUploader = ref.read(videoUploadProvider.notifier);
-      final credentialsConfig = AwsCredentialsConfig(
-        accessKey: AwsConfig.accessKey,
-        secretKey: AwsConfig.secretKey,
-        bucketName: AwsConfig.bucketName,
-        region: AwsConfig.region,
-      );
-
-      // Stop recording
-      final XFile videoFile = await _cameraController!.stopVideoRecording();
-
-      // Lưu state
       final lastCode = state.lastScannedCode;
       final deliveryOption = state.selectedDeliveryOption;
       final isQR = state.isQRCode;
 
-      debugPrint('Starting video upload...');
+      final videoFile = await _cameraController!.stopVideoRecording();
+      state = state.copyWith(isRecording: false);
 
-      // Upload video
-      await videoUploader.uploadVideo(
-        filePath: videoFile.path,
-        credentialsConfig: credentialsConfig,
-        lastScannedCode: lastCode!,
-        selectedDeliveryOption: deliveryOption!,
-        isQRCode: isQR,
-        storeId: storeId,
-      );
-      debugPrint('Upload completed');
-
-      await _cleanupControllers();
-      _initializeScannerController();
-      await _scannerController?.start();
-
-      state = state.copyWith(
-        isRecording: false,
-        isScanning: true,
-        lastScannedCode: null,
-      );
+      await _uploadVideo(videoFile, storeId, lastCode!, deliveryOption!, isQR);
+      await _resetAfterUpload();
     } catch (e) {
-      debugPrint('Error during stop & upload: $e');
-
-      state = state.copyWith(
-        isRecording: false,
-        isScanning: true,
-        lastScannedCode: null,
-      );
-
+      debugPrint('Stop recording error: $e');
+      state = state.copyWith(isRecording: false);
       rethrow;
     }
   }
 
+  Future<void> _uploadVideo(XFile videoFile, String storeId, String lastCode,
+      String deliveryOption, bool isQR) async {
+    await _uploader.uploadVideo(
+      filePath: videoFile.path,
+      credentialsConfig: AwsCredentialsConfig(
+        accessKey: AwsConfig.accessKey,
+        secretKey: AwsConfig.secretKey,
+        bucketName: AwsConfig.bucketName,
+        region: AwsConfig.region,
+      ),
+      lastScannedCode: lastCode,
+      selectedDeliveryOption: deliveryOption,
+      isQRCode: isQR,
+      storeId: storeId,
+    );
+  }
+
+  Future<void> _resetAfterUpload() async {
+    await _cleanupControllers();
+    _initializeScannerController();
+    await _scannerController?.start();
+
+    state = state.copyWith(
+        isRecording: false,
+        isScanning: true,
+        lastScannedCode: null,
+        selectedDeliveryOption: null);
+  }
+
   Future<void> _cleanupControllers() async {
     try {
-      // Dispose camera controller
       if (_cameraController != null) {
         await _cameraController!.dispose();
         _cameraController = null;
       }
-
       if (_scannerController != null) {
         await _scannerController!.dispose();
         _scannerController = null;
       }
-
-      // Reset state
       state = const RecordingState();
     } catch (e) {
       debugPrint('Cleanup error: $e');
@@ -197,8 +190,13 @@ class RecordingController extends StateNotifier<RecordingState> {
     if (code == null) return;
 
     try {
+      debugPrint('Detected code: $code'); // Log để debug
+      debugPrint('Current state: ${state.toString()}'); // Log state hiện tại
+
       if (state.isRecording) {
         if (code == STOP_CODE && _currentStoreId != null) {
+          debugPrint(
+              'STOP_CODE detected, stopping recording'); // Log khi phát hiện STOP_CODE
           await stopAndReset(_currentStoreId!);
         }
         return;
