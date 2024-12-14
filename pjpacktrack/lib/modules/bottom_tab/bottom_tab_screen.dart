@@ -1,5 +1,4 @@
 import 'package:camera/camera.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pjpacktrack/constants/themes.dart';
@@ -8,9 +7,10 @@ import 'package:pjpacktrack/modules/bottom_tab/components/tab_button_UI.dart';
 import 'package:pjpacktrack/modules/profile/hepl_center_screen.dart';
 import 'package:pjpacktrack/modules/profile/profile_screen.dart';
 import 'package:pjpacktrack/modules/forum/screens/post_list_screen.dart';
-import 'package:pjpacktrack/modules/ui/RecordingScreen.dart';
 import 'package:pjpacktrack/modules/ui/odervideo.dart';
 import 'package:pjpacktrack/widgets/common_card.dart';
+
+import '../ui/recording/recording_screen.dart';
 
 class BottomTabScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
