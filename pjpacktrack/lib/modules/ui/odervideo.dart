@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pjpacktrack/modules/ui/play_video.dart';
+import 'package:pjpacktrack/modules/ui/video/play_video.dart';
+import 'package:pjpacktrack/modules/ui/video/video_upload_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -314,7 +315,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AwsVideoPlayer(
+            builder: (context) => AwsVideoPlayer(
             orderId: orderId,
             deliveryOption: deliveryOption,
           ),

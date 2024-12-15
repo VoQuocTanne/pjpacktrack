@@ -67,9 +67,12 @@ dependencies:
   webview_flutter: ^4.2.1
   intl: ^0.19.0
   tflite_flutter: ^0.11.0
-  file_picker: ^8.1.4
+  file_picker: ^5.3.3
   kommunicate_flutter: ^1.9.8
   flutter_svg: ^2.0.9
+  provider: ^6.1.2
+  freezed_annotation: ^2.4.4
+  build_runner: ^2.4.13
 
 dev_dependencies:
   flutter_test:

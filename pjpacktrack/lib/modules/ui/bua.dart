@@ -1,4 +1,4 @@
-// Thêm class này vào RecordingScreen.dart
+// Thêm class này vào recording_screen.dart
 import 'package:camera/camera.dart';
 
 class BrightnessAnalyzer {
