@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -5,7 +9,6 @@ import 'package:aws_storage_service/aws_storage_service.dart';
 import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/modules/ui/delivery_option.dart';
 import 'package:pjpacktrack/modules/ui/video_upload.dart';
-
 
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -97,67 +100,126 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
   Future<void> _stopAndReset() async {
-  if (_cameraController != null && _isRecording) {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      print("User not logged in.");
+      return;
+    }
+
     try {
-      // 1. Dừng quay và lấy file video
-      final XFile videoFile = await _cameraController!.stopVideoRecording();
-      setState(() {
-        _videoPaths.add(videoFile.path);
-      });
+      // Lấy packageId từ user
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      if (!userDoc.exists) {
+        print("User document not found.");
+        return;
+      }
 
-      // 2. Upload video
-      final uploader = VideoUploader(
-        context: context,
-        credentialsConfig: credentialsConfig,
-        lastScannedCode: _lastScannedCode ?? 'UNKNOWN',
-        selectedDeliveryOption: _selectedDeliveryOption ?? 'UNKNOWN',
-        isQRCode: _isQRCode,
-        storeId: widget.storeId,
-      );
-      await uploader.uploadVideo(videoFile.path);
-      print('Upload completed successfully');
+      final userData = userDoc.data();
+      final String packageId = userData?['packageId'] ?? '';
+      if (packageId.isEmpty) {
+        print("PackageId not found for user.");
+        return;
+      }
 
-      // 3. Cleanup controllers
-      if (_cameraController != null) {
+      // Lấy limitData từ package
+      final packageDoc = await FirebaseFirestore.instance
+          .collection('packages')
+          .doc(packageId)
+          .get();
+      if (!packageDoc.exists) {
+        print("Package document not found.");
+        return;
+      }
+
+      final packageData = packageDoc.data();
+      final int limitData = packageData?['dataLimit'] ?? 10.0;
+      print('Data limit: ${limitData.toStringAsFixed(2)} MB');
+      if (_cameraController != null && _isRecording) {
+        // Dừng quay video và lấy file
+        final XFile videoFile = await _cameraController!.stopVideoRecording();
+
+        // Kiểm tra kích thước file video
+        final File file = File(videoFile.path);
+        final int fileSize = await file.length(); // Kích thước tính bằng byte
+        final double fileSizeMB = fileSize / (1024 * 1024); // Đổi thành MB
+
+        print('File size: ${fileSizeMB.toStringAsFixed(2)} MB');
+
+        if (fileSizeMB > limitData) {
+          // Xóa video nếu vượt quá dung lượng
+          await file.delete();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Video vượt quá giới hạn $limitData MB (${fileSizeMB.toStringAsFixed(2)} MB). Vui lòng quay lại.',
+              ),
+              duration: Duration(seconds: 4),
+            ),
+          );
+          print(
+              'Video vượt quá giới hạn $limitData MB (${fileSizeMB.toStringAsFixed(2)} MB). Vui lòng quay lại.');
+          setState(() {
+            _isRecording = false;
+            _isScanning = true;
+          });
+
+          return;
+        }
+
+        // Thêm video vào danh sách nếu đạt yêu cầu
+        setState(() {
+          _videoPaths.add(videoFile.path);
+          _isRecording = false;
+        });
+
+        // Upload video
+        final uploader = VideoUploader(
+          context: context,
+          credentialsConfig: credentialsConfig,
+          lastScannedCode: _lastScannedCode ?? 'UNKNOWN',
+          selectedDeliveryOption: _selectedDeliveryOption ?? 'UNKNOWN',
+          isQRCode: _isQRCode,
+          storeId: widget.storeId,
+        );
+
+        await uploader.uploadVideo(videoFile.path);
+        print('Upload completed successfully');
+
+        // Cleanup và reset
         await _cameraController?.dispose();
         _cameraController = null;
-      }
-      if (_scannerController != null) {
-        await _scannerController?.dispose();
-        _scannerController = null;
-      }
+        setState(() {
+          _isScanning = true;
+          _lastScannedCode = null;
+        });
+        await _initializeCamera();
+        _initializeScannerController();
+        // 6. Sau đó mới khởi tạo camera
+        if (!_continuousRecording) {
+          setState(() => _selectedDeliveryOption = null);
+          await Future.delayed(const Duration(milliseconds: 500)); // Đợi thêm
+          await _initializeCamera();
+        }
 
-      // 4. Reset state
+        // 7. Đảm bảo scanner được kích hoạt
+        setState(() {
+          _isScanning = true;
+        });
+      }
+    } catch (e) {
+      print('Error in _stopAndReset: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi: $e')),
+      );
       setState(() {
         _isRecording = false;
         _isScanning = true;
-        _lastScannedCode = null;
       });
-
-      // 5. Khởi tạo lại scanner TRƯỚC
-      await Future.delayed(const Duration(milliseconds: 500)); // Đợi một chút
-      _initializeScannerController();
-      
-      // 6. Sau đó mới khởi tạo camera
-      if (!_continuousRecording) {
-        setState(() => _selectedDeliveryOption = null);
-        await Future.delayed(const Duration(milliseconds: 500)); // Đợi thêm
-        await _initializeCamera();
-      }
-
-      // 7. Đảm bảo scanner được kích hoạt
-      setState(() {
-        _isScanning = true;
-      });
-      
-    } catch (e) {
-      print('Stop and reset error: $e');
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Lỗi: $e')),
-      // );
     }
   }
-}
 
   @override
   void dispose() {
@@ -425,7 +487,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
     final String? code = barcode.rawValue;
 
     if (code != null) {
-       if (!_isRecording && code != STOP_CODE) {
+      if (!_isRecording && code != STOP_CODE) {
         // Chế độ quét bình thường
         _isQRCode = barcode.format == BarcodeFormat.qrCode;
         setState(() {
@@ -443,15 +505,14 @@ class _RecordingScreenState extends State<RecordingScreen> {
         } catch (e) {
           print('Error during recording: $e');
         }
-      }else if (_isRecording && _continuousRecording && code == STOP_CODE) {
+      } else if (_isRecording && _continuousRecording && code == STOP_CODE) {
         // Chỉ xử lý mã "STOP" khi quay liên tục
-          try {
-            await _stopAndReset();
-          } catch (e) {
-            print('Error during stopping: $e');
-          }
-        
-      } 
+        try {
+          await _stopAndReset();
+        } catch (e) {
+          print('Error during stopping: $e');
+        }
+      }
     }
   }
 }
