@@ -46,12 +46,19 @@ flutter {
     source = "../.."
 }
 dependencies {
-    implementation 'io.kommunicate.sdk:kommunicateui:2.10.5'
-    implementation platform('com.google.firebase:firebase-bom:32.2.3')
+    implementation('io.kommunicate.sdk:kommunicateui:2.10.5') {
+        exclude group: 'com.google.firebase', module: 'firebase-messaging'
+        exclude group: 'com.google.firebase', module: 'firebase-iid'
+    }
+    implementation platform('com.google.firebase:firebase-bom:32.7.0')
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
-    implementation 'com.facebook.android:facebook-login:16.0.0' // Thêm Facebook Login SDK
+    implementation 'com.facebook.android:facebook-login:16.0.0'
+    implementation 'com.google.firebase:firebase-messaging'
 }
 
-// Bắt buộc cho Firebase
+configurations {
+    all*.exclude group: 'com.google.firebase', module: 'firebase-iid'
+}
+
 apply plugin: 'com.google.gms.google-services'
