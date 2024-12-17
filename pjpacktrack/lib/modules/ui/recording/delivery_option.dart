@@ -56,11 +56,11 @@ class DeliveryOptionsWidget extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: Colors.black87),
+              Icon(icon, color: Colors.black),
               const SizedBox(height: 4),
               Text(
                 label,
-                style: const TextStyle(color: Colors.black87),
+                style: const TextStyle(color: Colors.black),
               ),
             ],
           ),
