@@ -8,6 +8,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:aws_storage_service/aws_storage_service.dart';
 import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/modules/ui/delivery_option.dart';
+import 'package:pjpacktrack/modules/ui/fake_api/product_code_service.dart';
 import 'package:pjpacktrack/modules/ui/video_upload.dart';
 
 class RecordingScreen extends StatefulWidget {
@@ -35,6 +36,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
   String _brightnessWarning = "";
   static const String STOP_CODE = "STOP";
   bool _isContinuousScanning = false;
+  String? _productName;
   final AwsCredentialsConfig credentialsConfig = AwsCredentialsConfig(
     accessKey: AwsConfig.accessKey,
     secretKey: AwsConfig.secretKey,
@@ -390,6 +392,46 @@ class _RecordingScreenState extends State<RecordingScreen> {
                 ),
               ),
             ),
+
+          if (_productName != null)
+            Positioned(
+              top: 120,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment
+                        .start, //Canh nội dung sang phải màn hình
+                    children: [
+                      Text(
+                        'Sản phẩm:',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      ..._productName!
+                          .split(', ')
+                          .map((product) => Text(
+                                product,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ))
+                          .toList(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
       bottomNavigationBar: _buildBottomBar(),
@@ -487,32 +529,68 @@ class _RecordingScreenState extends State<RecordingScreen> {
     final String? code = barcode.rawValue;
 
     if (code != null) {
-      if (!_isRecording && code != STOP_CODE) {
-        // Chế độ quét bình thường
-        _isQRCode = barcode.format == BarcodeFormat.qrCode;
-        setState(() {
-          _isScanning = false;
-          _lastScannedCode = code;
-        });
+      // In ra thông tin chi tiết để debug
+      print('Raw Scanned Code: $code');
+      print('Barcode Format: ${barcode.format}');
 
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
-        // );
+      // Kiểm tra xem mã có phải QR code không (nếu bạn chỉ muốn xử lý QR code)
+      if (barcode.format == BarcodeFormat.qrCode) {
+        // Validate product code
+        final productName = await ProductCodeService.validateProductCode(code);
 
-        try {
-          await _startRecording();
-        } catch (e) {
-          print('Error during recording: $e');
-        }
-      } else if (_isRecording && _continuousRecording && code == STOP_CODE) {
-        // Chỉ xử lý mã "STOP" khi quay liên tục
-        try {
-          await _stopAndReset();
-        } catch (e) {
-          print('Error during stopping: $e');
+        if (productName != null) {
+          setState(() {
+            _productName = productName;
+            _isQRCode = true;
+            _isScanning = false;
+            _lastScannedCode = code;
+          });
+
+          try {
+            await _startRecording();
+          } catch (e) {
+            print('Error during recording: $e');
+          }
+        } else {
+          // Hiển thị thông báo chi tiết hơn
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text('Mã QR không hợp lệ. Vui lòng kiểm tra lại. Mã: $code'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ),
+          );
         }
       }
     }
+    // if (code != null) {
+    //   if (!_isRecording && code != STOP_CODE) {
+    //     // Chế độ quét bình thường
+    //     _isQRCode = barcode.format == BarcodeFormat.qrCode;
+    //     setState(() {
+    //       _isScanning = false;
+    //       _lastScannedCode = code;
+    //     });
+
+    //     // ScaffoldMessenger.of(context).showSnackBar(
+    //     //   SnackBar(
+    //     //       content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
+    //     // );
+
+    //     try {
+    //       await _startRecording();
+    //     } catch (e) {
+    //       print('Error during recording: $e');
+    //     }
+    //   } else if (_isRecording && _continuousRecording && code == STOP_CODE) {
+    //     // Chỉ xử lý mã "STOP" khi quay liên tục
+    //     try {
+    //       await _stopAndReset();
+    //     } catch (e) {
+    //       print('Error during stopping: $e');
+    //     }
+    //   }
+    // }
   }
 }
