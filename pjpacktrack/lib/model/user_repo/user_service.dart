@@ -4,6 +4,39 @@ import 'package:pjpacktrack/model/user_repo/my_user.dart';
 
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Stream<MyUser?> streamUser(String userId) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.exists) {
+        final data = snapshot.data();
+        if (data != null) {
+          return MyUser(
+            userId: userId,
+            email: data['email'] ??
+                '', // Giá trị mặc định là chuỗi rỗng nếu không tồn tại
+            fullname: data['fullname'] ??
+                'Unknown User', // Giá trị mặc định là 'Unknown User'
+            picture: data['picture'], // Có thể là null
+            phonenumber:
+                data['phonenumber'] ?? '', // Giá trị mặc định là chuỗi rỗng
+            birthday: (data['birthday'] as Timestamp)
+                .toDate(), // Chuyển Timestamp thành DateTime
+            role: data['role'] ?? 'user', // Giá trị mặc định là 'user'
+            status: data['status'] ?? 'active', // Giá trị mặc định là 'active'
+            packageId: data['packageId'] ??
+                'I9DKf6eLpXDqtLnu5t0l', // Giá trị mặc định là 0 nếu không tồn tại
+            quantily: data['quantity'] ??
+                0, // Giá trị mặc định là 0 nếu không tồn tại
+            limit: data['limit'] ?? 600,
+          );
+        }
+      }
+      return null;
+    });
+  }
 
   Future<MyUser?> fetchUser(String userId) async {
     try {

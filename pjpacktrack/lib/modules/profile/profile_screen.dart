@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pjpacktrack/constants/text_styles.dart';
 import 'package:pjpacktrack/constants/themes.dart';
 import 'package:pjpacktrack/language/app_localizations.dart';
+import 'package:pjpacktrack/model/package_repo/package.dart';
 import 'package:pjpacktrack/model/package_repo/packageprovider.dart';
 import 'package:pjpacktrack/model/setting_list_data.dart';
 import 'package:pjpacktrack/model/user_repo/user_provider.dart';
@@ -39,7 +40,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       );
     }
 
-    final userAsyncValue = ref.watch(userProvider(userId));
+    final userStream = ref.watch(userProvider(userId));
     List<SettingsListData> userSettingsList = SettingsListData.userSettingsList;
 
     return BottomTopMoveAnimationView(
@@ -52,147 +53,117 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
             child: Container(child: appBar(ref)), // Truyền ref vào appBar
           ),
-          // Thêm khu vực bán gói dịch vụ
-          // Thêm vào phần thay thế "Dịch vụ Premium"
           Padding(
-            padding: const EdgeInsets.all(12.0), // Giảm padding tổng thể
-            child: Consumer(
-              builder: (context, ref, _) {
-                final user = FirebaseAuth.instance.currentUser;
+            padding: const EdgeInsets.all(12.0),
+            child: userStream.when(
+              data: (userData) {
+                final String packageId = userData?.packageId ?? '';
+                final int used = userData?.quantily ?? 0;
 
-                if (user == null) {
-                  return Center(
-                    child: Text(
-                        'Không tìm thấy người dùng. Vui lòng đăng nhập lại.'),
-                  );
-                }
+                final packageStream = ref.watch(packageProvider(packageId));
 
-                final userAsyncValue = ref.watch(userProvider(user.uid));
+                return packageStream.when(
+                  data: (packageData) {
+                    if (packageData == null) {
+                      return Center(
+                        child: Text('Không thể tải thông tin gói dịch vụ'),
+                      );
+                    }
 
-                return userAsyncValue.when(
-                  data: (userData) {
-                    final String packageId = userData?.packageId ?? '';
-                    final int used = userData?.quantily ??
-                        0; // Lấy số lượng video đã sử dụng
-                    final int total =
-                        userData?.limit ?? 0; // Lấy giới hạn video từ Firestore
-
-                    // Lấy tên gói từ packageId
-                    return FutureBuilder<String?>(
-                      future: getPackageName(packageId), // Hàm để lấy tên gói
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-
-                        if (snapshot.hasError || !snapshot.hasData) {
-                          return Center(
-                            child: Text('Không thể tải tên gói dịch vụ'),
-                          );
-                        }
-
-                        final packageName = snapshot.data ?? 'Không xác định';
-
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.circular(10.0), // Giảm bo góc
-                            color: Colors.blue.shade50, // Màu nền nhẹ nhàng
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                blurRadius: 6.0,
-                                spreadRadius: 2.0,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.blue.shade50,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            blurRadius: 6.0,
+                            spreadRadius: 2.0,
+                            offset: Offset(0, 2),
                           ),
-                          padding: const EdgeInsets.all(
-                              12.0), // Giảm padding bên trong
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Gói dịch vụ của bạn: $packageName',
-                                    style: const TextStyle(
-                                      fontSize:
-                                          16, // Giảm kích thước chữ tiêu đề
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blueAccent,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const Divider(
-                                  color: Colors.blueAccent, thickness: 1),
-                              const SizedBox(
-                                  height:
-                                      8), // Giảm khoảng cách giữa các thành phần
-                              _buildFeatureRowWithIcon(
-                                context,
-                                'Video đã sử dụng',
-                                Icons.inbox_rounded,
-                                used,
-                                total,
-                              ),
-                              const SizedBox(height: 10),
-                              _buildFeatureRowWithIcon(
-                                context,
-                                'Video đơn vị vận chuyển',
-                                Icons.local_shipping,
-                                2,
-                                total,
-                              ),
-                              const SizedBox(height: 10),
-                              _buildFeatureRowWithIcon(
-                                context,
-                                'Video trả hàng',
-                                Icons.assignment_return,
-                                10,
-                                total,
-                              ),
-                              const SizedBox(height: 10),
-                              Center(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    NavigationServices(context)
-                                        .gotoServicePackageScreen();
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blueAccent,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                        horizontal: 20), // Giảm padding của nút
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Nâng cấp gói',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors
-                                            .white), // Giảm kích thước chữ
-                                  ),
+                              Text(
+                                'Gói dịch vụ của bạn: ${packageData.name}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blueAccent,
                                 ),
                               ),
                             ],
                           ),
-                        );
-                      },
+                          const Divider(color: Colors.blueAccent, thickness: 1),
+                          const SizedBox(height: 8),
+                          _buildFeatureRowWithIcon(
+                            context,
+                            'Video đã sử dụng',
+                            Icons.inbox_rounded,
+                            used,
+                            packageData.videoLimit,
+                          ),
+                          const SizedBox(height: 10),
+                          _buildFeatureRowWithIcon(
+                            context,
+                            'Video đơn vị vận chuyển',
+                            Icons.local_shipping,
+                            2,
+                            packageData.videoLimit,
+                          ),
+                          const SizedBox(height: 10),
+                          _buildFeatureRowWithIcon(
+                            context,
+                            'Video trả hàng',
+                            Icons.assignment_return,
+                            10,
+                            packageData.videoLimit,
+                          ),
+                          const SizedBox(height: 10),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                NavigationServices(context)
+                                    .gotoServicePackageScreen();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blueAccent,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 20,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Nâng cấp gói',
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     );
                   },
-                  loading: () => Center(child: CircularProgressIndicator()),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
                   error: (error, stack) => Center(
-                    child: Text('Không thể tải dữ liệu người dùng.'),
+                    child: Text('Không thể tải thông tin gói dịch vụ'),
                   ),
                 );
               },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stackTrace) => Center(
+                child: Text('Không thể tải dữ liệu người dùng'),
+              ),
             ),
           ),
           Expanded(
@@ -206,21 +177,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     // setting screen view
                     if (index == 5) {
                       NavigationServices(context).gotoSettingsScreen();
-                    }
-                    // help center screen view
-                    else if (index == 3) {
+                    } else if (index == 3) {
                       NavigationServices(context).gotoHeplCenterScreen();
-                    }
-                    // change password screen view
-                    else if (index == 0) {
+                    } else if (index == 0) {
                       NavigationServices(context).gotoChangepasswordScreen();
-                    }
-                    // invite friend screen view
-                    else if (index == 1) {
-                      // NavigationServices(context).gotoInviteFriend();
-                    }
-                    // store screen view
-                    else if (index == 2) {
+                    } else if (index == 2) {
                       final String uid =
                           FirebaseAuth.instance.currentUser?.uid ?? '';
                       if (uid.isNotEmpty) {
@@ -306,10 +267,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             child: Icon(
               icon,
               color: Colors.blueAccent,
-              size: 18, // Giảm kích thước icon
+              size: 18,
             ),
           ),
-          const SizedBox(width: 10), // Giảm khoảng cách
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,7 +278,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 13, // Giảm kích thước chữ
+                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: Colors.black87,
                   ),
@@ -328,8 +289,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     Text(
                       '$used video / $total video/tháng',
                       style: TextStyle(
-                        fontSize:
-                            11, // Giảm kích thước chữ của thông tin chi tiết
+                        fontSize: 11,
                         color: Colors.grey.shade700,
                       ),
                     ),
@@ -339,7 +299,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         value: used / total,
                         backgroundColor: Colors.grey.shade300,
                         color: Colors.blueAccent,
-                        minHeight: 4, // Giảm chiều cao của progress bar
+                        minHeight: 4,
                       ),
                     ),
                   ],

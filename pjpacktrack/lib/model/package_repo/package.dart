@@ -6,6 +6,7 @@ class Package {
   final String price; // Giá gói
   final List<String> features; // Danh sách tính năng của gói
   final int videoLimit; // Số lượng video giới hạn
+  final int dataLimit;
   final bool isFree; // Gói miễn phí hay không
 
   Package({
@@ -14,6 +15,7 @@ class Package {
     required this.price,
     required this.features,
     required this.videoLimit,
+    required this.dataLimit,
     this.isFree = false,
   });
 
@@ -26,6 +28,7 @@ class Package {
       price: data['price'] ?? '',
       features: List<String>.from(data['features'] ?? []),
       videoLimit: data['videoLimit'] ?? 0,
+      dataLimit: data['dataLimit']??30,
       isFree: data['isFree'] ?? false,
     );
   }
