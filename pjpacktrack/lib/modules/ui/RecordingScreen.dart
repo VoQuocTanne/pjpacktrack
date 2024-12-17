@@ -528,7 +528,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
     final barcode = capture.barcodes.first;
     final String? code = barcode.rawValue;
 
-    if (code != null) {
+    if (code != null && code != STOP_CODE) {
       // In ra thông tin chi tiết để debug
       print('Raw Scanned Code: $code');
       print('Barcode Format: ${barcode.format}');
@@ -564,33 +564,33 @@ class _RecordingScreenState extends State<RecordingScreen> {
         }
       }
     }
-    // if (code != null) {
-    //   if (!_isRecording && code != STOP_CODE) {
-    //     // Chế độ quét bình thường
-    //     _isQRCode = barcode.format == BarcodeFormat.qrCode;
-    //     setState(() {
-    //       _isScanning = false;
-    //       _lastScannedCode = code;
-    //     });
+    if (code != null) {
+      if (!_isRecording && code != STOP_CODE) {
+        // Chế độ quét bình thường
+        _isQRCode = barcode.format == BarcodeFormat.qrCode;
+        setState(() {
+          _isScanning = false;
+          _lastScannedCode = code;
+        });
 
-    //     // ScaffoldMessenger.of(context).showSnackBar(
-    //     //   SnackBar(
-    //     //       content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
-    //     // );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //       content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
+        // );
 
-    //     try {
-    //       await _startRecording();
-    //     } catch (e) {
-    //       print('Error during recording: $e');
-    //     }
-    //   } else if (_isRecording && _continuousRecording && code == STOP_CODE) {
-    //     // Chỉ xử lý mã "STOP" khi quay liên tục
-    //     try {
-    //       await _stopAndReset();
-    //     } catch (e) {
-    //       print('Error during stopping: $e');
-    //     }
-    //   }
-    // }
+        try {
+          await _startRecording();
+        } catch (e) {
+          print('Error during recording: $e');
+        }
+      } else if (_isRecording && _continuousRecording && code == STOP_CODE) {
+        // Chỉ xử lý mã "STOP" khi quay liên tục
+        try {
+          await _stopAndReset();
+        } catch (e) {
+          print('Error during stopping: $e');
+        }
+      }
+    }
   }
 }
