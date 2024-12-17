@@ -71,6 +71,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
     );
   }
 
+    //
   void tabClick(BottomBarType tabType) {
     if (tabType != bottomBarType) {
       bottomBarType = tabType;
