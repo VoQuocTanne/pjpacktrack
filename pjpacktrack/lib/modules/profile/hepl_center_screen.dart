@@ -112,7 +112,7 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).primaryColor,
         onPressed: () async {
           try {
@@ -131,7 +131,11 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
             print("Lỗi khi mở chatbot: $e");
           }
         },
-        child: const Icon(Icons.chat),
+        icon: const Icon(Icons.chat), // Icon chatbot
+        label: const Text(
+          'Chat với Bot',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        ), // Thêm chữ vào nút
       ),
     );
   }

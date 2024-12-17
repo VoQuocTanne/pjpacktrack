@@ -84,12 +84,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              _buildStatusCard('Đơn hàng', quantity, Colors.green[100]!),
-              const SizedBox(width: 8),
-              _buildStatusCard('Đóng hàng', quantity, Colors.orange[100]!),
+              _buildStatusCard('Đơn hàng', quantity, Colors.green[100]!,
+                  Icons.assignment_turned_in),
               const SizedBox(width: 8),
               _buildStatusCard(
-                  'Đã tải lên', '$quantity/$limit', Colors.blue[100]!),
+                  'Đóng hàng', quantity, Colors.orange[100]!, Icons.archive),
+              const SizedBox(width: 8),
+              _buildStatusCard('Đã tải lên', '$quantity/$limit',
+                  Colors.blue[100]!, Icons.cloud_upload),
             ],
           ),
         );
@@ -97,7 +99,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
-  Widget _buildStatusCard(String title, String count, Color color) {
+  Widget _buildStatusCard(
+      String title, String count, Color color, IconData icon) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
@@ -107,7 +110,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         ),
         child: Row(
           children: [
-            Icon(Icons.inventory_2, size: 20),
+            Icon(icon, size: 20),
             const SizedBox(width: 4),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,7 +318,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => AwsVideoPlayer(
+          builder: (context) => AwsVideoPlayer(
             orderId: orderId,
             deliveryOption: deliveryOption,
           ),
@@ -327,15 +330,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       spacing: 8,
       children: [
         if (data['closedStatus'] == true)
-          _buildStatusChip('Đóng gói', Colors.blue, () {
+          _buildStatusChip('Đóng gói', Colors.green[100]!, () {
             navigateToVideo('Đóng gói');
           }),
         if (data['shippingStatus'] == true)
-          _buildStatusChip('Giao hàng', Colors.green, () {
+          _buildStatusChip('Giao hàng', Colors.orange[100]!, () {
             navigateToVideo('Giao hàng');
           }),
         if (data['returnStatus'] == true)
-          _buildStatusChip('Trả hàng', Colors.orange, () {
+          _buildStatusChip('Trả hàng', Colors.blue[100]!, () {
             navigateToVideo('Trả hàng');
           }),
       ],
@@ -344,19 +347,31 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
   Widget _buildStatusChip(String label, Color color, VoidCallback onClick) {
     return SizedBox(
-      child: InkWell(
-        onTap: onClick,
-        child: Chip(
-          label: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
+        child: InkWell(
+      onTap: onClick,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(10), // Bo tròn góc
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 2), // Đổ bóng nhẹ
             ),
+          ],
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
           ),
-          backgroundColor: color,
         ),
       ),
-    );
+    ));
   }
 }
