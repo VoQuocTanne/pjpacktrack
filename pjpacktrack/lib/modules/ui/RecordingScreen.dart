@@ -4,12 +4,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
+import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:aws_storage_service/aws_storage_service.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/modules/ui/delivery_option.dart';
 import 'package:pjpacktrack/modules/ui/video_upload.dart';
-
+import 'ObjectDetectorPainter.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
   final String storeId;
@@ -31,9 +36,13 @@ class _RecordingScreenState extends State<RecordingScreen> {
   String? _lastScannedCode;
   String? _selectedDeliveryOption;
   final List<String> _videoPaths = [];
-  double _currentBrightness = 0;
-  String _brightnessWarning = "";
   static const String STOP_CODE = "STOP";
+  bool _isProcessing = false;
+  late ObjectDetector _objectDetector;
+  List<DetectedObject> _detectedObjects = [];
+  Map<String, int> _productCounts = {};
+  int _totalProducts = 0;
+
   bool _isContinuousScanning = false;
   final AwsCredentialsConfig credentialsConfig = AwsCredentialsConfig(
     accessKey: AwsConfig.accessKey,
@@ -46,6 +55,38 @@ class _RecordingScreenState extends State<RecordingScreen> {
   void initState() {
     super.initState();
     _initializeScannerController();
+    _initializeObjectDetector();
+  }
+
+  Future<void> _initializeObjectDetector() async {
+    final path = 'assets/ml/object_labeler.tflite';
+    final modelPath = await _getModel(path);
+
+    final options = LocalObjectDetectorOptions(
+      mode: DetectionMode.stream,
+      modelPath: modelPath,
+      classifyObjects: true,
+      multipleObjects: true,
+      confidenceThreshold: 0.5,
+    );
+
+    _objectDetector = ObjectDetector(options: options);
+  }
+
+  Future<String> _getModel(String assetPath) async {
+    if (Platform.isAndroid) {
+      return 'flutter_assets/$assetPath';
+    }
+    final String modelPath =
+        '${(await getApplicationSupportDirectory()).path}/$assetPath';
+    await Directory(path.dirname(modelPath)).create(recursive: true);
+    final file = File(modelPath);
+    if (!await file.exists()) {
+      final byteData = await rootBundle.load(assetPath);
+      await file.writeAsBytes(byteData.buffer
+          .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+    }
+    return file.path;
   }
 
   void _initializeScannerController() {
@@ -68,22 +109,155 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   Future<void> _initializeCamera() async {
     try {
-      if (_cameraController == null ||
-          !_cameraController!.value.isInitialized) {
+      if (_cameraController == null || !_cameraController!.value.isInitialized) {
         _cameraController = CameraController(
           widget.cameras[0],
-          ResolutionPreset.veryHigh,
+          ResolutionPreset.medium,  // Use medium resolution
           enableAudio: true,
+          imageFormatGroup: Platform.isAndroid
+              ? ImageFormatGroup.yuv420  // For Android
+              : ImageFormatGroup.bgra8888,  // For iOS
         );
+
         await _cameraController!.initialize();
-        if (mounted) setState(() {});
+
+        // Add a small delay before starting image stream
+        await Future.delayed(Duration(milliseconds: 300));
+
+        if (mounted) {
+          // Start image stream with lower frame rate
+          await _cameraController!.startImageStream((image) {
+            if (!_isRecording || !mounted) return;
+            _processImage(image);
+          });
+
+          setState(() {});
+        }
       }
     } catch (e) {
       print('Camera initialization error: $e');
     }
   }
+  Widget _buildDebugOverlay() {
+    return Positioned(
+      top: 160,  // Below product counts
+      left: 16,
+      child: Container(
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.black87,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Debug Info:',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Processing: ${_isRecording ? "Yes" : "No"}',
+              style: TextStyle(color: Colors.green),
+            ),
+            Text(
+              'Objects Found: ${_detectedObjects.length}',
+              style: TextStyle(color: Colors.yellow),
+            ),
+            if (_detectedObjects.isNotEmpty)
+              ..._detectedObjects.map((obj) =>
+                  Text(
+                    'Labels: ${obj.labels.map((l) => "${l.text}(${(l.confidence * 100).toStringAsFixed(1)}%)").join(", ")}',
+                    style: TextStyle(color: Colors.white),
+                  )
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _processImage(CameraImage image) async {
+    if (!mounted || !_isRecording || _isProcessing) return;
+
+    setState(() => _isProcessing = true);
+    try {
+      print("------- Frame Processing Start -------");
+      print("Image Size: ${image.width}x${image.height}");
+      print("Planes: ${image.planes.length}");
+      print("Format: ${image.format.raw}");
+
+      // Get camera rotation
+      final camera = widget.cameras[0];
+      final imageRotation = InputImageRotation.values[camera.sensorOrientation ~/ 90];
+
+      // Process image bytes
+      final WriteBuffer allBytes = WriteBuffer();
+      for (final Plane plane in image.planes) {
+        allBytes.putUint8List(plane.bytes);
+      }
+      final bytes = allBytes.done().buffer.asUint8List();
+
+      // Create InputImage
+      final inputImage = InputImage.fromBytes(
+        bytes: bytes,
+        metadata: InputImageMetadata(
+          size: Size(image.width.toDouble(), image.height.toDouble()),
+          rotation: imageRotation,
+          format: InputImageFormat.yuv420,
+          bytesPerRow: image.planes[0].bytesPerRow,
+        ),
+      );
+
+      print("Processing with ML Kit...");
+      final objects = await _objectDetector.processImage(inputImage);
+      print("Detection Results:");
+      print("Total Objects: ${objects.length}");
+
+      if (objects.isNotEmpty) {
+        for (int i = 0; i < objects.length; i++) {
+          final obj = objects[i];
+          print("Object $i:");
+          print("  Bounds: ${obj.boundingBox}");
+          print("  Labels: ${obj.labels.map((l) =>
+          "${l.text}(${(l.confidence * 100).toStringAsFixed(1)}%)"
+          ).join(", ")}");
+        }
+      }
+
+      _updateDetections(objects);
+      print("------- Frame Processing End -------");
+
+    } catch (e, stackTrace) {
+      print('Error processing image: $e');
+      print('Stack trace: $stackTrace');
+    } finally {
+      setState(() => _isProcessing = false);
+    }
+  }
+
+  void _updateDetections(List<DetectedObject> objects) {
+    setState(() {
+      _detectedObjects = objects;
+      // Update product counts
+      _productCounts.clear();
+      for (var object in objects) {
+        for (var label in object.labels) {
+          if (label.confidence > 0.7) {
+            String productName = label.text;
+            _productCounts[productName] =
+                (_productCounts[productName] ?? 0) + 1;
+          }
+        }
+      }
+
+      _totalProducts =
+          _productCounts.values.fold(0, (sum, count) => sum + count);
+    });
+  }
 
   Future<void> _startRecording() async {
+    // First stop the scanner before initializing camera
+    await _scannerController?.stop();
     await _initializeCamera();
 
     if (_cameraController != null && !_isRecording) {
@@ -92,6 +266,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
         setState(() {
           _isRecording = true;
           _isContinuousScanning = _continuousRecording;
+          _isScanning = false;  // Important: set scanning to false
         });
       } catch (e) {
         print('Recording start error: $e');
@@ -223,9 +398,63 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   @override
   void dispose() {
+    _objectDetector.close();
     _cameraController?.dispose();
     _scannerController?.dispose();
     super.dispose();
+  }
+
+  Widget _buildDetectionOverlay() {
+    print(
+        "Building detection overlay. Objects count: ${_detectedObjects.length}");
+    return CustomPaint(
+      painter: ObjectDetectorPainter(
+        _detectedObjects,
+        Size(
+          MediaQuery.of(context).size.width,
+          MediaQuery.of(context).size.height,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProductCounts() {
+    return Positioned(
+      top: 120,
+      right: 16,
+      child: Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Detected Products:',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            ..._productCounts.entries.map(
+              (entry) => Padding(
+                padding: EdgeInsets.only(top: 4),
+                child: Text(
+                  '${entry.key}: ${entry.value}',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+            Divider(color: Colors.white30),
+            Text(
+              'Total: $_totalProducts',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _toggleFlash() async {
@@ -267,6 +496,13 @@ class _RecordingScreenState extends State<RecordingScreen> {
                   Positioned.fill(
                     child: CameraPreview(_cameraController!),
                   ),
+                // Detection overlay on top of camera preview
+                Positioned.fill(
+                  child: _buildDetectionOverlay(),
+                ),
+                // Product counts display
+                _buildProductCounts(),
+                if (kDebugMode) _buildDebugOverlay(),  // Only show in debug mode
                 Positioned.fill(
                   child: Opacity(
                     opacity: 1,
@@ -276,7 +512,15 @@ class _RecordingScreenState extends State<RecordingScreen> {
               ],
             )
           else if (_isRecording && _cameraController != null)
-            CameraPreview(_cameraController!)
+            Stack(
+              children: [
+                CameraPreview(_cameraController!),
+                Positioned.fill(
+                  child: _buildDetectionOverlay(),
+                ),
+                _buildProductCounts(),
+              ],
+            )
           else if (_isScanning && _selectedDeliveryOption != null)
             _buildScanner()
           else
@@ -361,7 +605,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
                 ),
               ),
             ),
-          // Bottom status
           if (_isRecording)
             Positioned(
               bottom: 100,
