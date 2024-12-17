@@ -315,7 +315,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => AwsVideoPlayer(
+          builder: (context) => AwsVideoPlayer(
             orderId: orderId,
             deliveryOption: deliveryOption,
           ),
