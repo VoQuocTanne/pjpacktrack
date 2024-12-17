@@ -181,18 +181,7 @@ class RecordingController extends StateNotifier<RecordingState> {
     state = state.copyWith(selectedDeliveryOption: option);
   }
 
-  Future<void> navigateToMatchedOrders(
-      String codeId, BuildContext context) async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MatchedOrderScreen(scannedCodeId: codeId),
-      ),
-    );
-  }
-
-  Future<void> handleBarcodeDetection(
-      BarcodeCapture capture, BuildContext context) async {
+  Future<void> handleBarcodeDetection(BarcodeCapture capture) async {
     final barcodes = capture.barcodes;
     if (barcodes.isEmpty) return;
 
@@ -207,7 +196,8 @@ class RecordingController extends StateNotifier<RecordingState> {
 
       if (state.isRecording) {
         if (code == STOP_CODE && _currentStoreId != null) {
-          debugPrint('STOP_CODE detected, stopping recording');
+          debugPrint(
+              'STOP_CODE detected, stopping recording'); // Log khi phát hiện STOP_CODE
           await stopAndReset(_currentStoreId!);
         }
         return;
@@ -218,50 +208,13 @@ class RecordingController extends StateNotifier<RecordingState> {
           lastScannedCode: code,
           isQRCode: barcode.format == BarcodeFormat.qrCode,
         );
-        ref
-            .read(recordingControllerProvider.notifier)
-            .navigateToMatchedOrders(code, context);
+        await startRecording();
       }
     } catch (e) {
       debugPrint('Barcode handling error: $e');
       rethrow;
     }
   }
-
-  // Future<void> handleBarcodeDetection(BarcodeCapture capture) async {
-  //   final barcodes = capture.barcodes;
-  //   if (barcodes.isEmpty) return;
-
-  //   final barcode = barcodes.first;
-  //   final String? code = barcode.rawValue;
-
-  //   if (code == null) return;
-
-  //   try {
-  //     debugPrint('Detected code: $code'); // Log để debug
-  //     debugPrint('Current state: ${state.toString()}'); // Log state hiện tại
-
-  //     if (state.isRecording) {
-  //       if (code == STOP_CODE && _currentStoreId != null) {
-  //         debugPrint(
-  //             'STOP_CODE detected, stopping recording'); // Log khi phát hiện STOP_CODE
-  //         await stopAndReset(_currentStoreId!);
-  //       }
-  //       return;
-  //     }
-
-  //     if (state.selectedDeliveryOption != null) {
-  //       state = state.copyWith(
-  //         lastScannedCode: code,
-  //         isQRCode: barcode.format == BarcodeFormat.qrCode,
-  //       );
-  //       await startRecording();
-  //     }
-  //   } catch (e) {
-  //     debugPrint('Barcode handling error: $e');
-  //     rethrow;
-  //   }
-  // }
 
   @override
   void dispose() {
