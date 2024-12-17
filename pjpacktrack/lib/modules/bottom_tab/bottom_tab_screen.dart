@@ -71,6 +71,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
     );
   }
 
+    //
   void tabClick(BottomBarType tabType) {
     if (tabType != bottomBarType) {
       bottomBarType = tabType;
@@ -114,7 +115,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
           Row(
             children: <Widget>[
               TabButtonUI(
-                icon: Icons.search,
+                icon: Icons.inventory,
                 isSelected: tabType == BottomBarType.order,
                 text: Loc.alized.explore,
                 onTap: () {
@@ -122,7 +123,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
                 },
               ),
               TabButtonUI(
-                icon: FontAwesomeIcons.comment, // Icon for Store
+                icon: FontAwesomeIcons.users, // Icon for Store
                 isSelected: tabType == BottomBarType.forum,
                 text: 'Diễn đàn', // Text for Store
                 onTap: () {

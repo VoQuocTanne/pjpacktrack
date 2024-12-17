@@ -43,15 +43,10 @@ class RecordingScreen extends ConsumerWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Scanner luôn hiển thị khi isScanning = true
-          if (state.isScanning) _buildScanner(controller),
-
-          // Camera preview chỉ hiển thị khi recording
+          if (state.isScanning) _buildScanner(controller, context),
           if (state.isRecording && state.isInitialized)
             CameraPreview(controller.cameraController!),
-
           _buildDeliveryOptions(controller),
-
           if (!state.isRecording && state.selectedDeliveryOption == null)
             const StartPrompt(),
         ],
@@ -60,17 +55,34 @@ class RecordingScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildScanner(RecordingController controller) {
+  Widget _buildScanner(RecordingController controller, BuildContext context) {
     return MobileScanner(
       controller: controller.scannerController,
-      onDetect: controller.handleBarcodeDetection,
+      onDetect: (capture) async {
+        final barcodes = capture.barcodes;
+        if (barcodes.isNotEmpty) {
+          final code = barcodes.first.rawValue;
+          if (code != null) {
+            await controller.navigateToMatchedOrders(code, context);
+          }
+        }
+      },
       errorBuilder: (context, error, child) {
-        return Center(
-          child: Text('Scanner error: $error'),
-        );
+        return Center(child: Text('Scanner error: $error'));
       },
     );
   }
+  // Widget _buildScanner(RecordingController controller) {
+  //   return MobileScanner(
+  //     controller: controller.scannerController,
+  //     onDetect: controller.handleBarcodeDetection,
+  //     errorBuilder: (context, error, child) {
+  //       return Center(
+  //         child: Text('Scanner error: $error'),
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget _buildDeliveryOptions(RecordingController controller) {
     return Positioned(
