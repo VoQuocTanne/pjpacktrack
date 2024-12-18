@@ -90,7 +90,7 @@ class VideoUploader {
     final data = userDoc.data()!;
     final quantity = data['quantity'] ?? 0;
     final rank = data['rank'] ?? 'free';
-    final limit = rank == 'free' ? 50 : (data['limit'] ?? 50);
+    final limit = rank == 'free' ? 600 : (data['limit'] ?? 600);
 
     return (quantity + uploadCount) <= limit;
   }

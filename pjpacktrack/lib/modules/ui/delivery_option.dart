@@ -10,36 +10,33 @@ class DeliveryOptionsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _buildOptionButton(
-            context,
-            'Đóng gói',
-            Icons.inventory_2,
-            Colors.blue,
-            () => _handleOptionTap(context, 'Đóng gói'),
-          ),
-          const SizedBox(width: 20),
-          _buildOptionButton(
-            context,
-            'Giao hàng',
-            Icons.local_shipping,
-            Colors.green,
-            () => _handleOptionTap(context, 'Giao hàng'),
-          ),
-          const SizedBox(width: 20),
-          _buildOptionButton(
-            context,
-            'Trả hàng',
-            Icons.assignment_return,
-            Colors.orange,
-            () => _handleOptionTap(context, 'Trả hàng'),
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildOptionButton(
+          context,
+          'Đóng gói',
+          Icons.inventory_2,
+          Colors.green[100]!,
+          () => _handleOptionTap(context, 'Đóng gói'),
+        ),
+        const SizedBox(width: 20),
+        _buildOptionButton(
+          context,
+          'Giao hàng',
+          Icons.local_shipping,
+          Colors.orange[100]!,
+          () => _handleOptionTap(context, 'Giao hàng'),
+        ),
+        const SizedBox(width: 20),
+        _buildOptionButton(
+          context,
+          'Trả hàng',
+          Icons.assignment_return,
+          Colors.blue[100]!,
+          () => _handleOptionTap(context, 'Trả hàng'),
+        ),
+      ],
     );
   }
 
@@ -56,11 +53,11 @@ class DeliveryOptionsWidget extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: Colors.white),
+              Icon(icon, color: Colors.black87),
               const SizedBox(height: 4),
               Text(
                 label,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.black87),
               ),
             ],
           ),

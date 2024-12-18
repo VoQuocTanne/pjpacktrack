@@ -6,7 +6,6 @@ import 'package:pjpacktrack/modules/ui/aws_config.dart';
 import 'package:pjpacktrack/modules/ui/delivery_option.dart';
 import 'package:pjpacktrack/modules/ui/video_upload.dart';
 
-
 class RecordingScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
   final String storeId;
@@ -24,12 +23,10 @@ class _RecordingScreenState extends State<RecordingScreen> {
   bool _isScanning = true;
   bool _isFlashOn = false;
   bool _isQRCode = false;
-  bool _continuousRecording = false;
+  bool _continuousRecording = true;
   String? _lastScannedCode;
   String? _selectedDeliveryOption;
   final List<String> _videoPaths = [];
-  double _currentBrightness = 0;
-  String _brightnessWarning = "";
   static const String STOP_CODE = "STOP";
   bool _isContinuousScanning = false;
   final AwsCredentialsConfig credentialsConfig = AwsCredentialsConfig(
@@ -97,67 +94,58 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 
   Future<void> _stopAndReset() async {
-  if (_cameraController != null && _isRecording) {
-    try {
-      // 1. Dừng quay và lấy file video
-      final XFile videoFile = await _cameraController!.stopVideoRecording();
-      setState(() {
-        _videoPaths.add(videoFile.path);
-      });
+    if (_cameraController != null && _isRecording) {
+      try {
+        // 1. Dừng quay và lấy file video
+        final XFile videoFile = await _cameraController!.stopVideoRecording();
+        setState(() {
+          _videoPaths.add(videoFile.path);
+        });
 
-      // 2. Upload video
-      final uploader = VideoUploader(
-        context: context,
-        credentialsConfig: credentialsConfig,
-        lastScannedCode: _lastScannedCode ?? 'UNKNOWN',
-        selectedDeliveryOption: _selectedDeliveryOption ?? 'UNKNOWN',
-        isQRCode: _isQRCode,
-        storeId: widget.storeId,
-      );
-      await uploader.uploadVideo(videoFile.path);
-      print('Upload completed successfully');
+        // 2. Upload video
+        final uploader = VideoUploader(
+          context: context,
+          credentialsConfig: credentialsConfig,
+          lastScannedCode: _lastScannedCode ?? 'UNKNOWN',
+          selectedDeliveryOption: _selectedDeliveryOption ?? 'UNKNOWN',
+          isQRCode: _isQRCode,
+          storeId: widget.storeId,
+        );
+        await uploader.uploadVideo(videoFile.path);
+        print('Upload completed successfully');
 
-      // 3. Cleanup controllers
-      if (_cameraController != null) {
-        await _cameraController?.dispose();
-        _cameraController = null;
+        // 3. Cleanup controllers
+        if (_cameraController != null) {
+          await _cameraController?.dispose();
+          _cameraController = null;
+        }
+        if (_scannerController != null) {
+          await _scannerController?.dispose();
+          _scannerController = null;
+        }
+
+        // 4. Reset state
+        setState(() {
+          _isRecording = false;
+          _isScanning = true;
+          _lastScannedCode = null;
+        });
+
+        _initializeScannerController();
+
+        if (!_continuousRecording) {
+          setState(() => _selectedDeliveryOption = null);
+          await _initializeCamera();
+        }
+
+        setState(() {
+          _isScanning = true;
+        });
+      } catch (e) {
+        print('Stop and reset error: $e');
       }
-      if (_scannerController != null) {
-        await _scannerController?.dispose();
-        _scannerController = null;
-      }
-
-      // 4. Reset state
-      setState(() {
-        _isRecording = false;
-        _isScanning = true;
-        _lastScannedCode = null;
-      });
-
-      // 5. Khởi tạo lại scanner TRƯỚC
-      await Future.delayed(const Duration(milliseconds: 500)); // Đợi một chút
-      _initializeScannerController();
-      
-      // 6. Sau đó mới khởi tạo camera
-      if (!_continuousRecording) {
-        setState(() => _selectedDeliveryOption = null);
-        await Future.delayed(const Duration(milliseconds: 500)); // Đợi thêm
-        await _initializeCamera();
-      }
-
-      // 7. Đảm bảo scanner được kích hoạt
-      setState(() {
-        _isScanning = true;
-      });
-      
-    } catch (e) {
-      print('Stop and reset error: $e');
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Lỗi: $e')),
-      // );
     }
   }
-}
 
   @override
   void dispose() {
@@ -219,84 +207,30 @@ class _RecordingScreenState extends State<RecordingScreen> {
             _buildScanner()
           else
             Container(color: Colors.black),
-          if (_selectedDeliveryOption != null)
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.1,
-              left: 0,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(_isRecording ? 0.2 : 0.4),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _selectedDeliveryOption!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildModeButton('Quay lần lượt', Icons.looks_one,
-                            !_continuousRecording),
-                        const SizedBox(height: 12),
-                        _buildModeButton('Quay liên tục', Icons.repeat,
-                            _continuousRecording),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
           Positioned(
-            top: 0,
+            top: 10,
             right: 0,
             left: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.4),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  bottomLeft: Radius.circular(12),
-                ),
-              ),
-              child: DeliveryOptionsWidget(
-                onOptionSelected: _handleDeliveryOptionSelected,
-              ),
+            child: DeliveryOptionsWidget(
+              onOptionSelected: _handleDeliveryOptionSelected,
             ),
           ),
           if (_selectedDeliveryOption == null)
             Center(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.touch_app, color: Colors.white),
-                    SizedBox(width: 12),
-                    Text(
-                      'Chọn hình thức để bắt đầu',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.touch_app, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text(
+                    'Chọn hình thức để bắt đầu',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           // Bottom status
@@ -331,51 +265,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
         ],
       ),
       bottomNavigationBar: _buildBottomBar(),
-    );
-  }
-
-  Widget _buildModeButton(String label, IconData icon, bool isSelected) {
-    return InkWell(
-      onTap: _isRecording
-          ? null
-          : () {
-              setState(() {
-                // Thay đổi trạng thái của _continuousRecording dựa trên lựa chọn
-                _continuousRecording = (label == 'Quay liên tục');
-              });
-            },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.teal : Colors.black26,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? Colors.tealAccent : Colors.transparent,
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? Colors.white : Colors.grey,
-              // Màu icon tùy thuộc vào trạng thái
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.grey,
-                // Màu chữ tùy thuộc vào trạng thái
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -425,7 +314,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
     final String? code = barcode.rawValue;
 
     if (code != null) {
-       if (!_isRecording && code != STOP_CODE) {
+      if (!_isRecording && code != STOP_CODE) {
         // Chế độ quét bình thường
         _isQRCode = barcode.format == BarcodeFormat.qrCode;
         setState(() {
@@ -433,25 +322,19 @@ class _RecordingScreenState extends State<RecordingScreen> {
           _lastScannedCode = code;
         });
 
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //       content: Text('${_isQRCode ? "QR Code" : "Barcode"}: $code')),
-        // );
-
         try {
           await _startRecording();
         } catch (e) {
           print('Error during recording: $e');
         }
-      }else if (_isRecording && _continuousRecording && code == STOP_CODE) {
+      } else if (_isRecording && _continuousRecording && code == STOP_CODE) {
         // Chỉ xử lý mã "STOP" khi quay liên tục
-          try {
-            await _stopAndReset();
-          } catch (e) {
-            print('Error during stopping: $e');
-          }
-        
-      } 
+        try {
+          await _stopAndReset();
+        } catch (e) {
+          print('Error during stopping: $e');
+        }
+      }
     }
   }
 }

@@ -15,6 +15,7 @@ import 'package:pjpacktrack/widgets/common_card.dart';
 class BottomTabScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
   String storeId;
+
   BottomTabScreen({Key? key, required this.cameras, required this.storeId})
       : super(key: key);
 
@@ -79,17 +80,17 @@ class _BottomTabScreenState extends State<BottomTabScreen>
           setState(() {
             _indexView = OrderHistoryScreen(storeId: widget.storeId);
           });
+        } else if (tabType == BottomBarType.profile) {
+          setState(() {
+            _indexView = ProfileScreen(
+              animationController: _animationController,
+            );
+          });
         } else if (tabType == BottomBarType.camqr) {
           setState(() {
             _indexView = RecordingScreen(
               cameras: widget.cameras,
               storeId: widget.storeId,
-            );
-          });
-        } else if (tabType == BottomBarType.profile) {
-          setState(() {
-            _indexView = ProfileScreen(
-              animationController: _animationController,
             );
           });
         } else if (tabType == BottomBarType.forum) {
@@ -114,7 +115,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
           Row(
             children: <Widget>[
               TabButtonUI(
-                icon: Icons.search,
+                icon: Icons.inventory,
                 isSelected: tabType == BottomBarType.order,
                 text: Loc.alized.explore,
                 onTap: () {
@@ -122,7 +123,7 @@ class _BottomTabScreenState extends State<BottomTabScreen>
                 },
               ),
               TabButtonUI(
-                icon: FontAwesomeIcons.comment, // Icon for Store
+                icon: FontAwesomeIcons.users,
                 isSelected: tabType == BottomBarType.forum,
                 text: 'Diễn đàn', // Text for Store
                 onTap: () {
