@@ -26,6 +26,7 @@ mixin _$RecordingState {
   String? get selectedDeliveryOption => throw _privateConstructorUsedError;
   List<String> get videoPaths => throw _privateConstructorUsedError;
   bool get isContinuousScanning => throw _privateConstructorUsedError;
+  List<String> get detectedObjects => throw _privateConstructorUsedError;
 
   /// Create a copy of RecordingState
   /// with the given fields replaced by the non-null parameter values.
@@ -50,7 +51,8 @@ abstract class $RecordingStateCopyWith<$Res> {
       String? lastScannedCode,
       String? selectedDeliveryOption,
       List<String> videoPaths,
-      bool isContinuousScanning});
+      bool isContinuousScanning,
+      List<String> detectedObjects});
 }
 
 /// @nodoc
@@ -78,6 +80,7 @@ class _$RecordingStateCopyWithImpl<$Res, $Val extends RecordingState>
     Object? selectedDeliveryOption = freezed,
     Object? videoPaths = null,
     Object? isContinuousScanning = null,
+    Object? detectedObjects = null,
   }) {
     return _then(_value.copyWith(
       isRecording: null == isRecording
@@ -120,6 +123,10 @@ class _$RecordingStateCopyWithImpl<$Res, $Val extends RecordingState>
           ? _value.isContinuousScanning
           : isContinuousScanning // ignore: cast_nullable_to_non_nullable
               as bool,
+      detectedObjects: null == detectedObjects
+          ? _value.detectedObjects
+          : detectedObjects // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ) as $Val);
   }
 }
@@ -142,7 +149,8 @@ abstract class _$$RecordingStateImplCopyWith<$Res>
       String? lastScannedCode,
       String? selectedDeliveryOption,
       List<String> videoPaths,
-      bool isContinuousScanning});
+      bool isContinuousScanning,
+      List<String> detectedObjects});
 }
 
 /// @nodoc
@@ -168,6 +176,7 @@ class __$$RecordingStateImplCopyWithImpl<$Res>
     Object? selectedDeliveryOption = freezed,
     Object? videoPaths = null,
     Object? isContinuousScanning = null,
+    Object? detectedObjects = null,
   }) {
     return _then(_$RecordingStateImpl(
       isRecording: null == isRecording
@@ -210,6 +219,10 @@ class __$$RecordingStateImplCopyWithImpl<$Res>
           ? _value.isContinuousScanning
           : isContinuousScanning // ignore: cast_nullable_to_non_nullable
               as bool,
+      detectedObjects: null == detectedObjects
+          ? _value._detectedObjects
+          : detectedObjects // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -227,8 +240,10 @@ class _$RecordingStateImpl implements _RecordingState {
       this.lastScannedCode,
       this.selectedDeliveryOption,
       final List<String> videoPaths = const [],
-      this.isContinuousScanning = false})
-      : _videoPaths = videoPaths;
+      this.isContinuousScanning = false,
+      final List<String> detectedObjects = const []})
+      : _videoPaths = videoPaths,
+        _detectedObjects = detectedObjects;
 
   @override
   @JsonKey()
@@ -264,10 +279,18 @@ class _$RecordingStateImpl implements _RecordingState {
   @override
   @JsonKey()
   final bool isContinuousScanning;
+  final List<String> _detectedObjects;
+  @override
+  @JsonKey()
+  List<String> get detectedObjects {
+    if (_detectedObjects is EqualUnmodifiableListView) return _detectedObjects;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_detectedObjects);
+  }
 
   @override
   String toString() {
-    return 'RecordingState(isRecording: $isRecording, isScanning: $isScanning, isFlashOn: $isFlashOn, isQRCode: $isQRCode, isInitialized: $isInitialized, continuousRecording: $continuousRecording, lastScannedCode: $lastScannedCode, selectedDeliveryOption: $selectedDeliveryOption, videoPaths: $videoPaths, isContinuousScanning: $isContinuousScanning)';
+    return 'RecordingState(isRecording: $isRecording, isScanning: $isScanning, isFlashOn: $isFlashOn, isQRCode: $isQRCode, isInitialized: $isInitialized, continuousRecording: $continuousRecording, lastScannedCode: $lastScannedCode, selectedDeliveryOption: $selectedDeliveryOption, videoPaths: $videoPaths, isContinuousScanning: $isContinuousScanning, detectedObjects: $detectedObjects)';
   }
 
   @override
@@ -294,7 +317,9 @@ class _$RecordingStateImpl implements _RecordingState {
             const DeepCollectionEquality()
                 .equals(other._videoPaths, _videoPaths) &&
             (identical(other.isContinuousScanning, isContinuousScanning) ||
-                other.isContinuousScanning == isContinuousScanning));
+                other.isContinuousScanning == isContinuousScanning) &&
+            const DeepCollectionEquality()
+                .equals(other._detectedObjects, _detectedObjects));
   }
 
   @override
@@ -309,7 +334,8 @@ class _$RecordingStateImpl implements _RecordingState {
       lastScannedCode,
       selectedDeliveryOption,
       const DeepCollectionEquality().hash(_videoPaths),
-      isContinuousScanning);
+      isContinuousScanning,
+      const DeepCollectionEquality().hash(_detectedObjects));
 
   /// Create a copy of RecordingState
   /// with the given fields replaced by the non-null parameter values.
@@ -332,7 +358,8 @@ abstract class _RecordingState implements RecordingState {
       final String? lastScannedCode,
       final String? selectedDeliveryOption,
       final List<String> videoPaths,
-      final bool isContinuousScanning}) = _$RecordingStateImpl;
+      final bool isContinuousScanning,
+      final List<String> detectedObjects}) = _$RecordingStateImpl;
 
   @override
   bool get isRecording;
@@ -354,6 +381,8 @@ abstract class _RecordingState implements RecordingState {
   List<String> get videoPaths;
   @override
   bool get isContinuousScanning;
+  @override
+  List<String> get detectedObjects;
 
   /// Create a copy of RecordingState
   /// with the given fields replaced by the non-null parameter values.

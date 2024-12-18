@@ -8,6 +8,7 @@ import 'package:pjpacktrack/modules/ui/recording/recording_repo/recording_state.
 import '../aws_config.dart';
 import '../video/video_repo/video_upload_state.dart';
 import '../video/video_upload_provider.dart';
+import 'object_detector_controller.dart';
 
 final recordingControllerProvider =
     StateNotifierProvider.autoDispose<RecordingController, RecordingState>(
@@ -30,6 +31,7 @@ class RecordingController extends StateNotifier<RecordingState> {
   final Ref ref;
   CameraController? _cameraController;
   MobileScannerController? _scannerController;
+  ObjectDetectorController? _objectDetector;
   static const String STOP_CODE = "STOP";
   List<CameraDescription>? _cameras;
   String? _currentStoreId;
@@ -38,6 +40,8 @@ class RecordingController extends StateNotifier<RecordingState> {
   RecordingController(this.ref) : super(const RecordingState()) {
     _uploader = ref.read(videoUploadProvider.notifier);
     _initializeScannerController();
+    _objectDetector = ObjectDetectorController();
+    _initializeObjectDetector();
   }
 
   void _initializeScannerController() {
@@ -49,6 +53,10 @@ class RecordingController extends StateNotifier<RecordingState> {
       formats: [BarcodeFormat.qrCode],
       returnImage: false,
     );
+  }
+
+  Future<void> _initializeObjectDetector() async {
+    await _objectDetector?.initializeDetector();
   }
 
   Future<void> initializeCamera(List<CameraDescription> cameras) async {
@@ -64,11 +72,25 @@ class RecordingController extends StateNotifier<RecordingState> {
       cameras[0],
       ResolutionPreset.high,
       enableAudio: true,
+      imageFormatGroup: ImageFormatGroup.bgra8888,
     );
 
     try {
       await _cameraController!.initialize();
-      state = state.copyWith(isInitialized: true); // Cập nhật state
+
+      // Add image stream listener for object detection
+      _cameraController!.startImageStream((image) async {
+        if (state.isRecording) {
+          await _objectDetector?.processImage(image);
+          // Update state with detected objects if needed
+          final detectedObjects = _objectDetector?.detectedObjects ?? [];
+          state = state.copyWith(
+            detectedObjects: detectedObjects.map((obj) => obj.labels.first.text).toList(),
+          );
+        }
+      });
+
+      state = state.copyWith(isInitialized: true);
       debugPrint('Camera initialized successfully');
     } catch (e) {
       debugPrint('Camera init error: $e');
@@ -219,6 +241,7 @@ class RecordingController extends StateNotifier<RecordingState> {
   @override
   void dispose() {
     _cleanupControllers();
+    _objectDetector?.dispose();
     super.dispose();
   }
 

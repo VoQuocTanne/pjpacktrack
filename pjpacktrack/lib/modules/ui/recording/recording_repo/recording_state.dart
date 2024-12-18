@@ -1,4 +1,3 @@
-// recording_state.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'recording_state.freezed.dart';
@@ -16,5 +15,6 @@ class RecordingState with _$RecordingState {
     String? selectedDeliveryOption,
     @Default([]) List<String> videoPaths,
     @Default(false) bool isContinuousScanning,
+    @Default([]) List<String> detectedObjects,
   }) = _RecordingState;
 }

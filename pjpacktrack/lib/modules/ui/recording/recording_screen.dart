@@ -6,6 +6,7 @@ import 'package:pjpacktrack/modules/ui/recording/recording_controller.dart';
 import 'package:pjpacktrack/modules/ui/recording/recording_repo/recording_state.dart';
 import 'package:pjpacktrack/modules/ui/recording/start_prompt.dart';
 import 'delivery_option.dart';
+import 'object_detector_overlay.dart';
 
 final uploadStatusProvider = StateProvider<String?>((ref) => null);
 
@@ -19,6 +20,7 @@ class RecordingScreen extends ConsumerWidget {
     required this.storeId,
   });
 
+// In your RecordingScreen class
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(recordingControllerProvider);
@@ -43,15 +45,15 @@ class RecordingScreen extends ConsumerWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Scanner luôn hiển thị khi isScanning = true
           if (state.isScanning) _buildScanner(controller),
-
-          // Camera preview chỉ hiển thị khi recording
           if (state.isRecording && state.isInitialized)
             CameraPreview(controller.cameraController!),
           _buildDeliveryOptions(controller),
           if (!state.isRecording && state.selectedDeliveryOption == null)
             const StartPrompt(),
+          // Add the object detector overlay
+          if (state.isRecording)
+            ObjectDetectorOverlay(detectedObjects: state.detectedObjects),
         ],
       ),
       bottomNavigationBar: _buildBottomBar(context, state, controller),
