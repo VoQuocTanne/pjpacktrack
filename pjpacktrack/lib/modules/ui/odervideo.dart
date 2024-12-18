@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:pjpacktrack/modules/ui/video/play_video.dart';
 import 'package:pjpacktrack/modules/ui/video/video_upload_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,6 +19,7 @@ class OrderHistoryScreen extends StatefulWidget {
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   String? searchQuery;
+  String? userName;
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +187,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     isQRCode,
                     context,
                     userId,
+                    index,
                   );
                 },
               ),
@@ -226,7 +229,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   }
 
   Widget _buildOrderCard(String code, Map<String, dynamic> data, bool isQRCode,
-      BuildContext context, String userId) {
+      BuildContext context, String userId, int index) {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
@@ -240,7 +243,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildOrderHeader(code, data, isQRCode, context),
+              _buildOrderHeader(code, data, isQRCode, context, index),
               const Divider(height: 24),
             ],
           ),
@@ -249,8 +252,46 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName(); // Gọi hàm lấy tên người dùng
+  }
+
+  Future<void> _fetchUserName() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      try {
+        // Truy vấn tên người dùng từ Firestore
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
+
+        if (userDoc.exists) {
+          setState(() {
+            userName =
+                userDoc.data()?['fullname'] ?? 'Không xác định'; // Lưu tên
+          });
+        }
+      } catch (e) {
+        debugPrint('Error fetching user name: $e');
+      }
+    }
+  }
+
   Widget _buildOrderHeader(String code, Map<String, dynamic> data,
-      bool isQRCode, BuildContext context) {
+      bool isQRCode, BuildContext context, int index) {
+    // Lấy logo theo thứ tự
+    String logoAsset;
+    if (index % 3 == 0) {
+      logoAsset =
+          'assets/images/icons8-shopee.svg'; // Shopee cho video đầu tiên
+    } else if (index % 3 == 1) {
+      logoAsset = 'assets/images/icons8-tiktok.svg'; // TikTok cho video thứ hai
+    } else {
+      logoAsset = 'assets/images/icons8-lazada.svg'; // Lazada cho video thứ ba
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -258,16 +299,36 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '${isQRCode ? "Mã đơn hàng" : "Mã đơn hàng"}: $code',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${isQRCode ? "Mã đơn hàng" : "Mã đơn hàng"}: $code',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  // Hiển thị logo dựa trên thứ tự
+                  SvgPicture.asset(
+                    logoAsset,
+                    height: 24,
+                    width: 24,
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
               Text(
                 'Ngày tạo đơn: ${formatDate(data['createDate'])}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Người thực hiện: ${userName ?? 'Đang tải...'}',
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
