@@ -1,13 +1,11 @@
+// recording_screen.dart
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:pjpacktrack/modules/ui/recording/recording_controller.dart';
 import 'package:pjpacktrack/modules/ui/recording/recording_repo/recording_state.dart';
-import 'package:pjpacktrack/modules/ui/recording/start_prompt.dart';
+import 'recording_indicator.dart';
 import 'delivery_option.dart';
-
-final uploadStatusProvider = StateProvider<String?>((ref) => null);
 
 class RecordingScreen extends ConsumerWidget {
   final List<CameraDescription> cameras;
@@ -24,15 +22,16 @@ class RecordingScreen extends ConsumerWidget {
     final state = ref.watch(recordingControllerProvider);
     final controller = ref.watch(recordingControllerProvider.notifier);
 
-    if (controller.cameraController == null) {
+    // Step 1: Initialize camera
+    if (!state.isInitialized) {
       controller.initializeCamera(cameras);
-      return const SizedBox.shrink();
+      return const Center(child: CircularProgressIndicator());
     }
 
     return Scaffold(
       appBar: AppBar(
+        title: _buildStatusText(state),
         backgroundColor: Theme.of(context).primaryColor,
-        elevation: 0,
         actions: [
           IconButton(
             icon: Icon(state.isFlashOn ? Icons.flash_on : Icons.flash_off),
@@ -40,51 +39,127 @@ class RecordingScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Scanner luôn hiển thị khi isScanning = true
-          if (state.isScanning) _buildScanner(controller),
-
-          // Camera preview chỉ hiển thị khi recording
-          if (state.isRecording && state.isInitialized)
-            CameraPreview(controller.cameraController!),
-          _buildDeliveryOptions(controller),
-          if (!state.isRecording && state.selectedDeliveryOption == null)
-            const StartPrompt(),
-        ],
-      ),
-      bottomNavigationBar: _buildBottomBar(context, state, controller),
+      body: _buildBody(context, state, controller),
     );
   }
 
-  Widget _buildScanner(RecordingController controller) {
-    return MobileScanner(
-      controller: controller.scannerController,
-            onDetect: controller.handleBarcodeDetection,
+  Widget _buildStatusText(RecordingState state) {
+    if (!state.isInitialized) {
+      return const Text('Initializing...');
+    }
+    if (state.selectedDeliveryOption == null) {
+      return const Text('Select Delivery Option');
+    }
+    if (!state.isRecording) {
+      return const Text('Ready to Scan');
+    }
+    return const Text('Recording...');
+  }
 
-      errorBuilder: (context, error, child) {
-        return Center(child: Text('Scanner error: $error'));
-      },
+  Widget _buildBody(BuildContext context, RecordingState state, RecordingController controller) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Step 2: Always show camera preview after initialization
+        if (state.isInitialized)
+          CameraPreview(controller.cameraController!),
+
+        // Step 3: Show delivery options if not selected
+        if (state.selectedDeliveryOption == null)
+          _buildDeliveryOptions(controller),
+
+        // Step 4: Show scanning overlay when ready
+        if (state.selectedDeliveryOption != null && !state.isRecording)
+          _buildScanningOverlay(),
+
+        // Step 5: Show recording indicator and detected labels during recording
+        if (state.isRecording) ...[
+          const RecordingIndicator(),
+          _buildDetectedLabelsOverlay(state),
+        ],
+
+        // Bottom bar for recording controls
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: _buildBottomBar(context, state, controller),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScanningOverlay() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white, width: 2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      margin: const EdgeInsets.all(50),
+      child: const Center(
+        child: Text(
+          'Position barcode in frame',
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
+      ),
     );
   }
 
   Widget _buildDeliveryOptions(RecordingController controller) {
-    return Positioned(
-      top: 0,
-      right: 0,
-      left: 0,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.4),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(12),
-            bottomLeft: Radius.circular(12),
+    return Container(
+      color: Colors.black87,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Select Delivery Option',
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              const SizedBox(height: 20),
+              DeliveryOptionsWidget(
+                onOptionSelected: controller.setDeliveryOption,
+              ),
+            ],
           ),
         ),
-        child: DeliveryOptionsWidget(
-          onOptionSelected: controller.setDeliveryOption,
+      ),
+    );
+  }
+
+  Widget _buildDetectedLabelsOverlay(RecordingState state) {
+    if (state.imageLabels.isEmpty && state.detectedObjects.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Positioned(
+      top: 100,
+      left: 16,
+      right: 16,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.black54,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (state.detectedObjects.isNotEmpty) ...[
+              Text(
+                'Objects: ${state.detectedObjects.map((obj) => obj.labels.first.text).join(", ")}',
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(height: 4),
+            ],
+            if (state.imageLabels.isNotEmpty)
+              Text(
+                'Labels: ${state.imageLabels.map((label) => label.label).join(", ")}',
+                style: const TextStyle(color: Colors.white),
+              ),
+          ],
         ),
       ),
     );
@@ -93,12 +168,11 @@ class RecordingScreen extends ConsumerWidget {
   Widget _buildBottomBar(BuildContext context, RecordingState state,
       RecordingController controller) {
     return Container(
-      color: Colors.black,
+      color: Colors.black87,
       padding: const EdgeInsets.all(16),
       child: SafeArea(
         child: ElevatedButton(
-          onPressed:
-              state.isRecording ? () => controller.stopAndReset(storeId) : null,
+          onPressed: state.isRecording ? () => controller.stopAndReset(storeId) : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -109,10 +183,10 @@ class RecordingScreen extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(state.isRecording ? Icons.stop : Icons.videocam),
+              Icon(state.isRecording ? Icons.stop : Icons.qr_code_scanner),
               const SizedBox(width: 8),
               Text(
-                state.isRecording ? 'Dừng quay video' : 'Chờ quét mã',
+                _getBottomButtonText(state),
                 style: const TextStyle(fontSize: 16),
               ),
             ],
@@ -122,30 +196,10 @@ class RecordingScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildUploadStatus(String status) {
-    return Positioned(
-      top: 60,
-      left: 0,
-      right: 0,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.black87,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          status,
-          style: const TextStyle(color: Colors.white),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+  String _getBottomButtonText(RecordingState state) {
+    if (!state.isInitialized) return 'Initializing...';
+    if (state.selectedDeliveryOption == null) return 'Select Delivery Option';
+    if (state.isRecording) return 'Stop Recording';
+    return 'Scan QR Code';
   }
 }

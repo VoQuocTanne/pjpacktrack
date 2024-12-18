@@ -1,56 +1,35 @@
+// recording_controller.dart
 import 'package:aws_storage_service/aws_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:camera/camera.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:pjpacktrack/modules/ui/fake_api/matched_order_screen.dart';
+import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 import 'package:pjpacktrack/modules/ui/recording/recording_repo/recording_state.dart';
 import '../aws_config.dart';
 import '../video/video_repo/video_upload_state.dart';
 import '../video/video_upload_provider.dart';
+import 'mk_kit_service.dart';
 
 final recordingControllerProvider =
     StateNotifierProvider.autoDispose<RecordingController, RecordingState>(
-        (ref) {
-  return RecordingController(ref);
-});
-final videoUploadProvider =
-    StateNotifierProvider<VideoUploadNotifier, VideoUploadState>((ref) {
-  // Bỏ autoDispose
-  return VideoUploadNotifier();
-});
-
-final cameraControllerProvider =
-    Provider.autoDispose<CameraController?>((ref) => null);
-
-final scannerControllerProvider =
-    Provider.autoDispose<MobileScannerController?>((ref) => null);
+        (ref) => RecordingController(ref));
 
 class RecordingController extends StateNotifier<RecordingState> {
   final Ref ref;
   CameraController? _cameraController;
-  MobileScannerController? _scannerController;
+  MLKitService? _mlKitService;
   static const String STOP_CODE = "STOP";
   List<CameraDescription>? _cameras;
   String? _currentStoreId;
   late final VideoUploadNotifier _uploader;
+  bool _isProcessing = false;
 
   RecordingController(this.ref) : super(const RecordingState()) {
     _uploader = ref.read(videoUploadProvider.notifier);
-    _initializeScannerController();
+    _initializeMLKit();
   }
 
-  void _initializeScannerController() {
-    _scannerController?.dispose();
-
-    _scannerController = MobileScannerController(
-      detectionSpeed: DetectionSpeed.noDuplicates,
-      facing: CameraFacing.back,
-      formats: [BarcodeFormat.qrCode],
-      returnImage: false,
-    );
-  }
-
+  // Step 1: Initialize camera
   Future<void> initializeCamera(List<CameraDescription> cameras) async {
     if (cameras.isEmpty) return;
 
@@ -64,11 +43,13 @@ class RecordingController extends StateNotifier<RecordingState> {
       cameras[0],
       ResolutionPreset.high,
       enableAudio: true,
+      imageFormatGroup: ImageFormatGroup.yuv420,
     );
 
     try {
       await _cameraController!.initialize();
-      state = state.copyWith(isInitialized: true); // Cập nhật state
+      await _cameraController!.startImageStream(_processImageStream);
+      state = state.copyWith(isInitialized: true);
       debugPrint('Camera initialized successfully');
     } catch (e) {
       debugPrint('Camera init error: $e');
@@ -76,19 +57,75 @@ class RecordingController extends StateNotifier<RecordingState> {
     }
   }
 
-  void setStoreId(String storeId) {
-    _currentStoreId = storeId;
+  Future<void> _initializeMLKit() async {
+    _mlKitService = await MLKitService.create();
   }
 
+  // Step 2: Set delivery option
+  void setDeliveryOption(String option) {
+    state = state.copyWith(
+      selectedDeliveryOption: option,
+      isScanning: true,
+    );
+  }
+
+  // Step 3: Process camera stream for barcode detection
+  Future<void> _processImageStream(CameraImage image) async {
+    if (!state.isInitialized ||
+        !state.isScanning ||
+        _isProcessing ||
+        _mlKitService == null ||
+        state.selectedDeliveryOption == null) {
+      return;
+    }
+
+    _isProcessing = true;
+
+    try {
+      final barcodes = await _mlKitService!.scanBarcodes(image);
+
+      if (state.isRecording) {
+        // During recording, process ML Kit results
+        final labels = await _mlKitService!.labelImage(image);
+        final objects = await _mlKitService!.detectObjects(image);
+
+        state = state.copyWith(
+          imageLabels: labels,
+          detectedObjects: objects,
+        );
+
+        // Check for STOP code during recording
+        if (barcodes.isNotEmpty &&
+            barcodes.first.rawValue == STOP_CODE &&
+            _currentStoreId != null) {
+          await stopAndReset(_currentStoreId!);
+        }
+      } else if (barcodes.isNotEmpty && state.selectedDeliveryOption != null) {
+        // Start recording when barcode is detected
+        final barcode = barcodes.first;
+        state = state.copyWith(
+          lastScannedCode: barcode.rawValue,
+          isQRCode: barcode.format == BarcodeFormat.qrCode,
+        );
+        await startRecording();
+      }
+    } catch (e) {
+      debugPrint('ML Kit processing error: $e');
+    } finally {
+      _isProcessing = false;
+    }
+  }
+
+  // Step 4: Start recording
   Future<void> startRecording() async {
     if (_cameraController != null &&
         !state.isRecording &&
-        state.isQRCode != STOP_CODE) {
+        state.lastScannedCode != STOP_CODE) {
       try {
         await _cameraController!.startVideoRecording();
         state = state.copyWith(
           isRecording: true,
-          isScanning: true, // Giữ scanning mode bật
+          isScanning: true,
         );
       } catch (e) {
         debugPrint('Recording start error: $e');
@@ -97,19 +134,31 @@ class RecordingController extends StateNotifier<RecordingState> {
     }
   }
 
+  // Step 5: Stop recording and reset
   Future<void> stopAndReset(String storeId) async {
     if (!state.isRecording || _cameraController == null) return;
 
     try {
-      final lastCode = state.lastScannedCode;
-      final deliveryOption = state.selectedDeliveryOption;
-      final isQR = state.isQRCode;
-
       final videoFile = await _cameraController!.stopVideoRecording();
-      state = state.copyWith(isRecording: false);
 
-      await _uploadVideo(videoFile, storeId, lastCode!, deliveryOption!, isQR);
-      await _resetAfterUpload();
+      // Upload video
+      await _uploadVideo(
+        videoFile,
+        storeId,
+        state.lastScannedCode!,
+        state.selectedDeliveryOption!,
+        state.isQRCode,
+      );
+
+      // Reset state
+      state = state.copyWith(
+        isRecording: false,
+        isScanning: true,
+        lastScannedCode: null,
+        selectedDeliveryOption: null,
+        imageLabels: [],
+        detectedObjects: [],
+      );
     } catch (e) {
       debugPrint('Stop recording error: $e');
       state = state.copyWith(isRecording: false);
@@ -134,39 +183,8 @@ class RecordingController extends StateNotifier<RecordingState> {
     );
   }
 
-  Future<void> _resetAfterUpload() async {
-    await _cleanupControllers();
-    _initializeScannerController();
-    await _scannerController?.start();
-
-    state = state.copyWith(
-        isRecording: false,
-        isScanning: true,
-        lastScannedCode: null,
-        selectedDeliveryOption: null);
-  }
-
-  Future<void> _cleanupControllers() async {
-    try {
-      if (_cameraController != null) {
-        await _cameraController!.dispose();
-        _cameraController = null;
-      }
-      if (_scannerController != null) {
-        await _scannerController!.dispose();
-        _scannerController = null;
-      }
-      state = const RecordingState();
-    } catch (e) {
-      debugPrint('Cleanup error: $e');
-    }
-  }
-
   Future<void> toggleFlash() async {
-    if (state.isScanning) {
-      await _scannerController?.toggleTorch();
-      state = state.copyWith(isFlashOn: !state.isFlashOn);
-    } else if (_cameraController != null) {
+    if (_cameraController != null) {
       try {
         final newFlashMode = state.isFlashOn ? FlashMode.off : FlashMode.torch;
         await _cameraController!.setFlashMode(newFlashMode);
@@ -177,52 +195,16 @@ class RecordingController extends StateNotifier<RecordingState> {
     }
   }
 
-  void setDeliveryOption(String option) {
-    state = state.copyWith(selectedDeliveryOption: option);
-  }
-
-  Future<void> handleBarcodeDetection(BarcodeCapture capture) async {
-    final barcodes = capture.barcodes;
-    if (barcodes.isEmpty) return;
-
-    final barcode = barcodes.first;
-    final String? code = barcode.rawValue;
-
-    if (code == null) return;
-
-    try {
-      debugPrint('Detected code: $code'); // Log để debug
-      debugPrint('Current state: ${state.toString()}'); // Log state hiện tại
-
-      if (state.isRecording) {
-        if (code == STOP_CODE && _currentStoreId != null) {
-          debugPrint(
-              'STOP_CODE detected, stopping recording'); // Log khi phát hiện STOP_CODE
-          await stopAndReset(_currentStoreId!);
-        }
-        return;
-      }
-
-      if (state.selectedDeliveryOption != null) {
-        state = state.copyWith(
-          lastScannedCode: code,
-          isQRCode: barcode.format == BarcodeFormat.qrCode,
-        );
-        await startRecording();
-      }
-    } catch (e) {
-      debugPrint('Barcode handling error: $e');
-      rethrow;
-    }
+  void setStoreId(String storeId) {
+    _currentStoreId = storeId;
   }
 
   @override
-  void dispose() {
-    _cleanupControllers();
+  void dispose() async {
+    await _mlKitService?.dispose();
+    await _cameraController?.dispose();
     super.dispose();
   }
 
   CameraController? get cameraController => _cameraController;
-
-  MobileScannerController? get scannerController => _scannerController;
 }

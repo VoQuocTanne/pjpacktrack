@@ -1,177 +1,179 @@
-bối cảnh
-cá mú
-cá vàng
-cá mập trắng lớn
-cá mập hổ
-cá đầu búa
-cá đuối điện
-cá đuối gai độc
-gà
-gà mái
-đà điểu
-cỏ mú
-sẻ vàng
-chim sẻ nhà
+background
+tench
+goldfish
+great white shark
+tiger shark
+hammerhead
+electric ray
+stingray
+cock
+hen
+ostrich
+brambling
+goldfinch
+house finch
 junco
-chim sẻ chàm
-chim hồng tước
-chim ác là
-chim sẻ nước
-diều
-đại bàng đầu hói
-kền kền
-cú xám lớn
-kỳ giông lửa châu Âu
-chim sa giông thường
-chim eft
-kỳ giông đốm
+indigo bunting
+robin
+bulbul
+jay
+magpie
+chickadee
+water ouzel
+kite
+bald eagle
+vulture
+great grey owl
+European fire salamander
+common newt
+eft
+spotted salamander
 axolotl
-ếch bò
-ếch cây
-ếch đuôi
-cá đầu to
-rùa lưng da
-rùa bùn
-cá rùa nước
-rùa hộp
-thằn lằn vằn
-kỳ nhông thường
-tắc kè Mỹ
-tắc kè đuôi roi
+bullfrog
+tree frog
+tailed frog
+loggerhead
+leatherback turtle
+mud turtle
+terrapin
+box turtle
+banded gecko
+common iguana
+American chameleon
+whiptail
 agama
-thằn lằn có tua
-thằn lằn cá sấu
-quái vật Gila
-thằn lằn xanh
-tắc kè châu Phi
-rồng Komodo
-cá sấu châu Phi
-cá sấu Mỹ
+frilled lizard
+alligator lizard
+Gila monster
+green lizard
+African chameleon
+Komodo dragon
+African crocodile
+American alligator
 triceratops
-rắn sấm
-rắn vòng cổ
-rắn lợn
-rắn xanh
-rắn vua
-rắn garter
-rắn nước
-rắn dây leo
-đêm rắn
-trăn khổng lồ
-trăn đá
-rắn hổ mang Ấn Độ
-mamba xanh
-rắn biển
-rắn lục sừng
-lưng kim cương
+thunder snake
+ringneck snake
+hognose snake
+green snake
+king snake
+garter snake
+water snake
+vine snake
+night snake
+boa constrictor
+rock python
+Indian cobra
+green mamba
+sea snake
+horned viper
+diamondback
 sidewinder
 trilobite
 harvestman
-bọ cạp
-nhện vườn đen và vàng
-nhện chuồng
-nhện vườn
-góa phụ đen
+scorpion
+black and gold garden spider
+barn spider
+garden spider
+black widow
 tarantula
-nhện sói
-ve
-rết
-gà gô đen
+wolf spider
+tick
+centipede
+black grouse
 ptarmigan
-gà gô ruffed
-gà thảo nguyên
-công
-chim cút
-gà gô
-gà gô châu Phi
-vẹt macaw
-vẹt mào lưu huỳnh
+ruffed grouse
+prairie chicken
+peacock
+quail
+partridge
+African grey
+macaw
+sulphur-crested cockatoo
 lorikeet
 coucal
-chim ăn ong
-hỏm sừng
-chim ruồi
+bee eater
+hornbill
+hummingbird
 jacamar
-chim toucan
-rồng đực
-vịt mồng đỏ
-ngỗng
-thiên nga đen
-voi ngà
+toucan
+drake
+red-breasted merganser
+goose
+black swan
+tusker
 echidna
-thú mỏ vịt
+platypus
 wallaby
 koala
 wombat
-sứa
-hải quỳ
-san hô não
-giun dẹp
-tuyến trùng
-ốc xà cừ
-ốc sên
-sên
-sên biển
+jellyfish
+sea anemone
+brain coral
+flatworm
+nematode
+conch
+snail
+slug
+sea slug
 chiton
-có khoang nautilus
-cua Dungeness
-cua đá
-cua vĩ cầm
-cua hoàng đế
-tôm hùm Mỹ
-tôm hùm gai
-tôm càng
-cua ẩn sĩ
-chân đều
-cò trắng
-cò đen
-mỏ thìa
-hồng hạc
-diệc xanh nhỏ
-diệc Mỹ
-bạc
-sếu
+chambered nautilus
+Dungeness crab
+rock crab
+fiddler crab
+king crab
+American lobster
+spiny lobster
+crayfish
+hermit crab
+isopod
+white stork
+black stork
+spoonbill
+flamingo
+little blue heron
+American egret
+bittern
+crane
 limpkin
-chim gallinule châu Âu
-chim cốc Mỹ
-chim ô đầu
-chim quay đỏ
-chim choắt lưng đỏ
-chim choắt đỏ
-chim choắt nâu
-chim dowitcher
-chim bắt hàu
-chim bồ nông
-chim cánh cụt vua
-chim hải âu
-cá voi xám
-cá voi sát thủ
-cá cúi
-sư tử biển
-chihuahua
-chó săn Nhật Bản
-chó Maltese
-chó Bắc Kinh
-chó Shih-Tzu
-chó săn Blenheim
-chó papillon
-chó sục đồ chơi
-chó săn lưng cong Rhodesian
-chó săn Afghanistan
-chó săn basset
-chó săn beagle
-chó săn máu
-chó săn bluetick
-chó săn gấu đen và nâu
-chó săn Walker
-chó săn cáo Anh
-chó săn xương đỏ
-chó săn borzoi
-chó săn sói Ireland
-chó săn Ý greyhound
+European gallinule
+American coot
+bustard
+ruddy turnstone
+red-backed sandpiper
+redshank
+dowitcher
+oystercatcher
+pelican
+king penguin
+albatross
+grey whale
+killer whale
+dugong
+sea lion
+Chihuahua
+Japanese spaniel
+Maltese dog
+Pekinese
+Shih-Tzu
+Blenheim spaniel
+papillon
+toy terrier
+Rhodesian ridgeback
+Afghan hound
+basset
+beagle
+bloodhound
+bluetick
+black-and-tan coonhound
+Walker hound
+English foxhound
+redbone
+borzoi
+Irish wolfhound
+Italian greyhound
 whippet
 Ibizan hound
-Norwegian elekhound
+Norwegian elkhound
 otterhound
 Saluki
 Scottish deerhound
@@ -207,7 +209,7 @@ curly-coated retriever
 golden retriever
 Labrador retriever
 Chesapeake Bay retriever
-German shorthaired pointer
+German short-haired pointer
 vizsla
 English setter
 Irish setter
@@ -218,7 +220,7 @@ English springer
 Welsh springer spaniel
 cocker spaniel
 Sussex spaniel
-Ireland water spaniel
+Irish water spaniel
 kuvasz
 schipperke
 groenendael
@@ -263,739 +265,737 @@ Brabancon griffon
 Pembroke
 Cardigan
 toy poodle
-poodle thu nhỏ
-poodle tiêu chuẩn
-chó săn Mexico không lông
-sói gỗ
-sói trắng
-sói đỏ
-sói đồng cỏ
-chó sói
-chó sói đồng cỏ
-chó sói đồng cỏ
-chó sói đồng cỏ
-chó sói đồng cỏ
-chó săn châu Phi
-linh cẩu
-cáo đỏ
-cáo ​​kit
-cáo Bắc Cực
-cáo xám
-mèo vằn
-mèo hổ
-mèo Ba Tư
-mèo Xiêm
-mèo Ai Cập
-báo sư tử
-linh miêu
-báo hoa mai
-báo tuyết
-báo đốm
-sư tử
-hổ
-báo gêpa
-gấu nâu
-gấu đen Mỹ
-gấu băng
-gấu lười
-cầy mangut
-cầy meerkat
-bọ cánh cứng hổ
-bọ rùa
-bọ đất
-bọ sừng dài
-bọ cánh cứng lá
-bọ cánh cứng phân
-bọ cánh cứng tê giác
-mọt sách
-ruồi
-ong
-kiến
-châu chấu
-dế
-gậy đi bộ
-gián
-bọ ngựa
-ve sầu
-chó cánh ren
-chuồn chuồn
-chuồn chuồn
-đô đốc
+miniature poodle
+standard poodle
+Mexican hairless
+timber wolf
+white wolf
+red wolf
+coyote
+dingo
+dhole
+African hunting dog
+hyena
+red fox
+kit fox
+Arctic fox
+grey fox
+tabby
+tiger cat
+Persian cat
+Siamese cat
+Egyptian cat
+cougar
+lynx
+leopard
+snow leopard
+jaguar
+lion
+tiger
+cheetah
+brown bear
+American black bear
+ice bear
+sloth bear
+mongoose
+meerkat
+tiger beetle
+ladybug
+ground beetle
+long-horned beetle
+leaf beetle
+dung beetle
+rhinoceros beetle
+weevil
+fly
+bee
+ant
+grasshopper
+cricket
+walking stick
+cockroach
+mantis
+cicada
+leafhopper
+lacewing
+dragonfly
+damselfly
+admiral
 ringlet
-bướm chúa
-bướm bắp cải
-bướm lưu huỳnh
+monarch
+cabbage butterfly
+sulphur butterfly
 lycaenid
-sao biển
-biển nhím biển
-dưa chuột biển
-thỏ rừng
-thỏ rừng
-thỏ rừng
+starfish
+sea urchin
+sea cucumber
+wood rabbit
+hare
 Angora
-chuột đồng
-nhím
-sóc cáo
+hamster
+porcupine
+fox squirrel
 marmot
-hải ly
-chuột lang
-chuột me chua
-ngựa vằn
-lợn rừng
-lợn lợn lòi
-hà mã
-bò
-trâu nước
-bò rừng bison
+beaver
+guinea pig
+sorrel
+zebra
+hog
+wild boar
+warthog
+hippopotamus
+ox
+water buffalo
+bison
 ram
-sừng lớn
+bighorn
 ibex
 hartebeest
 impala
-linh dương
-lạc đà Ả Rập
+gazelle
+Arabian camel
 llama
-chồn ecmin
-mèo ecmin
-chồn chồn đen
-rái cá
-chồn hôi
-lửng
+weasel
+mink
+polecat
+black-footed ferret
+otter
+skunk
+badger
 armadillo
-lười ba ngón
-đười ươi
-khỉ đột
-tinh tinh
-vượn
+three-toed sloth
+orangutan
+gorilla
+chimpanzee
+gibbon
 siamang
 guenon
 patas
-khỉ đầu chó
-khỉ đầu khỉ
-voọc mun
+baboon
+macaque
+langur
 colobus
-khỉ vòi
+proboscis monkey
 marmoset
 capuchin
-khỉ hú
+howler monkey
 titi
-khỉ nhện
-khỉ sóc
-mèo Madagascar
+spider monkey
+squirrel monkey
+Madagascar cat
 indri
-voi Ấn Độ
-voi châu Phi
-gấu trúc nhỏ
-khổng lồ gấu trúc
-cá nhồng
-cá chình
-cá chình
-cá coho
-cá đẹp đá
-cá hải quỳ
-cá tầm
-cá sư tử
-cá nóc
-bàn tính
+Indian elephant
+African elephant
+lesser panda
+giant panda
+barracouta
+eel
+coho
+rock beauty
+anemone fish
+sturgeon
+gar
+lionfish
+puffer
+abacus
 abaya
-áo choàng học thuật
-đàn accordion
-đàn ghita acoustic
-tàu sân bay
-máy bay
-phi thuyền
-bàn thờ
-xe cứu thương
-lưỡng cư
-đồng hồ kim
-tổ ong
-tạp dề
-thùng đựng tro
-súng trường tấn công
-ba lô
-tiệm bánh
-xà lan thăng bằng
-bóng bay
-bút bi
-Băng cứu thương
+academic gown
+accordion
+acoustic guitar
+aircraft carrier
+airliner
+airship
+altar
+ambulance
+amphibian
+analog clock
+apiary
+apron
+ashcan
+assault rifle
+backpack
+bakery
+balance beam
+balloon
+ballpoint
+Band Aid
 banjo
-lan can
-tạ
-ghế cắt tóc
-tiệm cắt tóc
-chuồng trại
-áp kế
-thùng
-xe cút kít
-bóng chày
-bóng rổ
-nôi
-kèn bassoon
-mũ tắm
-khăn tắm
-bồn tắm
-xe ngựa bãi biển
-đèn hiệu
-cốc thủy tinh
-da gấu
-chai bia
-cốc bia
+bannister
+barbell
+barber chair
+barbershop
+barn
+barometer
+barrel
+barrow
+baseball
+basketball
+bassinet
+bassoon
+bathing cap
+bath towel
+bathtub
+beach wagon
+beacon
+beaker
+bearskin
+beer bottle
+beer glass
 bell cote
-yếm
-xe đạp dành cho hai người
+bib
+bicycle-built-for-two
 bikini
 binder
-ống nhòm
-nhà chim
-nhà thuyền
-xe trượt tuyết
-cà vạt bolo
-mũ trùm đầu
-kệ sách
-hiệu sách
-nắp chai
-nơ
-nơ thắt lưng
-đồng thau
-áo ngực
-đê chắn sóng
-chổi
-xô. xô
-khóa. khóa
-áo chống đạn
-tàu hỏa
-cửa hàng thịt
-xe taxi
-vạc
-nến. nến
-pháo. pháo
-xuồng
-đồ khui hộp
-áo len cardigan
-gương xe hơi
-đu quay ngựa gỗ
-bộ đồ thợ mộc
-bìa các tông
-bánh xe ô tô
-máy rút tiền
-băng cát-sét
-máy phát băng cát-sét
-lâu đài
-tàu catamaran
-máy phát CD
-đàn cello
-điện thoại di động
-xích. xích
-hàng rào mắt xích
-thư xích
-cưa xích
-rương
-váy chiffonier
-chuông
-tủ Trung Quốc
-tất Giáng sinh
-nhà thờ
-rạp chiếu phim. rạp chiếu phim
-dao chặt
-nhà vách đá
-áo choàng
-gờ
-bình lắc cocktail
-cốc cà phê
-ấm pha cà phê
-cuộn dây
-khóa kết hợp
-bàn phím máy tính
-bánh kẹo
-tàu container
-xe mui trần
-khui nút chai
-kèn cornet
-giày cao bồi
-mũ cao bồi
-cái nôi
-cần cẩu. cần cẩu
-mũ bảo hiểm
-thùng
-cũi
-Nồi nấu chậm
-bóng croquet
-nạng
-áo giáp
-chết tiệt
-bàn làm việc
-máy tính để bàn
-điện thoại quay số
-tã
-đồng hồ kỹ thuật số
-đồng hồ kỹ thuật số
-bàn ăn
-giẻ rửa bát
-máy rửa chén
-phanh đĩa
-bến tàu. bến tàu
-xe trượt tuyết cho chó
-mái vòm
-thảm chùi chân
-bệ khoan
-trống. trống
-dùi trống
-tạ
-lò nướng
-quạt điện
-đàn ghi ta điện
-đầu máy xe lửa điện
-trung tâm giải trí
-phong bì
-máy pha cà phê
-phấn phủ mặt
-khăn lông vũ
-tệp
-tàu cứu hỏa
-xe cứu hỏa
-màn chắn lửa
-cột cờ
-sáo
-ghế gấp
-mũ bóng đá
-xe nâng
-đài phun nước
-bút máy
-giường bốn cọc
-xe chở hàng
-kèn cor
-chảo rán
-lông thú. áo khoác lông thú. áo khoác
-xe chở rác
-mặt nạ phòng độc
-máy bơm xăng
-cốc
-xe go-kart
-bóng gôn
-xe đẩy gôn
+binoculars
+birdhouse
+boathouse
+bobsled
+bolo tie
+bonnet
+bookcase
+bookshop
+bottlecap
+bow
+bow tie
+brass
+brassiere
+breakwater
+breastplate
+broom
+bucket
+buckle
+bulletproof vest
+bullet train
+butcher shop
+cab
+caldron
+candle
+cannon
+canoe
+can opener
+cardigan
+car mirror
+carousel
+carpenter's kit
+carton
+car wheel
+cash machine
+cassette
+cassette player
+castle
+catamaran
+CD player
+cello
+cellular telephone
+chain
+chainlink fence
+chain mail
+chain saw
+chest
+chiffonier
+chime
+china cabinet
+Christmas stocking
+church
+cinema
+cleaver
+cliff dwelling
+cloak
+clog
+cocktail shaker
+coffee mug
+coffeepot
+coil
+combination lock
+computer keyboard
+confectionery
+container ship
+convertible
+corkscrew
+cornet
+cowboy boot
+cowboy hat
+cradle
+crane
+crash helmet
+crate
+crib
+Crock Pot
+croquet ball
+crutch
+cuirass
+dam
+desk
+desktop computer
+dial telephone
+diaper
+digital clock
+digital watch
+dining table
+dishrag
+dishwasher
+disk brake
+dock
+dogsled
+dome
+doormat
+drilling platform
+drum
+drumstick
+dumbbell
+Dutch oven
+electric fan
+electric guitar
+electric locomotive
+entertainment center
+envelope
+espresso maker
+face powder
+feather boa
+file
+fireboat
+fire engine
+fire screen
+flagpole
+flute
+folding chair
+football helmet
+forklift
+fountain
+fountain pen
+four-poster
+freight car
+French horn
+frying pan
+fur coat
+garbage truck
+gasmask
+gas pump
+goblet
+go-kart
+golf ball
+golfcart
 gondola
-cồng
-áo choàng
-đàn piano lớn
-nhà kính
-lưới tản nhiệt
-cửa hàng tạp hóa
-máy chém
-máy trượt tóc
-xịt xịt tóc
-nửa đường ray
-búa. búa
-giỏ
-máy thổi cầm tay
-máy tính cầm tay
-khăn tay
-ổ cứng
+gong
+gown
+grand piano
+greenhouse
+grille
+grocery store
+guillotine
+hair slide
+hair spray
+half track
+hammer
+hamper
+hand blower
+hand-held computer
+handkerchief
+hard disc
 harmonica
-đàn hạc
-máy gặt
-rìu
-bao da
-rạp hát tại nhà
-tổ ong
-móc
-váy vòng
-quầy ngang
-xe ngựa
-đồng hồ cát
+harp
+harvester
+hatchet
+holster
+home theater
+honeycomb
+hook
+hoopskirt
+horizontal bar
+horse cart
+hourglass
 iPod
-bàn là. bàn là
-đèn lồng bí ngô
-quần jean
-xe jeep
-áo jersey
-trò chơi ghép hình
+iron
+jack-o'-lantern
+jean
+jeep
+jersey
+jigsaw puzzle
 jinrikisha
-cần điều khiển
+joystick
 kimono
-băng đầu gối
-thắt nút. thắt nút
-áo khoác phòng thí nghiệm
-múc
-chụp đèn
-máy tính xách tay
-máy cắt cỏ
-nắp ống kính
-dụng cụ mở thư
-thư viện
-thuyền cứu sinh
-bật lửa
-xe limousine
-lớp lót
-son môi. son môi
-giày lười
-kem dưỡng da
-loa
-kính lúp
-xưởng gỗ
-từ tính. la bàn từ tính. la bàn
-túi thư
-hộp thư
-hộp thư
-hộp thư
-hộp thư
-nắp cống
-maracas
+knee pad
+knot
+lab coat
+ladle
+lampshade
+laptop
+lawn mower
+lens cap
+letter opener
+library
+lifeboat
+lighter
+limousine
+liner
+lipstick
+Loafer
+lotion
+loudspeaker
+loupe
+lumbermill
+magnetic compass
+mailbag
+mailbox
+maillot
+maillot
+manhole cover
+maraca
 marimba
-mặt nạ. mặt nạ
-que diêm
-cây sào
-mê cung. mê cung
-cốc đong
-rương thuốc
-khối đá lớn
-micrô
-lò vi sóng
-quân phục
-bình sữa
-xe buýt nhỏ
-váy ngắn
-xe tải nhỏ
-tên lửa
-găng tay
-bát trộn
-nhà di động
+mask
+matchstick
+maypole
+maze
+measuring cup
+medicine chest
+megalith
+microphone
+microwave
+military uniform
+milk can
+minibus
+miniskirt
+minivan
+missile
+mitten
+mixing bowl
+mobile home
 Model T
 modem
-tu viện
-màn hình
-xe máy
-cối
-vữa
-vữa
-nhà thờ Hồi giáo
-màn chống muỗi
-xe tay ga
-xe đạp leo núi
-lều leo ​​núi
-chuột
-bẫy chuột
-xe tải chuyển nhà
-mõm
-đinh
-dây đeo cổ
-vòng cổ
-núm vú
-sổ tay
-cột tháp
-ôboa
+monastery
+monitor
+moped
+mortar
+mortarboard
+mosque
+mosquito net
+motor scooter
+mountain bike
+mountain tent
+mouse
+mousetrap
+moving van
+muzzle
+nail
+neck brace
+necklace
+nipple
+notebook
+obelisk
+oboe
 ocarina
-đồng hồ đo quãng đường
-bộ lọc dầu
-đàn organ
-máy hiện sóng
-váy ngoài
-xe bò
-mặt nạ dưỡng khí
-gói
-mái chèo
-bánh lái
-ổ khóa
-cọ sơn
-đồ ngủ
-cung điện
-ống pan
-khăn giấy
-dù
-thanh song song
-ghế dài công viên
-đồng hồ đỗ xe
-xe chở khách
-sân trong
-điện thoại công cộng
-bệ đỡ
-hộp bút chì
-máy gọt bút chì
-nước hoa
-Đĩa Petri
-máy photocopy
-cuốc
+odometer
+oil filter
+organ
+oscilloscope
+overskirt
+oxcart
+oxygen mask
+packet
+paddle
+paddlewheel
+padlock
+paintbrush
+pajama
+palace
+panpipe
+paper towel
+parachute
+parallel bars
+park bench
+parking meter
+passenger car
+patio
+pay-phone
+pedestal
+pencil box
+pencil sharpener
+perfume
+Petri dish
+photocopier
+pick
 pickelhaube
-hàng rào gỗ
-xe bán tải
-bến tàu
-con heo đất
-chai đựng thuốc
-gối
-bóng bàn bóng
-cánh quạt
-cướp biển
-bình đựng nước
-máy bay
-thiên văn học
-túi nhựa
-giá đĩa
-cày
-pít tông
-máy ảnh Polaroid
-cây sào
-xe cảnh sát
-áo choàng
-bàn bi-a
-chai nước ngọt
-nồi
-bánh xe của thợ gốm
-máy khoan điện
-thảm cầu nguyện
-máy in
-nhà tù
-đạn
-máy chiếu
-bóng
-bao đấm bốc
-ví
-lông
-chăn
-người đua
-vợt
-bộ tản nhiệt
+picket fence
+pickup
+pier
+piggy bank
+pill bottle
+pillow
+ping-pong ball
+pinwheel
+pirate
+pitcher
+plane
+planetarium
+plastic bag
+plate rack
+plow
+plunger
+Polaroid camera
+pole
+police van
+poncho
+pool table
+pop bottle
+pot
+potter's wheel
+power drill
+prayer rug
+printer
+prison
+projectile
+projector
+puck
+punching bag
+purse
+quill
+quilt
+racer
+racket
+radiator
 radio
-kính viễn vọng vô tuyến
-thùng đựng nước mưa
-xe giải trí
-cuộn phim
-máy ảnh phản xạ
-tủ lạnh
-điều khiển từ xa
-nhà hàng
-súng lục
-súng trường
-ghế bập bênh
-xưởng quay
-tẩy cao su
-bóng bầu dục
-luật
-giày chạy bộ
-an toàn
-ghim an toàn
-bình đựng muối
-xăng đan
-xà sà rông
+radio telescope
+rain barrel
+recreational vehicle
+reel
+reflex camera
+refrigerator
+remote control
+restaurant
+revolver
+rifle
+rocking chair
+rotisserie
+rubber eraser
+rugby ball
+rule
+running shoe
+safe
+safety pin
+saltshaker
+sandal
+sarong
 sax
-bao kiếm
-cân
-xe buýt trường học
-tàu buồm
-bảng điểm
-màn hình
-vít
-tua vít
-dây an toàn
-máy khâu
-khiên
-cửa hàng giày
+scabbard
+scale
+school bus
+schooner
+scoreboard
+screen
+screw
+screwdriver
+seat belt
+sewing machine
+shield
+shoe shop
 shoji
-giỏ hàng
-xe đẩy hàng
-xẻng
-mũ tắm
-vòi hoa sen rèm
-trượt tuyết
-mặt nạ trượt tuyết
-túi ngủ
-thước tính
-cửa trượt
-khe
-ống thở
-xe trượt tuyết
-xe cày tuyết
-bình đựng xà phòng
-bóng đá
-tất
-đĩa năng lượng mặt trời
-mũ rộng vành
-bát súp
-quầy bar
-máy sưởi không gian
-tàu con thoi
-xẻng
-tàu cao tốc
-mạng nhện
-trục ​​chính
-xe thể thao
-đèn rọi
-sân khấu
-đầu máy hơi nước
-cầu vòm thép
-trống thép
-ống nghe
-khăn choàng
-tường đá
-đồng hồ bấm giờ
-bếp
-lọc
-xe điện
-cáng
-ghế dài trong studio
-bảo tháp
-tàu ngầm
-bộ đồ
-đồng hồ mặt trời
-kính râm
-kính râm
-kem chống nắng
-cầu treo
-tăm bông
-áo nỉ
-quần bơi
-xích đu
-công tắc
-ống tiêm
-đèn bàn
-bể
-máy nghe băng
-ấm trà
-gấu bông
-tivi
-bóng tennis
-mái tranh
-rèm rạp hát
-thiếc
-máy đập lúa
-ngai vàng
-mái ngói
-máy nướng bánh mì
-cửa hàng thuốc lá
-bệ xí
-đèn pin
-cột totem
-xe kéo
-cửa hàng đồ chơi
-máy kéo
-xe kéo
-xe đầu kéo
-khay
-áo khoác dài
-xe ba bánh
-xe ba thân
-chân máy
-vòm chiến thắng
-xe đẩy
+shopping basket
+shopping cart
+shovel
+shower cap
+shower curtain
+ski
+ski mask
+sleeping bag
+slide rule
+sliding door
+slot
+snorkel
+snowmobile
+snowplow
+soap dispenser
+soccer ball
+sock
+solar dish
+sombrero
+soup bowl
+space bar
+space heater
+space shuttle
+spatula
+speedboat
+spider web
+spindle
+sports car
+spotlight
+stage
+steam locomotive
+steel arch bridge
+steel drum
+stethoscope
+stole
+stone wall
+stopwatch
+stove
+strainer
+streetcar
+stretcher
+studio couch
+stupa
+submarine
+suit
+sundial
+sunglass
+sunglasses
+sunscreen
+suspension bridge
+swab
+sweatshirt
+swimming trunks
+swing
+switch
+syringe
+table lamp
+tank
+tape player
+teapot
+teddy
+television
+tennis ball
+thatch
+theater curtain
+thimble
+thresher
+throne
+tile roof
+toaster
+tobacco shop
+toilet seat
+torch
+totem pole
+tow truck
+toyshop
+tractor
+trailer truck
+tray
+trench coat
+tricycle
+trimaran
+tripod
+triumphal arch
+trolleybus
 trombone
-bồn tắm
-cửa quay
-bàn phím máy đánh chữ
-ô
-xe đạp một bánh
-thẳng đứng
-máy hút bụi
-bình hoa
-hầm
-nhung
-máy bán hàng tự động
-áo lễ
-cầu cạn
-vĩ cầm
-bóng chuyền
-máy làm bánh quế
-đồng hồ treo tường
-ví
-tủ quần áo
-máy bay chiến đấu
-chậu rửa
-máy giặt
-chai nước
-bình đựng nước
-tháp nước
-bình đựng rượu whisky
-còi
-tóc giả
-màn che cửa sổ
-bóng che cửa sổ
-cà vạt Windsor
-chai rượu vang
-cánh
-chảo
-gỗ thìa
-len
-hàng rào sâu
-xác tàu
-thuyền buồm
+tub
+turnstile
+typewriter keyboard
+umbrella
+unicycle
+upright
+vacuum
+vase
+vault
+velvet
+vending machine
+vestment
+viaduct
+violin
+volleyball
+waffle iron
+wall clock
+wallet
+wardrobe
+warplane
+washbasin
+washer
+water bottle
+water jug
+water tower
+whiskey jug
+whistle
+wig
+window screen
+window shade
+Windsor tie
+wine bottle
+wing
+wok
+wooden spoon
+wool
+worm fence
+wreck
+yawl
 yurt
-trang web
-truyện tranh
-trò chơi ô chữ
-biển báo đường phố
-đèn giao thông
-bìa sách
-thực đơn
-đĩa
+web site
+comic book
+crossword puzzle
+street sign
+traffic light
+book jacket
+menu
+plate
 guacamole
 consomme
-lẩu
-trà trifle
-kem
-kem que
-ổ bánh mì Pháp
-bánh mì tròn
-bánh quy xoắn
-bánh mì kẹp phô mai
+hot pot
+trifle
+ice cream
+ice lolly
+French loaf
+bagel
+pretzel
+cheeseburger
 hotdog
-khoai tây nghiền
-bắp cải đầu
-súp lơ xanh
-súp lơ trắng
-bí ngồi
-bí ngồi bí ngồi
-bí ngồi bí ngồi
-dưa chuột
-atisô
-ớt chuông
-cải thảo
-nấm
+mashed potato
+head cabbage
+broccoli
+cauliflower
+zucchini
+spaghetti squash
+acorn squash
+butternut squash
+cucumber
+artichoke
+bell pepper
+cardoon
+mushroom
 Granny Smith
-dâu tây
-cam
-chanh
-vả
-sung
-dứa
-chuối
-mít
-táo sữa
-lựu
-cỏ khô
+strawberry
+orange
+lemon
+fig
+pineapple
+banana
+jackfruit
+custard apple
+pomegranate
+hay
 carbonara
-sốt sô cô la
-bột
-ổ thịt
+chocolate sauce
+dough
+meat loaf
 pizza
 potpie
 burrito
-rượu vang đỏ
+red wine
 espresso
-cốc
-egnog
+cup
+eggnog
 alp
-bong bóng
-vách đá
-san hô rạn san hô
-mạch nước phun
-bờ hồ
-mũi đất nhô ra
-cát bờ biển
-thung lũng
-núi lửa
-cầu thủ bóng chày
-chú rể
-thợ lặn
-hạt cải dầu
-cúc
-giày vàng của bà
-ngô
-quả sồi
-hông
-cây dẻ ngựa
-nấm san hô
-nấm hương
+bubble
+cliff
+coral reef
+geyser
+lakeside
+promontory
+sandbar
+seashore
+valley
+volcano
+ballplayer
+groom
+scuba diver
+rapeseed
+daisy
+yellow lady's slipper
+corn
+acorn
+hip
+buckeye
+coral fungus
+agaric
 gyromitra
-sừng hôi
-sao đất
-gà mái rừng
+stinkhorn
+earthstar
+hen-of-the-woods
 bolete
-tai
-giấy vệ sinh
+ear
+toilet tissue

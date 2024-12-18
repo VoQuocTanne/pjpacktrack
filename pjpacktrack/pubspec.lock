@@ -642,6 +642,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.3"
+  google_mlkit_barcode_scanning:
+    dependency: "direct main"
+    description:
+      name: google_mlkit_barcode_scanning
+      sha256: "5852d1daa007a05b33f99e3e3fa34227c49d9c41bc92a85d820666a57fd5c35f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.13.0"
   google_mlkit_commons:
     dependency: "direct main"
     description:
@@ -650,6 +658,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.0"
+  google_mlkit_image_labeling:
+    dependency: "direct main"
+    description:
+      name: google_mlkit_image_labeling
+      sha256: "9251c91c9281378a4716bb96dc0d3c9f54c0f809577aaba47ef24c52941dc859"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.13.0"
   google_mlkit_object_detection:
     dependency: "direct main"
     description:
@@ -938,14 +954,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
-  mobile_scanner:
-    dependency: "direct main"
-    description:
-      name: mobile_scanner
-      sha256: "728828a798d1a2ee506beb652ca23d974c542c96ed03dcbd5eaf97bef96cdaad"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.2"
   mocktail:
     dependency: transitive
     description:
