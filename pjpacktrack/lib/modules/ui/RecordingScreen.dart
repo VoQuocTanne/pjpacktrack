@@ -62,14 +62,27 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   Future<void> _initializeCamera() async {
     try {
-      if (_cameraController == null ||
-          !_cameraController!.value.isInitialized) {
+      if (_cameraController == null || !_cameraController!.value.isInitialized) {
         _cameraController = CameraController(
           widget.cameras[0],
-          ResolutionPreset.veryHigh,
+          ResolutionPreset.max, // Change to max resolution
           enableAudio: true,
+          imageFormatGroup: ImageFormatGroup.jpeg, // Add format group
         );
+
         await _cameraController!.initialize();
+
+        // Configure video recording settings
+        await _cameraController!.prepareForVideoRecording();
+
+        // Set video resolution if available
+        final available = await availableCameras();
+        if (available.isNotEmpty) {
+          final resolution = available[0].sensorOrientation;
+          // Adjust based on sensor capabilities
+          await _cameraController!.lockCaptureOrientation();
+        }
+
         if (mounted) setState(() {});
       }
     } catch (e) {
