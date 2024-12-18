@@ -68,6 +68,7 @@ dependencies:
   intl: ^0.19.0
   tflite_flutter: ^0.11.0
   #file_picker: ^8.1.4
+  file_picker: ^5.3.3
   kommunicate_flutter: ^1.9.8
   flutter_svg: ^2.0.9
 
@@ -97,6 +98,7 @@ flutter:
   assets:
       - assets/images/
       - packages/pjpacktrack/language/lang/language_text.json
+      - assets/data/product123_MOCK.json
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

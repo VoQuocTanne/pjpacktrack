@@ -105,7 +105,7 @@ class VideoUploader {
     final data = userDoc.data()!;
     final currentQuantity = data['quantity'] ?? 0;
     final rank = data['rank'] ?? 'free';
-    final limit = rank == 'free' ? 50 : (data['limit'] ?? 50);
+    final limit = rank == 'free' ? 650 : (data['limit'] ?? 650);
 
     final newQuantity = currentQuantity + increment;
     if (newQuantity <= limit) {
@@ -160,22 +160,19 @@ class VideoUploader {
     await _incrementQuantity(currentUser.uid, uploadData.length, batch);
     await batch.commit();
 
-    _showMessage(
-        uploadData.length > 1
-            ? 'Tất cả videos đã được cập nhật'
-            : 'Video đã được cập nhật cho đơn hàng'
-    );
+    _showMessage(uploadData.length > 1
+        ? 'Tất cả videos đã được cập nhật'
+        : 'Video đã được cập nhật cho đơn hàng');
   }
 
   Future<void> _handleExistingDocument(
-      DocumentReference docRef,
-      String videoUrl,
-      String videoFileName,
-      String deliveryOption,
-      Map<String, dynamic> data,
-      WriteBatch batch,
-      ) async {
-
+    DocumentReference docRef,
+    String videoUrl,
+    String videoFileName,
+    String deliveryOption,
+    Map<String, dynamic> data,
+    WriteBatch batch,
+  ) async {
     final existingVideos = await docRef
         .collection('videos')
         .where('deliveryOption', isEqualTo: deliveryOption)
@@ -195,9 +192,12 @@ class VideoUploader {
     });
 
     batch.update(docRef, {
-      'closedStatus': deliveryOption == 'Đóng gói' ? true : data['closedStatus'],
-      'shippingStatus': deliveryOption == 'Giao hàng' ? true : data['shippingStatus'],
-      'returnStatus': deliveryOption == 'Trả hàng' ? true : data['returnStatus'],
+      'closedStatus':
+          deliveryOption == 'Đóng gói' ? true : data['closedStatus'],
+      'shippingStatus':
+          deliveryOption == 'Giao hàng' ? true : data['shippingStatus'],
+      'returnStatus':
+          deliveryOption == 'Trả hàng' ? true : data['returnStatus'],
       'lastUpdated': FieldValue.serverTimestamp(), // Thêm thời gian cập nhật
     });
   }
@@ -215,7 +215,7 @@ class VideoUploader {
     batch.set(newDocRef, {
       'code': code,
       'userId': userId,
-      'storeId':storeId,
+      'storeId': storeId,
       'type': isQRCode ? 'QR_CODE' : 'BAR_CODE',
       'closedStatus': deliveryOption == 'Đóng gói',
       'shippingStatus': deliveryOption == 'Giao hàng',
@@ -234,8 +234,35 @@ class VideoUploader {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+    showDialog(
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (context) => Dialog(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.black87,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.info_outline, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                message,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
+
+    Future.delayed(const Duration(milliseconds: 200), () {
+      Navigator.of(context).pop();
+    });
   }
 }

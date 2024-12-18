@@ -4,6 +4,7 @@ import 'package:pjpacktrack/language/app_localizations.dart';
 
 class SettingsListData {
   String titleTxt;
+  String titleminTxt;
   String subTxt;
   String url;
   String iconimg;
@@ -12,6 +13,7 @@ class SettingsListData {
 
   SettingsListData({
     this.titleTxt = '',
+    this.titleminTxt = '',
     this.isSelected = false,
     this.subTxt = '',
     this.url = '',
@@ -178,38 +180,378 @@ class SettingsListData {
   ];
 
   static List<SettingsListData> helpSearchList = [
+    // Shopee
     SettingsListData(
-      titleTxt: "Shoppe",
+      titleTxt: "Shopee",
+      titleminTxt: '',
       subTxt: "",
       iconimg: "assets/images/icons8-shopee.svg",
     ),
+
+    // Danh mục lớn: Tổng quan
     SettingsListData(
-      titleTxt: '',
-      subTxt: "Quy trình hoàn trả của shopee",
-      iconimg: "assets/images/default-icon.svg", // Giá trị mặc định
-      url: "https://banhang.shopee.vn/edu/category?sub_cat_id=251",
+      titleTxt: "Shopee",
+      titleminTxt: 'Tổng quan về quản lý đơn hàng và hoàn trả',
+      subTxt: '',
+      iconimg: "assets/images/default-icon.svg",
     ),
     SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Tổng quan về quản lý đơn hàng và hoàn trả",
+      subTxt: "Quản lý yêu cầu hủy đơn khi vận chuyển",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/21031",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Tổng quan về quản lý đơn hàng và hoàn trả",
+      subTxt: "Tổng quan trang quản lý Trả hàng/Hoàn tiền",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/21021",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Tổng quan về quản lý đơn hàng và hoàn trả",
+      subTxt: "Hướng dẫn Người bán nhận hàng hoàn trả",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/12227",
+    ),
+
+    // Danh mục lớn: Bồi thường & Khiếu nại
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: 'Hướng dẫn bồi thường và khiếu nại',
+      subTxt: '',
+      iconimg: "assets/images/default-icon.svg",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Hướng dẫn bồi thường và khiếu nại",
+      subTxt: "Quy trình Shopee bồi thường đơn 'Chưa nhận được hàng'",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/20822",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Hướng dẫn bồi thường và khiếu nại",
+      subTxt: "Chính sách khiếu nại yêu cầu bồi thường sản phẩm hư hỏng",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/19443",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Hướng dẫn bồi thường và khiếu nại",
+      subTxt: "Hướng dẫn gửi khiếu nại tới Shopee (Shopee Mall)",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/7936",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Hướng dẫn bồi thường và khiếu nại",
+      subTxt: "Hướng dẫn Người bán khiếu nại yêu cầu Trả hàng/Hoàn tiền",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/18501",
+    ),
+
+    // Danh mục lớn: Quản lý trả hàng
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: 'Xử lý các đơn hàng hoàn trả',
+      subTxt: '',
+      iconimg: "assets/images/default-icon.svg",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "Hướng dẫn bổ sung bằng chứng Trả hàng/Hoàn tiền",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/8001",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "Hướng dẫn theo dõi hành trình hàng trả về",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/12227",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "Hướng dẫn thực hiện phản hồi khác khi quản lý Trả hàng",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/7937",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "Hướng dẫn Người bán đề xuất Hoàn tiền ngay (Shopee Mall)",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/7937",
+    ),
+
+    // Danh mục lớn: Chính sách bổ sung
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Chi tiết các chính sách bổ sung",
+      subTxt: "",
+      iconimg: "assets/images/default-icon.svg",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Chi tiết các chính sách bổ sung",
+      subTxt: "Hướng dẫn gửi Khiếu nại tới Shopee (Shopee Mall)",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/7936",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Chi tiết các chính sách bổ sung",
+      subTxt: "Điều kiện và Chính sách bồi thường Shopee",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/5633",
+    ),
+    SettingsListData(
+      titleTxt: "Shopee",
+      titleminTxt: "Chi tiết các chính sách bổ sung",
+      subTxt: "Quy trình Trả hàng/Hoàn tiền dành cho Người bán",
+      iconimg: "assets/images/default-icon.svg",
+      url: "https://banhang.shopee.vn/edu/article/8655",
+    ),
+    // Lazada
+    SettingsListData(
       titleTxt: "Lazada",
+      titleminTxt: "",
       subTxt: "",
       iconimg: "assets/images/icons8-lazada.svg",
     ),
+
+    // Danh mục lớn: Tổng quan quy trình trả hàng
     SettingsListData(
-      titleTxt: '',
-      subTxt: "Quy trình hoàn trả của lazada",
-      iconimg: "assets/images/default-icon.svg", // Giá trị mặc định
-      url:
-          "https://helpcenter.lazada.vn/s/faq/category?categoryId=1000027300&language=vi_VN&m_station=BuyerHelp",
+      titleTxt: "Lazada",
+      titleminTxt: "Tổng quan quy trình trả hàng",
+      subTxt: "",
+      iconimg: "assets/images/default-icon.svg",
     ),
     SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Tổng quan quy trình trả hàng",
+      subTxt: "Hướng dẫn trả hàng về Lazada/LazMall nội địa",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027309&language=vi_VN&m_station=BuyerHelp&questionId=1000140798",
+    ),
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Tổng quan quy trình trả hàng",
+      subTxt: "Làm thế nào để hủy đơn hàng?",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027311&language=vi_VN&m_station=BuyerHelp&questionId=1000140743",
+    ),
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Tổng quan quy trình trả hàng",
+      subTxt: "Thông báo cập nhật thời gian trả hàng",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027309&language=vi_VN&m_station=BuyerHelp&questionId=1000141155",
+    ),
+
+    // Danh mục lớn: Hướng dẫn xử lý khiếu nại & hoàn tiền
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Hướng dẫn xử lý khiếu nại & hoàn tiền",
+      subTxt: "",
+      iconimg: "assets/images/default-icon.svg",
+    ),
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Hướng dẫn xử lý khiếu nại & hoàn tiền",
+      subTxt: "Lazada yêu cầu bổ sung bằng chứng trên hệ thống",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027305&language=vi_VN&m_station=BuyerHelp&questionId=1000140908",
+    ),
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Hướng dẫn xử lý khiếu nại & hoàn tiền",
+      subTxt: "Tại sao yêu cầu trả hàng của tôi bị hủy?",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027306&language=vi_VN&m_station=BuyerHelp&questionId=1000140981",
+    ),
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Hướng dẫn xử lý khiếu nại & hoàn tiền",
+      subTxt: "Lazada mất bao lâu để kiểm định sản phẩm hoàn trả?",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027307&language=vi_VN&m_station=BuyerHelp&questionId=1000140897",
+    ),
+
+    // Danh mục lớn: Chính sách & điều kiện trả hàng
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Chính sách & điều kiện trả hàng",
+      subTxt: "",
+      iconimg: "assets/images/default-icon.svg",
+    ),
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Chính sách & điều kiện trả hàng",
+      subTxt: "Điều kiện và chính sách trả hàng tại Lazada",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027304&language=vi_VN&m_station=BuyerHelp&questionId=1000140967",
+    ),
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Chính sách & điều kiện trả hàng",
+      subTxt: "Cập nhật mới về thuế VAT 8% và mã giảm giá hoàn thuế",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027310&language=vi_VN&m_station=BuyerHelp&questionId=1000140842",
+    ),
+
+    // Danh mục lớn: Xử lý các đơn hàng hoàn trả
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "",
+      iconimg: "assets/images/default-icon.svg",
+    ),
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "Tôi cần làm gì nếu sản phẩm nhận được bị hư hỏng ngoại quan?",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027305&language=vi_VN&m_station=BuyerHelp&questionId=1000140986",
+    ),
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "Tôi cần lưu ý gì khi gửi trả hàng?",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027306&language=vi_VN&m_station=BuyerHelp&questionId=1000140875",
+    ),
+    SettingsListData(
+      titleTxt: "Lazada",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "Nếu quá thời hạn trả hàng, tôi có thể trả hàng được không?",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://helpcenter.lazada.vn/s/faq/knowledge?categoryId=1000027304&language=vi_VN&m_station=BuyerHelp&questionId=1000140667",
+    ),
+    // TikTok
+    SettingsListData(
       titleTxt: "TikTok",
+      titleminTxt: "",
       subTxt: "",
       iconimg: "assets/images/icons8-tiktok.svg",
     ),
+
+    // Danh mục lớn: Quản lý yêu cầu trả hàng/hoàn tiền
     SettingsListData(
-      titleTxt: '',
-      subTxt: "Quy trình hoàn trả của tiktok",
-      iconimg: "assets/images/default-icon.svg", // Giá trị mặc định
+      titleTxt: "TikTok",
+      titleminTxt: "Quản lý yêu cầu trả hàng/hoàn tiền",
+      subTxt: "",
+      iconimg: "assets/images/default-icon.svg",
+    ),
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Quản lý yêu cầu trả hàng/hoàn tiền",
+      subTxt: "Quản lý yêu cầu trả hàng/hoàn tiền",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://seller-vn.tiktok.com/university/essay?knowledge_id=6819122768905985&default_language=vi-VN&identity=1",
+    ),
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Quản lý yêu cầu trả hàng/hoàn tiền",
+      subTxt: "Quản lý yêu cầu trả hàng/hoàn tiền trên ứng dụng",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://seller-vn.tiktok.com/university/essay?knowledge_id=3726084311222032&default_language=vi-VN&identity=1",
+    ),
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Quản lý yêu cầu trả hàng/hoàn tiền",
+      subTxt: "Phương thức trả hàng và hoàn tiền",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://seller-vn.tiktok.com/university/essay?knowledge_id=1398156382422785&default_language=vi-VN&identity=1",
+    ),
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Quản lý yêu cầu trả hàng/hoàn tiền",
+      subTxt: "Hoàn tiền một phần",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://seller-vn.tiktok.com/university/essay?knowledge_id=3325723009222416&default_language=vi-VN&identity=1",
+    ),
+
+    // Danh mục lớn: Hướng dẫn bồi thường và khiếu nại
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Hướng dẫn bồi thường và khiếu nại",
+      subTxt: "",
+      iconimg: "assets/images/default-icon.svg",
+    ),
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Hướng dẫn bồi thường và khiếu nại",
+      subTxt: "Bồi thường tự động cho các yêu cầu trả hàng",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://seller-vn.tiktok.com/university/essay?knowledge_id=6790288090941186&default_language=vi-VN&identity=1",
+    ),
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Hướng dẫn bồi thường và khiếu nại",
+      subTxt: "Khiếu nại yêu cầu trả hàng/hoàn tiền",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://seller-vn.tiktok.com/university/essay?knowledge_id=5104634859620098&default_language=vi-VN&identity=1",
+    ),
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Hướng dẫn bồi thường và khiếu nại",
+      subTxt: "Bằng chứng cần cung cấp để từ chối yêu cầu hậu mãi",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://seller-vn.tiktok.com/university/essay?knowledge_id=6837795793012482&default_language=vi-VN&identity=1",
+    ),
+
+    // Danh mục lớn: Xử lý các đơn hàng hoàn trả
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "",
+      iconimg: "assets/images/default-icon.svg",
+    ),
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "Trả hàng không thành công",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://seller-vn.tiktok.com/university/essay?knowledge_id=8356736328402705&default_language=vi-VN&identity=1",
+    ),
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "Đơn trả hàng và hoàn tiền",
+      iconimg: "assets/images/default-icon.svg",
+      url:
+          "https://seller-vn.tiktok.com/university/essay?knowledge_id=6209644738184961&default_language=vi-VN&identity=1",
+    ),
+    SettingsListData(
+      titleTxt: "TikTok",
+      titleminTxt: "Xử lý các đơn hàng hoàn trả",
+      subTxt: "Nguyên tắc hủy đơn, trả hàng và hoàn tiền trên TikTok Shop",
+      iconimg: "assets/images/default-icon.svg",
       url:
           "https://seller-vn.tiktok.com/university/essay?knowledge_id=6837773789234946&default_language=vi-VN&identity=1",
     ),

@@ -68,8 +68,37 @@ class DeliveryOptionsWidget extends StatelessWidget {
 
   void _handleOptionTap(BuildContext context, String option) {
     onOptionSelected(option);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Đã chọn: $option')),
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (context) => Dialog(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.black87,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check_circle, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Đã chọn: $option',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
+
+    // Tự động đóng sau 2 giây
+    Future.delayed(Duration(milliseconds: 200), () {
+      Navigator.of(context).pop();
+    });
   }
 }

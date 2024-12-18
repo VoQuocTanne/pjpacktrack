@@ -34,104 +34,153 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
                 child: appBar(),
               ),
             ),
+            const SizedBox(height: 22),
+            _buildSearchBar(),
+            const SizedBox(height: 22),
             Expanded(
-                child: ListView.builder(
-              padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom),
-              itemCount: helpSearchList.length,
-              itemBuilder: (context, index) {
-                final item = helpSearchList[index];
-                return InkWell(
-                  onTap: item.subTxt.isNotEmpty
-                      ? () {
-                          NavigationServices(context).gotoViewWeb(item.url);
-                        }
-                      : null,
-                  child: Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8, right: 16),
-                        child: Row(
-                          children: <Widget>[
-                            if (item.titleTxt.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left:
-                                        12.0), // Thêm khoảng cách giữa icon và text
-                                child: SvgPicture.asset(
-                                  index == 0
-                                      ? "assets/images/icons8-shopee.svg"
-                                      : index == 2
-                                          ? "assets/images/icons8-lazada.svg"
-                                          : "assets/images/icons8-tiktok.svg",
-                                  height: 24,
-                                  width: 24,
-                                ),
-                              ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(
-                                  item.titleTxt.isNotEmpty
-                                      ? item.titleTxt
-                                      : item.subTxt,
-                                  style: TextStyles(context)
-                                      .getRegularStyle()
-                                      .copyWith(
-                                        fontWeight: item.titleTxt.isNotEmpty
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        fontSize:
-                                            item.titleTxt.isNotEmpty ? 18 : 14,
-                                      ),
+              child: ListView.builder(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).padding.bottom),
+                itemCount: helpSearchList.length,
+                itemBuilder: (context, index) {
+                  final item = helpSearchList[index];
+
+                  // Shopee, Lazada, TikTok (Danh mục lớn)
+                  if (item.titleTxt.isNotEmpty && item.titleminTxt.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 12.0),
+                            child: SvgPicture.asset(
+                              item.iconimg,
+                              height: 24,
+                              width: 24,
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 12.0),
+                              child: Text(
+                                item.titleTxt,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
                                 ),
                               ),
                             ),
-                            if (item.subTxt.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Icon(
-                                  Icons.keyboard_arrow_right,
-                                  color: Theme.of(context)
-                                      .disabledColor
-                                      .withOpacity(0.3),
-                                ),
-                              ),
-                          ],
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  // Các danh mục con (titleminTxt)
+                  if (item.titleminTxt.isNotEmpty && item.subTxt.isEmpty) {
+                    final subItems = helpSearchList
+                        .where((subItem) =>
+                            subItem.titleTxt == item.titleTxt &&
+                            subItem.titleminTxt == item.titleminTxt &&
+                            subItem.subTxt.isNotEmpty)
+                        .toList();
+
+                    return ExpansionTile(
+                      leading: SvgPicture.asset(
+                        item.iconimg,
+                        height: 24,
+                        width: 24,
+                      ),
+                      title: Text(
+                        item.titleminTxt,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 16, right: 16),
-                        child: Divider(height: 1),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ))
+                      children: subItems.map((subItem) {
+                        return ListTile(
+                          title: Text(subItem.subTxt),
+                          trailing: Icon(
+                            Icons.keyboard_arrow_right,
+                            color: Theme.of(context)
+                                .disabledColor
+                                .withOpacity(0.3),
+                          ),
+                          onTap: () {
+                            if (subItem.url.isNotEmpty) {
+                              NavigationServices(context)
+                                  .gotoViewWeb(subItem.url);
+                            }
+                          },
+                        );
+                      }).toList(),
+                    );
+                  }
+
+                  // Trường hợp không có dữ liệu gì
+                  return const SizedBox.shrink();
+                },
+              ),
+            )
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).primaryColor,
-        onPressed: () async {
-          try {
-            // Cấu hình chatbot với App ID của bạn từ Kommunicate
-            var conversationObject = {
-              'appId':
-                  AwsConfig.appKey, // Thay bằng App ID từ Kommunicate Dashboard
-            };
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 16), // Nâng lên 16px
+        child: FloatingActionButton.extended(
+          backgroundColor: Theme.of(context).primaryColor,
+          onPressed: () async {
+            try {
+              var conversationObject = {
+                'appId': AwsConfig.appKey,
+              };
 
-            dynamic result = await KommunicateFlutterPlugin.buildConversation(
-              conversationObject,
-            );
+              dynamic result = await KommunicateFlutterPlugin.buildConversation(
+                conversationObject,
+              );
 
-            print("Chatbot mở thành công: $result");
-          } catch (e) {
-            print("Lỗi khi mở chatbot: $e");
-          }
-        },
-        child: const Icon(Icons.chat),
+              print("Chatbot mở thành công: $result");
+            } catch (e) {
+              print("Lỗi khi mở chatbot: $e");
+            }
+          },
+          icon: const Icon(Icons.chat),
+          label: const Text(
+            'BOT hỗ trợ',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.search, color: Colors.grey[600]),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  // searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Tìm kiếm',
+                border: InputBorder.none,
+                hintStyle: TextStyle(color: Colors.grey[600]),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

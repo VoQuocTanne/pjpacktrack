@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:pjpacktrack/modules/ui/play_video.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class OrderHistoryScreen extends StatefulWidget {
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   String? searchQuery;
+  String? userName;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +54,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             _buildStatusCards(),
             Expanded(
               child: _buildOrdersList(currentUser.uid),
@@ -80,15 +82,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         final limit = data['limit']?.toString() ?? '0';
 
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
-              _buildStatusCard('Đơn hàng', quantity, Colors.green[100]!),
-              const SizedBox(width: 8),
-              _buildStatusCard('Đóng hàng', quantity, Colors.orange[100]!),
+              _buildStatusCard('Đơn hàng', quantity, Colors.green[100]!,
+                  Icons.assignment_turned_in),
               const SizedBox(width: 8),
               _buildStatusCard(
-                  'Đã tải lên', '$quantity/$limit', Colors.blue[100]!),
+                  'Đóng hàng', quantity, Colors.orange[100]!, Icons.archive),
+              const SizedBox(width: 8),
+              _buildStatusCard('Đã tải lên', '$quantity/$limit',
+                  Colors.blue[100]!, Icons.cloud_upload),
             ],
           ),
         );
@@ -96,7 +100,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
-  Widget _buildStatusCard(String title, String count, Color color) {
+  Widget _buildStatusCard(
+      String title, String count, Color color, IconData icon) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
@@ -106,7 +111,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         ),
         child: Row(
           children: [
-            Icon(Icons.inventory_2, size: 20),
+            Icon(icon, size: 20),
             const SizedBox(width: 4),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,6 +186,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     isQRCode,
                     context,
                     userId,
+                    index,
                   );
                 },
               ),
@@ -222,7 +228,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   }
 
   Widget _buildOrderCard(String code, Map<String, dynamic> data, bool isQRCode,
-      BuildContext context, String userId) {
+      BuildContext context, String userId, int index) {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
@@ -236,8 +242,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildOrderHeader(code, data, isQRCode, context),
-              const Divider(height: 24),
+              _buildOrderHeader(code, data, isQRCode, context, index),
             ],
           ),
         ),
@@ -245,8 +250,46 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName(); // Gọi hàm lấy tên người dùng
+  }
+
+  Future<void> _fetchUserName() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      try {
+        // Truy vấn tên người dùng từ Firestore
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
+
+        if (userDoc.exists) {
+          setState(() {
+            userName =
+                userDoc.data()?['fullname'] ?? 'Không xác định'; // Lưu tên
+          });
+        }
+      } catch (e) {
+        debugPrint('Error fetching user name: $e');
+      }
+    }
+  }
+
   Widget _buildOrderHeader(String code, Map<String, dynamic> data,
-      bool isQRCode, BuildContext context) {
+      bool isQRCode, BuildContext context, int index) {
+    // Lấy logo theo thứ tự
+    String logoAsset;
+    if (index % 3 == 0) {
+      logoAsset =
+          'assets/images/icons8-shopee.svg'; // Shopee cho video đầu tiên
+    } else if (index % 3 == 1) {
+      logoAsset = 'assets/images/icons8-tiktok.svg'; // TikTok cho video thứ hai
+    } else {
+      logoAsset = 'assets/images/icons8-lazada.svg'; // Lazada cho video thứ ba
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -254,16 +297,36 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '${isQRCode ? "Mã đơn hàng" : "Mã đơn hàng"}: $code',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${isQRCode ? "Mã đơn hàng" : "Mã đơn hàng"}: $code',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  // Hiển thị logo dựa trên thứ tự
+                  SvgPicture.asset(
+                    logoAsset,
+                    height: 24,
+                    width: 24,
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
               Text(
                 'Ngày tạo đơn: ${formatDate(data['createDate'])}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Người thực hiện: ${userName ?? 'Đang tải...'}',
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
@@ -326,15 +389,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       spacing: 8,
       children: [
         if (data['closedStatus'] == true)
-          _buildStatusChip('Đóng gói', Colors.blue, () {
+          _buildStatusChip('Đóng gói', Colors.green[100]!, () {
             navigateToVideo('Đóng gói');
           }),
         if (data['shippingStatus'] == true)
-          _buildStatusChip('Giao hàng', Colors.green, () {
+          _buildStatusChip('Giao hàng', Colors.orange[100]!, () {
             navigateToVideo('Giao hàng');
           }),
         if (data['returnStatus'] == true)
-          _buildStatusChip('Trả hàng', Colors.orange, () {
+          _buildStatusChip('Trả hàng', Colors.blue[100]!, () {
             navigateToVideo('Trả hàng');
           }),
       ],
@@ -343,19 +406,31 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
   Widget _buildStatusChip(String label, Color color, VoidCallback onClick) {
     return SizedBox(
-      child: InkWell(
-        onTap: onClick,
-        child: Chip(
-          label: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
+        child: InkWell(
+      onTap: onClick,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(10), // Bo tròn góc
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 2), // Đổ bóng nhẹ
             ),
+          ],
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
           ),
-          backgroundColor: color,
         ),
       ),
-    );
+    ));
   }
 }
