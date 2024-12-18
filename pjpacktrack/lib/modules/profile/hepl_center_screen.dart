@@ -34,6 +34,9 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
                 child: appBar(),
               ),
             ),
+            const SizedBox(height: 22),
+            _buildSearchBar(),
+            const SizedBox(height: 22),
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.only(
@@ -144,9 +147,39 @@ class _HeplCenterScreenState extends State<HeplCenterScreen> {
         },
         icon: const Icon(Icons.chat), // Icon chatbot
         label: const Text(
-          'Chat với Bot',
+          'Liên hệ hỗ trợ',
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ), // Thêm chữ vào nút
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.search, color: Colors.grey[600]),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  // searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: 'Tìm kiếm',
+                border: InputBorder.none,
+                hintStyle: TextStyle(color: Colors.grey[600]),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
