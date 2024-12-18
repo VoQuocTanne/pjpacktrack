@@ -47,7 +47,7 @@ class RecordingScreen extends ConsumerWidget {
           if (state.isScanning) _buildScanner(controller),
 
           // Camera preview chỉ hiển thị khi recording
-          if (state.isRecording && state.isInitialized)
+          if (state.isRecording && state.isInitialized && controller.cameraController != null)
             CameraPreview(controller.cameraController!),
           _buildDeliveryOptions(controller),
           if (!state.isRecording && state.selectedDeliveryOption == null)

@@ -41,15 +41,13 @@ class RecordingController extends StateNotifier<RecordingState> {
   }
 
   void _initializeScannerController() {
-    _scannerController?.dispose();
-
-    _scannerController = MobileScannerController(
-      detectionSpeed: DetectionSpeed.noDuplicates,
-      facing: CameraFacing.back,
-      formats: [BarcodeFormat.qrCode],
-      returnImage: false,
-    );
-  }
+  _scannerController = MobileScannerController(
+    detectionSpeed: DetectionSpeed.noDuplicates,
+    facing: CameraFacing.back,
+    returnImage: false,
+  );
+  debugPrint('Scanner initialized');
+}
 
   Future<void> initializeCamera(List<CameraDescription> cameras) async {
     if (cameras.isEmpty) return;
@@ -68,11 +66,13 @@ class RecordingController extends StateNotifier<RecordingState> {
 
     try {
       await _cameraController!.initialize();
-      state = state.copyWith(isInitialized: true); // Cập nhật state
+      state = state.copyWith(isInitialized: true);
       debugPrint('Camera initialized successfully');
     } catch (e) {
       debugPrint('Camera init error: $e');
       state = state.copyWith(isInitialized: false);
+      await Future.delayed(const Duration(seconds: 2));
+      await initializeCamera(cameras); // Khởi tạo lại camera
     }
   }
 
@@ -81,14 +81,18 @@ class RecordingController extends StateNotifier<RecordingState> {
   }
 
   Future<void> startRecording() async {
-    if (_cameraController != null &&
-        !state.isRecording &&
-        state.isQRCode != STOP_CODE) {
+    if (_scannerController != null) {
+      await _scannerController!.stop();
+      await _scannerController!.dispose();
+      _scannerController = null; // Đảm bảo xóa scanner
+    }
+
+    if (_cameraController != null && !state.isRecording) {
       try {
         await _cameraController!.startVideoRecording();
         state = state.copyWith(
           isRecording: true,
-          isScanning: true, // Giữ scanning mode bật
+          isScanning: false, // Ngừng chế độ quét
         );
       } catch (e) {
         debugPrint('Recording start error: $e');
@@ -98,24 +102,26 @@ class RecordingController extends StateNotifier<RecordingState> {
   }
 
   Future<void> stopAndReset(String storeId) async {
-    if (!state.isRecording || _cameraController == null) return;
+  if (!state.isRecording || _cameraController == null) return;
 
-    try {
-      final lastCode = state.lastScannedCode;
-      final deliveryOption = state.selectedDeliveryOption;
-      final isQR = state.isQRCode;
+  try {
+    debugPrint('Stopping recording...');
+    final videoFile = await _cameraController!.stopVideoRecording();
+    state = state.copyWith(isRecording: false);
 
-      final videoFile = await _cameraController!.stopVideoRecording();
-      state = state.copyWith(isRecording: false);
+    debugPrint('Uploading video...');
+    await _uploadVideo(videoFile, storeId, state.lastScannedCode!,
+        state.selectedDeliveryOption!, state.isQRCode);
 
-      await _uploadVideo(videoFile, storeId, lastCode!, deliveryOption!, isQR);
-      await _resetAfterUpload();
-    } catch (e) {
-      debugPrint('Stop recording error: $e');
-      state = state.copyWith(isRecording: false);
-      rethrow;
-    }
+    debugPrint('Resetting controllers...');
+    await _resetAfterUpload();
+    debugPrint('Reset complete, ready for new recording.');
+  } catch (e) {
+    debugPrint('Stop recording error: $e');
+    state = state.copyWith(isRecording: false);
+    rethrow;
   }
+}
 
   Future<void> _uploadVideo(XFile videoFile, String storeId, String lastCode,
       String deliveryOption, bool isQR) async {
@@ -135,27 +141,35 @@ class RecordingController extends StateNotifier<RecordingState> {
   }
 
   Future<void> _resetAfterUpload() async {
-    await _cleanupControllers();
-    _initializeScannerController();
-    await _scannerController?.start();
+  await _cleanupControllers(); // Dọn dẹp controller
+  _initializeScannerController(); // Khởi tạo lại scanner
 
-    state = state.copyWith(
-        isRecording: false,
-        isScanning: true,
-        lastScannedCode: null,
-        selectedDeliveryOption: null);
+  if (_cameras != null) {
+    await initializeCamera(_cameras!); // Khởi tạo lại camera
   }
+
+  state = state.copyWith(
+    isRecording: false,
+    isScanning: true,
+    isInitialized: true, // Cập nhật lại trạng thái
+    lastScannedCode: null,
+    selectedDeliveryOption: null,
+  );
+}
 
   Future<void> _cleanupControllers() async {
     try {
+      if (_scannerController != null) {
+        await _scannerController!.stop();
+        await _scannerController!.dispose();
+        _scannerController = null;
+      }
+
       if (_cameraController != null) {
         await _cameraController!.dispose();
         _cameraController = null;
       }
-      if (_scannerController != null) {
-        await _scannerController!.dispose();
-        _scannerController = null;
-      }
+
       state = const RecordingState();
     } catch (e) {
       debugPrint('Cleanup error: $e');
