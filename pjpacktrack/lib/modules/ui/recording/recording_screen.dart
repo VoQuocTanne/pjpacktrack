@@ -41,19 +41,18 @@ class RecordingScreen extends ConsumerWidget {
         ],
       ),
       body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Scanner luôn hiển thị khi isScanning = true
-          if (state.isScanning) _buildScanner(controller),
+  fit: StackFit.expand,
+  children: [
+    if (state.isInitialized && state.isScanning) 
+      MobileScanner(controller: controller.scannerController),
+    
+    if (state.isInitialized && state.isRecording && controller.cameraController != null) 
+      CameraPreview(controller.cameraController!),
 
-          // Camera preview chỉ hiển thị khi recording
-          if (state.isRecording && state.isInitialized && controller.cameraController != null)
-            CameraPreview(controller.cameraController!),
-          _buildDeliveryOptions(controller),
-          if (!state.isRecording && state.selectedDeliveryOption == null)
-            const StartPrompt(),
-        ],
-      ),
+    if (!state.isInitialized || (!state.isRecording && !state.isScanning))
+      const StartPrompt(), // Hiển thị prompt mặc định
+  ],
+),
       bottomNavigationBar: _buildBottomBar(context, state, controller),
     );
   }
