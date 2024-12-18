@@ -59,15 +59,52 @@ class _BottomTabScreenState extends State<BottomTabScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: Container(
+        height: 65,
+        width: 65,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).primaryColor,
+              Theme.of(context).primaryColor.withOpacity(0.8),
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).primaryColor.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => tabClick(BottomBarType.camqr),
+            customBorder: const CircleBorder(),
+            child: const Center(
+              child: Icon(
+                FontAwesomeIcons.qrcode,
+                color: Colors.white,
+                size: 35,
+              ),
+            ),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: SizedBox(
           height: 60 + MediaQuery.of(context).padding.bottom,
           child: getBottomBarUI(bottomBarType)),
       body: _isFirstTime
           ? const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-              ),
-            )
+        child: CircularProgressIndicator(
+          strokeWidth: 5,
+        ),
+      )
           : _indexView,
     );
   }
@@ -125,23 +162,17 @@ class _BottomTabScreenState extends State<BottomTabScreen>
               TabButtonUI(
                 icon: FontAwesomeIcons.users,
                 isSelected: tabType == BottomBarType.forum,
-                text: 'Diễn đàn', // Text for Store
+                text: 'Diễn đàn',
                 onTap: () {
                   tabClick(BottomBarType.forum);
                 },
               ),
+              // Add spacer for the floating action button
+              const SizedBox(width: 40),
               TabButtonUI(
-                icon: FontAwesomeIcons.qrcode,
-                isSelected: tabType == BottomBarType.camqr,
-                text: Loc.alized.trips,
-                onTap: () {
-                  tabClick(BottomBarType.camqr);
-                },
-              ),
-              TabButtonUI(
-                icon: FontAwesomeIcons.headset, // Icon cho Help Center
+                icon: FontAwesomeIcons.headset,
                 isSelected: tabType == BottomBarType.helpCenter,
-                text: 'Hỗ trợ', // Text cho Help Center
+                text: 'Hỗ trợ',
                 onTap: () {
                   tabClick(BottomBarType.helpCenter);
                 },
