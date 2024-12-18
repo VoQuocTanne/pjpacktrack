@@ -55,7 +55,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             _buildStatusCards(),
             Expanded(
               child: _buildOrdersList(currentUser.uid),
@@ -83,7 +83,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         final limit = data['limit']?.toString() ?? '0';
 
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
               _buildStatusCard('Đơn hàng', quantity, Colors.green[100]!,

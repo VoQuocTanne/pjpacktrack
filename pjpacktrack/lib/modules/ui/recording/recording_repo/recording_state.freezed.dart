@@ -24,6 +24,7 @@ mixin _$RecordingState {
   bool get continuousRecording => throw _privateConstructorUsedError;
   String? get lastScannedCode => throw _privateConstructorUsedError;
   String? get selectedDeliveryOption => throw _privateConstructorUsedError;
+  String? get productName => throw _privateConstructorUsedError;
   List<String> get videoPaths => throw _privateConstructorUsedError;
   bool get isContinuousScanning => throw _privateConstructorUsedError;
 
@@ -49,6 +50,7 @@ abstract class $RecordingStateCopyWith<$Res> {
       bool continuousRecording,
       String? lastScannedCode,
       String? selectedDeliveryOption,
+      String? productName,
       List<String> videoPaths,
       bool isContinuousScanning});
 }
@@ -76,6 +78,7 @@ class _$RecordingStateCopyWithImpl<$Res, $Val extends RecordingState>
     Object? continuousRecording = null,
     Object? lastScannedCode = freezed,
     Object? selectedDeliveryOption = freezed,
+    Object? productName = freezed,
     Object? videoPaths = null,
     Object? isContinuousScanning = null,
   }) {
@@ -112,6 +115,10 @@ class _$RecordingStateCopyWithImpl<$Res, $Val extends RecordingState>
           ? _value.selectedDeliveryOption
           : selectedDeliveryOption // ignore: cast_nullable_to_non_nullable
               as String?,
+      productName: freezed == productName
+          ? _value.productName
+          : productName // ignore: cast_nullable_to_non_nullable
+              as String?,
       videoPaths: null == videoPaths
           ? _value.videoPaths
           : videoPaths // ignore: cast_nullable_to_non_nullable
@@ -141,6 +148,7 @@ abstract class _$$RecordingStateImplCopyWith<$Res>
       bool continuousRecording,
       String? lastScannedCode,
       String? selectedDeliveryOption,
+      String? productName,
       List<String> videoPaths,
       bool isContinuousScanning});
 }
@@ -166,6 +174,7 @@ class __$$RecordingStateImplCopyWithImpl<$Res>
     Object? continuousRecording = null,
     Object? lastScannedCode = freezed,
     Object? selectedDeliveryOption = freezed,
+    Object? productName = freezed,
     Object? videoPaths = null,
     Object? isContinuousScanning = null,
   }) {
@@ -202,6 +211,10 @@ class __$$RecordingStateImplCopyWithImpl<$Res>
           ? _value.selectedDeliveryOption
           : selectedDeliveryOption // ignore: cast_nullable_to_non_nullable
               as String?,
+      productName: freezed == productName
+          ? _value.productName
+          : productName // ignore: cast_nullable_to_non_nullable
+              as String?,
       videoPaths: null == videoPaths
           ? _value._videoPaths
           : videoPaths // ignore: cast_nullable_to_non_nullable
@@ -226,6 +239,7 @@ class _$RecordingStateImpl implements _RecordingState {
       this.continuousRecording = false,
       this.lastScannedCode,
       this.selectedDeliveryOption,
+      this.productName,
       final List<String> videoPaths = const [],
       this.isContinuousScanning = false})
       : _videoPaths = videoPaths;
@@ -252,6 +266,8 @@ class _$RecordingStateImpl implements _RecordingState {
   final String? lastScannedCode;
   @override
   final String? selectedDeliveryOption;
+  @override
+  final String? productName;
   final List<String> _videoPaths;
   @override
   @JsonKey()
@@ -267,7 +283,7 @@ class _$RecordingStateImpl implements _RecordingState {
 
   @override
   String toString() {
-    return 'RecordingState(isRecording: $isRecording, isScanning: $isScanning, isFlashOn: $isFlashOn, isQRCode: $isQRCode, isInitialized: $isInitialized, continuousRecording: $continuousRecording, lastScannedCode: $lastScannedCode, selectedDeliveryOption: $selectedDeliveryOption, videoPaths: $videoPaths, isContinuousScanning: $isContinuousScanning)';
+    return 'RecordingState(isRecording: $isRecording, isScanning: $isScanning, isFlashOn: $isFlashOn, isQRCode: $isQRCode, isInitialized: $isInitialized, continuousRecording: $continuousRecording, lastScannedCode: $lastScannedCode, selectedDeliveryOption: $selectedDeliveryOption, productName: $productName, videoPaths: $videoPaths, isContinuousScanning: $isContinuousScanning)';
   }
 
   @override
@@ -291,6 +307,8 @@ class _$RecordingStateImpl implements _RecordingState {
                 other.lastScannedCode == lastScannedCode) &&
             (identical(other.selectedDeliveryOption, selectedDeliveryOption) ||
                 other.selectedDeliveryOption == selectedDeliveryOption) &&
+            (identical(other.productName, productName) ||
+                other.productName == productName) &&
             const DeepCollectionEquality()
                 .equals(other._videoPaths, _videoPaths) &&
             (identical(other.isContinuousScanning, isContinuousScanning) ||
@@ -308,6 +326,7 @@ class _$RecordingStateImpl implements _RecordingState {
       continuousRecording,
       lastScannedCode,
       selectedDeliveryOption,
+      productName,
       const DeepCollectionEquality().hash(_videoPaths),
       isContinuousScanning);
 
@@ -331,6 +350,7 @@ abstract class _RecordingState implements RecordingState {
       final bool continuousRecording,
       final String? lastScannedCode,
       final String? selectedDeliveryOption,
+      final String? productName,
       final List<String> videoPaths,
       final bool isContinuousScanning}) = _$RecordingStateImpl;
 
@@ -350,6 +370,8 @@ abstract class _RecordingState implements RecordingState {
   String? get lastScannedCode;
   @override
   String? get selectedDeliveryOption;
+  @override
+  String? get productName;
   @override
   List<String> get videoPaths;
   @override

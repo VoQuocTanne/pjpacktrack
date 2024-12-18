@@ -36,33 +36,78 @@ class RecordingScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: Icon(state.isFlashOn ? Icons.flash_on : Icons.flash_off),
-            onPressed: controller.toggleFlash,
+            onPressed:
+                ref.read(recordingControllerProvider.notifier).toggleFlash,
           ),
         ],
       ),
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Scanner luôn hiển thị khi isScanning = true
-          if (state.isScanning) _buildScanner(controller),
-
-          // Camera preview chỉ hiển thị khi recording
+          if (state.isScanning)
+            MobileScanner(
+              controller: ref
+                  .read(recordingControllerProvider.notifier)
+                  .scannerController,
+              onDetect: ref
+                  .read(recordingControllerProvider.notifier)
+                  .handleBarcodeDetection,
+            ),
           if (state.isRecording && state.isInitialized)
-            CameraPreview(controller.cameraController!),
-          _buildDeliveryOptions(controller),
+            CameraPreview(ref
+                .read(recordingControllerProvider.notifier)
+                .cameraController!),
+          if (state.productName != null)
+            _buildProductNameOverlay(state.productName!),
+          _buildDeliveryOptions(ref.read(recordingControllerProvider.notifier)),
           if (!state.isRecording && state.selectedDeliveryOption == null)
             const StartPrompt(),
         ],
       ),
-      bottomNavigationBar: _buildBottomBar(context, state, controller),
+      bottomNavigationBar: _buildBottomBar(
+          context, state, ref.read(recordingControllerProvider.notifier)),
+    );
+  }
+
+  Widget _buildProductNameOverlay(String productName) {
+    // Chia danh sách sản phẩm thành từng dòng
+    final List<String> productList = productName.split(',');
+
+    return Positioned(
+      top: 82,
+      left: 0, // Sát lề trái của màn hình
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.black26,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // Căn lề trái các sản phẩm
+          children: [
+            for (var product in productList) // Duyệt qua từng sản phẩm
+              Padding(
+                padding: const EdgeInsets.only(
+                    bottom: 4), // Khoảng cách giữa các dòng
+                child: Text(
+                  product.trim(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildScanner(RecordingController controller) {
     return MobileScanner(
       controller: controller.scannerController,
-            onDetect: controller.handleBarcodeDetection,
-
+      onDetect: controller.handleBarcodeDetection,
       errorBuilder: (context, error, child) {
         return Center(child: Text('Scanner error: $error'));
       },
@@ -77,7 +122,7 @@ class RecordingScreen extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.4),
+          color: Colors.black.withOpacity(0),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(12),
             bottomLeft: Radius.circular(12),

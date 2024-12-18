@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:aws_storage_service/aws_storage_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:camera/camera.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -34,10 +37,12 @@ class RecordingController extends StateNotifier<RecordingState> {
   List<CameraDescription>? _cameras;
   String? _currentStoreId;
   late final VideoUploadNotifier _uploader;
+  Map<String, List<String>> _productData = {};
 
   RecordingController(this.ref) : super(const RecordingState()) {
     _uploader = ref.read(videoUploadProvider.notifier);
     _initializeScannerController();
+    loadProductData();
   }
 
   void _initializeScannerController() {
@@ -181,6 +186,25 @@ class RecordingController extends StateNotifier<RecordingState> {
     state = state.copyWith(selectedDeliveryOption: option);
   }
 
+  Future<void> loadProductData() async {
+    try {
+      final jsonString =
+          await rootBundle.loadString('assets/data/product123_MOCK.json');
+      final List<dynamic> jsonData = json.decode(jsonString);
+      _productData = {
+        for (var item in jsonData)
+          item['codeId'] as String:
+              List<String>.from(item['productName'] as List)
+      };
+    } catch (e) {
+      debugPrint('Error loading product data: $e');
+    }
+  }
+
+  String? getProductName(String codeId) {
+    return _productData[codeId]?.join(', ');
+  }
+
   Future<void> handleBarcodeDetection(BarcodeCapture capture) async {
     final barcodes = capture.barcodes;
     if (barcodes.isEmpty) return;
@@ -191,23 +215,23 @@ class RecordingController extends StateNotifier<RecordingState> {
     if (code == null) return;
 
     try {
-      debugPrint('Detected code: $code'); // Log để debug
-      debugPrint('Current state: ${state.toString()}'); // Log state hiện tại
+      debugPrint('Detected code: $code');
+
+      final productName = getProductName(code);
+      state = state.copyWith(
+        lastScannedCode: code,
+        isQRCode: barcode.format == BarcodeFormat.qrCode,
+        productName: productName, // Lưu tên sản phẩm nếu tìm thấy
+      );
 
       if (state.isRecording) {
         if (code == STOP_CODE && _currentStoreId != null) {
-          debugPrint(
-              'STOP_CODE detected, stopping recording'); // Log khi phát hiện STOP_CODE
           await stopAndReset(_currentStoreId!);
         }
         return;
       }
 
       if (state.selectedDeliveryOption != null) {
-        state = state.copyWith(
-          lastScannedCode: code,
-          isQRCode: barcode.format == BarcodeFormat.qrCode,
-        );
         await startRecording();
       }
     } catch (e) {

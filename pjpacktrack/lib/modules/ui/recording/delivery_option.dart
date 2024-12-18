@@ -10,36 +10,33 @@ class DeliveryOptionsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _buildOptionButton(
-            context,
-            'Đóng gói',
-            Icons.inventory_2,
-            Colors.blue[100]!,
-            () => _handleOptionTap(context, 'Đóng gói'),
-          ),
-          const SizedBox(width: 20),
-          _buildOptionButton(
-            context,
-            'Giao hàng',
-            Icons.local_shipping,
-            Colors.green[100]!,
-            () => _handleOptionTap(context, 'Giao hàng'),
-          ),
-          const SizedBox(width: 20),
-          _buildOptionButton(
-            context,
-            'Trả hàng',
-            Icons.assignment_return,
-            Colors.orange[100]!,
-            () => _handleOptionTap(context, 'Trả hàng'),
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildOptionButton(
+          context,
+          'Đóng gói',
+          Icons.inventory_2,
+          Colors.blue[100]!,
+          () => _handleOptionTap(context, 'Đóng gói'),
+        ),
+        const SizedBox(width: 20),
+        _buildOptionButton(
+          context,
+          'Giao hàng',
+          Icons.local_shipping,
+          Colors.green[100]!,
+          () => _handleOptionTap(context, 'Giao hàng'),
+        ),
+        const SizedBox(width: 20),
+        _buildOptionButton(
+          context,
+          'Trả hàng',
+          Icons.assignment_return,
+          Colors.orange[100]!,
+          () => _handleOptionTap(context, 'Trả hàng'),
+        ),
+      ],
     );
   }
 

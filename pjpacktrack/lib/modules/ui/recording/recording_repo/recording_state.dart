@@ -14,6 +14,7 @@ class RecordingState with _$RecordingState {
     @Default(false) bool continuousRecording,
     String? lastScannedCode,
     String? selectedDeliveryOption,
+    String? productName,
     @Default([]) List<String> videoPaths,
     @Default(false) bool isContinuousScanning,
   }) = _RecordingState;
