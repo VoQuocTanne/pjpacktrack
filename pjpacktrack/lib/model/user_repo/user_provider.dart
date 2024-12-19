@@ -10,10 +10,9 @@ final userServiceProvider = Provider<UserService>((ref) {
 });
 
 // Provider for fetching MyUser data
-final userProvider =
-    FutureProvider.family<MyUser?, String>((ref, userId) async {
+final userProvider = StreamProvider.family<MyUser?, String>((ref, userId) {
   final userService = ref.watch(userServiceProvider);
-  return userService.fetchUser(userId);
+  return userService.streamUser(userId); // Hàm này trả về một Stream<MyUser?>
 });
 // Provider for uploading a profile picture and updating user's picture URL
 final uploadPictureProvider =
@@ -27,7 +26,8 @@ final uploadUserProvider =
   final userService = ref.watch(userServiceProvider);
   userService.updateUser(params);
 });
-Future<void> updateUserPackage(String userId, String packageId, int videoLimit) async {
+Future<void> updateUserPackage(
+    String userId, String packageId, int videoLimit) async {
   try {
     final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
 

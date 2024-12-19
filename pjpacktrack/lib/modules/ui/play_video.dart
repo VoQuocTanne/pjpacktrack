@@ -66,7 +66,7 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Xem Video'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: _hasError
           ? _buildErrorUI()
@@ -122,8 +122,8 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
                   _controller,
                   allowScrubbing: true,
                   colors: VideoProgressColors(
-                    playedColor: Colors.teal,
-                    bufferedColor: Colors.teal.withOpacity(0.2),
+                    playedColor: Theme.of(context).primaryColor,
+                    bufferedColor: Theme.of(context).primaryColor,
                     backgroundColor: Colors.grey.shade300,
                   ),
                 ),
@@ -137,7 +137,7 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
                         _controller.value.isPlaying
                             ? Icons.pause
                             : Icons.play_arrow,
-                        color: Colors.teal,
+                        color: Color(0xFF284B8C),
                       ),
                       onPressed: () {
                         if (_controller.value.isInitialized) {
@@ -151,7 +151,7 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
                     ),
                     IconButton(
                       iconSize: 32,
-                      icon: const Icon(Icons.replay, color: Colors.teal),
+                      icon: const Icon(Icons.replay, color: Color(0xFF284B8C)),
                       onPressed: () {
                         if (_controller.value.isInitialized) {
                           _controller.seekTo(Duration.zero);
@@ -162,7 +162,7 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
                     // Thêm nút copy URL
                     IconButton(
                       iconSize: 32,
-                      icon: const Icon(Icons.copy, color: Colors.teal),
+                      icon: const Icon(Icons.copy, color: Color(0xFF284B8C)),
                       onPressed: () {
                         if (_videoUrl != null) {
                           Clipboard.setData(ClipboardData(text: _videoUrl!));

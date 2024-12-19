@@ -5,11 +5,12 @@ import 'package:pjpacktrack/model/user_repo/my_user.dart';
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<MyUser?> fetchUser(String userId) async {
-    try {
-      DocumentSnapshot<Map<String, dynamic>> snapshot =
-          await _firestore.collection('users').doc(userId).get();
-
+  Stream<MyUser?> streamUser(String userId) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .snapshots()
+        .map((snapshot) {
       if (snapshot.exists) {
         final data = snapshot.data();
         if (data != null) {
@@ -35,10 +36,7 @@ class UserService {
         }
       }
       return null;
-    } catch (e) {
-      print("Error fetching user: $e");
-      return null;
-    }
+    });
   }
 
   Future<void> updateUser(MyUser user) async {
