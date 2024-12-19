@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_url_shortener/bitly.dart';
 import 'package:video_player/video_player.dart';
 
 class AwsVideoPlayer extends StatefulWidget {
@@ -125,7 +126,7 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
                   allowScrubbing: true,
                   colors: VideoProgressColors(
                     playedColor: Theme.of(context).primaryColor,
-                    bufferedColor: Theme.of(context).primaryColor,
+                    bufferedColor: Color(0xFF284B8C).withOpacity(0.2),
                     backgroundColor: Colors.grey.shade300,
                   ),
                 ),
@@ -165,22 +166,36 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
                     IconButton(
                       iconSize: 32,
                       icon: const Icon(Icons.copy, color: Color(0xFF284B8C)),
-                      onPressed: () {
-                        if (_videoUrl != null && widget.orderCode != null) {
-                          // Tạo text chứa mã đơn hàng và URL
-                          final String copyText =
-                              'Mã đơn hàng: ${widget.orderCode}\nURL: $_videoUrl';
+                      onPressed: () async {
+                        if (_videoUrl != null && widget.orderCode.isNotEmpty) {
+                          try {
+                            // Rút gọn URL
+                            final String shortUrl =
+                                await shortenUrl(_videoUrl!);
 
-                          // Sao chép text vào Clipboard
-                          Clipboard.setData(ClipboardData(text: copyText));
+                            // Tạo nội dung sao chép
+                            final String copyText =
+                                'Mã đơn hàng: ${widget.orderCode}\nURL: $shortUrl';
 
-                          // Hiển thị SnackBar với thông báo đã sao chép
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Đã sao chép:\n$copyText'),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
+                            // Sao chép nội dung vào Clipboard
+                            Clipboard.setData(ClipboardData(text: copyText));
+
+                            // Hiển thị SnackBar
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Đã sao chép:\n$copyText'),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          } catch (e) {
+                            // Hiển thị lỗi nếu không rút gọn được URL
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Lỗi khi rút gọn URL: $e'),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          }
                         } else {
                           // Hiển thị thông báo nếu thiếu dữ liệu
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -210,5 +225,21 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
       _controller.dispose();
     }
     super.dispose();
+  }
+}
+
+Future<String> shortenUrl(String longUrl) async {
+  try {
+    // Cấu hình với token
+    FShort.instance.setup(token: 'YOUR_API_TOKEN');
+
+    // Gọi hàm rút gọn URL
+    final result = await FShort.instance.generateShortenURL(longUrl: longUrl);
+
+    // Trả về URL rút gọn
+    return result.link ?? 'Lỗi: Không thể rút gọn URL';
+  } catch (e) {
+    print('Lỗi khi rút gọn URL: $e');
+    throw Exception('Không thể rút gọn URL');
   }
 }

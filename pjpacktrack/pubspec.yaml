@@ -71,6 +71,7 @@ dependencies:
   file_picker: ^5.3.3
   kommunicate_flutter: ^1.9.8
   flutter_svg: ^2.0.9
+  flutter_url_shortener: ^2.0.0
 
 dev_dependencies:
   flutter_test:
