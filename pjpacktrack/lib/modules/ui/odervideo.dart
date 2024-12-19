@@ -138,8 +138,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           return const Center(child: CircularProgressIndicator());
         }
 
+        // Lấy danh sách đơn hàng từ dữ liệu
         var orders = snapshot.data!.docs;
 
+        // Lọc nếu có từ khóa tìm kiếm
         if (searchQuery != null && searchQuery!.isNotEmpty) {
           orders = orders.where((order) {
             final data = order.data() as Map<String, dynamic>;
@@ -147,6 +149,21 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             return code.toLowerCase().contains(searchQuery!.toLowerCase());
           }).toList();
         }
+
+        // Sắp xếp danh sách theo thời gian giảm dần
+        orders.sort((a, b) {
+          final aData = a.data() as Map<String, dynamic>;
+          final bData = b.data() as Map<String, dynamic>;
+
+          final aTimestamp = aData['createDate'] as Timestamp?;
+          final bTimestamp = bData['createDate'] as Timestamp?;
+
+          if (aTimestamp == null || bTimestamp == null) {
+            return 0; // Không sắp xếp nếu thiếu dữ liệu
+          }
+
+          return bTimestamp.compareTo(aTimestamp);
+        });
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +192,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 itemBuilder: (context, index) {
                   final order = orders[index];
                   final data = order.data() as Map<String, dynamic>;
-                  // Thêm document ID vào data
                   data['id'] = order.id; // Thêm ID document vào data
                   final code = data['code'].toString();
                   final isQRCode = data['isQRCode'] ?? false;
