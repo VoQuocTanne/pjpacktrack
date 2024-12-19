@@ -295,67 +295,67 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   }
 
   Widget _buildOrderHeader(String code, Map<String, dynamic> data,
-      bool isQRCode, BuildContext context, int index) {
-    // Lấy logo theo thứ tự
-    String logoAsset;
-    if (index % 3 == 0) {
-      logoAsset =
-          'assets/images/icons8-shopee.svg'; // Shopee cho video đầu tiên
-    } else if (index % 3 == 1) {
-      logoAsset = 'assets/images/icons8-tiktok.svg'; // TikTok cho video thứ hai
-    } else {
-      logoAsset = 'assets/images/icons8-lazada.svg'; // Lazada cho video thứ ba
-    }
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '${isQRCode ? "Mã đơn hàng" : "Mã đơn hàng"}: $code',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+    bool isQRCode, BuildContext context, int index) {
+  // Lấy logo theo chữ cái đầu tiên của mã đơn hàng
+  String logoAsset;
+  if (code.isNotEmpty && code.substring(0, 1).toUpperCase() == 'S') {
+    logoAsset = 'assets/images/icons8-shopee.svg'; // Icon Shopee
+  } else if (code.substring(0, 1).toUpperCase() == 'L') {
+    logoAsset = 'assets/images/icons8-lazada.svg'; // Icon Lazada
+  } else {
+    logoAsset = 'assets/images/icons8-tiktok.svg'; // Icon TikTok
+  }
+
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${isQRCode ? "Mã QR" : "Mã đơn hàng"}: $code',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  // Hiển thị logo dựa trên thứ tự
-                  SvgPicture.asset(
-                    logoAsset,
-                    height: 24,
-                    width: 24,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Ngày tạo đơn: ${formatDate(data['createDate'])}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Người thực hiện: ${userName ?? 'Đang tải...'}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+                // Hiển thị logo theo mã đơn hàng
+                SvgPicture.asset(
+                  logoAsset,
+                  height: 24,
+                  width: 24,
                 ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Ngày tạo đơn: ${formatDate(data['createDate'])}',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
               ),
-              const SizedBox(height: 8),
-              _buildStatusChips(data, context),
-            ],
-          ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Người thực hiện: ${data['fullname'] ?? 'Trần Thanh Nguyên'}',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 8),
+            _buildStatusChips(data, context),
+          ],
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
   String formatDate(dynamic timestamp) {
     if (timestamp == null) return 'N/A';
@@ -376,7 +376,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     print('Data received: $data');
 
     final orderId = data['id'] ?? '';
-
+    final orderCode = data['code'] ?? '';
     print('OrderId: $orderId');
 
     void navigateToVideo(String deliveryOption) {
@@ -396,6 +396,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           builder: (context) => AwsVideoPlayer(
             orderId: orderId,
             deliveryOption: deliveryOption,
+            orderCode : orderCode
           ),
         ),
       );

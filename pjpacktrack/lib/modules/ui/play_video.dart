@@ -6,9 +6,11 @@ import 'package:video_player/video_player.dart';
 class AwsVideoPlayer extends StatefulWidget {
   final String orderId;
   final String deliveryOption;
+  final String orderCode;
   const AwsVideoPlayer({
     super.key,
     required this.orderId,
+    required this.orderCode,
     required this.deliveryOption,
   });
 
@@ -164,17 +166,33 @@ class _AwsVideoPlayerState extends State<AwsVideoPlayer> {
                       iconSize: 32,
                       icon: const Icon(Icons.copy, color: Color(0xFF284B8C)),
                       onPressed: () {
-                        if (_videoUrl != null) {
-                          Clipboard.setData(ClipboardData(text: _videoUrl!));
+                        if (_videoUrl != null && widget.orderCode != null) {
+                          // Tạo text chứa mã đơn hàng và URL
+                          final String copyText =
+                              'Mã đơn hàng: ${widget.orderCode}\nURL: $_videoUrl';
+
+                          // Sao chép text vào Clipboard
+                          Clipboard.setData(ClipboardData(text: copyText));
+
+                          // Hiển thị SnackBar với thông báo đã sao chép
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Đã sao chép:\n$copyText'),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        } else {
+                          // Hiển thị thông báo nếu thiếu dữ liệu
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Đã sao chép đường dẫn video'),
+                              content: Text(
+                                  'Không thể sao chép. Thiếu mã đơn hàng hoặc URL!'),
                               duration: Duration(seconds: 2),
                             ),
                           );
                         }
                       },
-                      tooltip: 'Sao chép đường dẫn video',
+                      tooltip: 'Sao chép đường dẫn video và mã đơn hàng',
                     ),
                   ],
                 ),
